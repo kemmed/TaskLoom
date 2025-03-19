@@ -1,22 +1,129 @@
-html {
-  font-size: 14px;
-}
-
 @media (min-width: 768px) {
-  html {
-    font-size: 16px;
-  }
+    html {
+        font-size: 16px;
+    }
 }
 
-.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+* {
+    margin: 0;
 }
 
-html {
-  position: relative;
-  min-height: 100%;
+html,
+body {
+    min-height: 100vh;
 }
 
 body {
-  margin-bottom: 60px;
+    background: #f9f9f9;
+    color: #333;
+    font-family: Helvetica, Arial, sans-serif;
 }
+
+.text-success {
+    color: #28a745;
+}
+
+.text-danger {
+    color: #dc3545;
+}
+
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 5px;
+    border-bottom: 1px solid #ddd;
+    background-color: #ffffff;
+}
+
+h1 {
+    font-size: 24px;
+    color: #333;
+}
+
+.input-form__label {
+    margin-bottom: 40px;
+    position: relative;
+}
+
+.input-placeholder {
+    position: absolute;
+    color: #aaa;
+    cursor: text;
+    font-size: 16px;
+    top: 9px;
+    transition: all 0.2s;
+}
+
+    .input-placeholder.focus {
+        top: -12px;
+        font-size: 12px;
+    }
+
+.form__input {
+    position: relative;
+    width: 260px;
+    height: 40px;
+    background: transparent;
+    color: #57606a;
+    box-sizing: border-box;
+    font-size: 16px;
+    outline: none;
+    border: none;
+    box-shadow: 0 1px 0 0 #666;
+}
+
+    .form__input.focus {
+        border-color: #007bff;
+    }
+
+.input-select {
+    appearance: none;
+    background: #ffffff;
+    color: #333;
+    width: 240px;
+    height: 40px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: border-color 0.2s;
+}
+
+    .input-select:focus {
+        outline: none;
+        border-color: #007bff;
+    }
+
+    .input-select option {
+        background: #ffffff;
+        color: #333;
+    }
+
+        .input-select option:hover {
+            background: #007bff;
+            color: #ffffff;
+        }
+
+.jquery-modal .modal.delete {
+    position: fixed;
+    top: 35%;
+    left: 38%;
+    width: 350px;
+    height: 175px;
+    background: #ffffff;
+    padding-top: 30px;
+    border: 1px solid #ddd;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.close-button {
+    top: 1%;
+    right: 1%;
+    display: block;
+    width: 30px;
+    height: 30px;
+    text-indent: -9999px;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADwAAAA8CAYAAAA6/NlyAAAAAXNSR0IArs4c6QAAA3hJREFUaAXlm8+K00Acx7MiCIJH/yw+gA9g25O49SL4AO3Bp1jw5NvktC+wF88qevK4BU97EmzxUBCEolK/n5

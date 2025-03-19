@@ -1,3 +1,8 @@
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+using diplom.Data;
+using diplom.Services;
+
 namespace diplom
 {
     public class Program
@@ -5,9 +10,21 @@ namespace diplom
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
+            builder.Services.AddDbContext<diplomContext>(options =>
+                options.UseSqlite(builder.Configuration.GetConnectionString("diplomContext") ?? throw new InvalidOperationException("Connection string 'diplomContext' not found.")));
+           
 
             // Add services to the container.
             builder.Services.AddRazorPages();
+
+            builder.Services.AddSingleton<MailService>();
+
+            builder.Services.AddSession(options =>
+            {
+                options.IdleTimeout = TimeSpan.FromMinutes(90);
+                options.Cookie.HttpOnly = true;
+                options.Cookie.IsEssential = true;
+            });
 
             var app = builder.Build();
 
@@ -18,15 +35,25 @@ namespace diplom
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
+            app.UseSession();
 
             app.UseHttpsRedirection();
             app.UseStaticFiles();
 
             app.UseRouting();
 
+
+
             app.UseAuthorization();
 
             app.MapRazorPages();
+
+            app.MapControllerRoute(
+              name: "default",
+              pattern: "{controller=Users}/{action=Login}/{id?}");
+
+
+         //app.MapFallbackToPage("/Users/Login");
 
             app.Run();
         }

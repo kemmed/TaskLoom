@@ -1,0 +1,65 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Восстановление пароля учетной записи в TaskLoom</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f9f9f9;
+            margin: 0;
+            padding: 0;
+        }
+
+        .email-container {
+            margin: 20px auto;
+            background: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background-color: #007bff;
+            color: #ffffff;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .content {
+            padding: 20px;
+            margin-bottom: 50px;
+            color: #333333;
+            line-height: 1.6;
+            text-align: center;
+        }
+
+        .button {
+            display: inline-block;
+            margin: 30px 0;
+            padding: 12px 24px;
+            background-color: #007bff;
+            color: #ffffff;
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: bold;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="email-container">
+        <div class="header">
+            <h1>{LName} {FName}, с вашим email поступил запрос на восстановления пароля.</h1>
+        </div>
+
+        <div class="content">
+            <p>Для восстановления пароля нажмите на кнопку ниже:</p>
+            <a href="{recoveryLink}" class="button">Восстановить</a>
+            <p>Если вы не отправляли запрос на восстановление пароля, проигнорируйте это письмо.</p>
+        </div>
+    </div>
+</body>
+</html>

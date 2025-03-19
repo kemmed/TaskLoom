@@ -1,0 +1,56 @@
+.centered-container {
+    display: flex;
+    justify-content: center; 
+    align-items: center;
+    min-height: 100vh;
+    background-color: #f9f9f9;
+}
+
+
+.message-container {
+    text-align: center;
+    font-family: Arial, sans-serif;
+    color: #333;
+    width: 50%;
+    max-width: 600px;
+    padding: 50px 30px;
+    background-color: #ffffff; 
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); 
+}
+
+    .message-container h2 {
+        font-size: 24px;
+        margin-bottom: 20px;
+    }
+
+    .message-container p {
+        font-size: 16px;
+        color: #666;
+    }
+
+    .message-container strong {
+        color: #007bff;
+    }
+
+    .message-container a {
+        display: inline-block;
+        text-decoration: none;
+        padding: 12px 24px;
+        cursor: pointer;
+        border: 2px solid #9fb6cc;
+        border-radius: 10px;
+        background-color: #cbd6e1;
+        color: #333;
+        font-size: 16px;
+        font-weight: bold;
+        text-align: center;
+        transition: all 0.3s ease;
+    }
+
+        .message-container a:hover {
+            background-color: #9fb6cc;
+            border-color: #9fb6cc;
+            color: #ffffff;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }

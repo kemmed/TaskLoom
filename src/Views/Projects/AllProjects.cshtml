@@ -1,0 +1,39 @@
+﻿@using diplom.Models
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@model List<Project>
+
+@{
+    Layout = "_Layout";
+}
+<div class="main-window">
+    <div class="header">
+        <a href="#add-board" rel="modal:open" class="add-board-button">Добавить доску</a>
+
+        <a href="/Users/UserProfile" class="profile-icon">
+            <i class="la la-user-circle"></i>
+        </a>
+    </div>
+    <div class="board-list">
+        @foreach (Project project in Model)
+        {
+            <a @* href="/Boards/Board/@project.ID" class="board-item" *@>@* @Board.StringCut(board.Name) *@</a>
+        }
+    </div>
+</div>
+
+
+
+
+
+
+
+
+<!--------------------------------------------------------------->
+<form asp-action="CreateBoard" asp-controller="Home" id="add-board" class="modal">
+    <label class="input-form__label">
+        <span class="input-placeholder">название</span>
+        <input class="form__input input-name" name="Name" autocomplete="off" required>
+    </label>
+    <button class="add-board-button">Добавить</button>
+    <a href="#" rel="modal:close"></a>
+</form>
