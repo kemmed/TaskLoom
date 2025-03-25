@@ -1,39 +1,149 @@
 ﻿@using diplom.Models
 @addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
-@model List<Project>
 
 @{
     Layout = "_Layout";
+    var projects = new List<Project>
+{
+    new Project
+    {
+        Name = "Редизайн веб-сайта",
+        Description = "Обновление дизайна и функционала веб-сайта.",
+        DeadlineDate = null,
+        CreateDate = DateTime.Now,
+        ProjectStatus = ProjectStatus.InProcess
+    },
+    new Project
+    {
+        Name = "Разработка мобильного приложения",
+        Description = "Создание кроссплатформенного мобильного приложения для iOS и Android.",
+        DeadlineDate = new DateTime(2024, 2, 1),
+        CreateDate = DateTime.Now,
+        ProjectStatus = ProjectStatus.Frozen
+    },
+    new Project
+    {
+        Name = "Маркетинговая кампания",
+        Description = "Запуск маркетинговой кампании для нового продукта.",
+        DeadlineDate = new DateTime(2023, 10, 20),
+        CreateDate = DateTime.Now,
+        ProjectStatus = ProjectStatus.Completed
+    },
+    new Project
+    {
+        Name = "Интеграция API",
+        Description = "Интеграция сторонних API в существующую систему.",
+        DeadlineDate = new DateTime(2023, 11, 10),
+        CreateDate = DateTime.Now,
+        ProjectStatus = ProjectStatus.InProcess
+    },
+    new Project
+    {
+        Name = "Разработка мобильного приложения",
+        Description = "Создание кроссплатформенного мобильного приложения для iOS и Android.",
+        DeadlineDate = new DateTime(2024, 2, 1),
+        CreateDate = DateTime.Now,
+        ProjectStatus = ProjectStatus.Frozen
+    },
+    new Project
+    {
+        Name = "Интеграция API",
+        Description = "Интеграция сторонних API в существующую систему.",
+        DeadlineDate = new DateTime(2023, 11, 10),
+        CreateDate = DateTime.Now,
+        ProjectStatus = ProjectStatus.InProcess
+    },
+    new Project
+    {
+        Name = "Маркетинговая кампания",
+        Description = "Запуск маркетинговой кампании для нового продукта.",
+        DeadlineDate = new DateTime(2023, 10, 20),
+        CreateDate = DateTime.Now,
+        ProjectStatus = ProjectStatus.Completed
+    },
+    new Project
+    {
+        Name = "Маркетинговая кампания",
+        Description = "Запуск маркетинговой кампании для нового продукта.",
+        DeadlineDate = new DateTime(2023, 10, 20),
+        CreateDate = DateTime.Now,
+        ProjectStatus = ProjectStatus.Completed
+    }
+};
 }
-<div class="main-window">
-    <div class="header">
-        <a href="#add-board" rel="modal:open" class="add-board-button">Добавить доску</a>
 
-        <a href="/Users/UserProfile" class="profile-icon">
-            <i class="la la-user-circle"></i>
-        </a>
+<header>
+    <div class="site-title">
+        <h1>Task<span class="title-part">Loom</span></h1>
     </div>
-    <div class="board-list">
-        @foreach (Project project in Model)
+    <a class="user-info-link">
+        <div class="user-info">
+            <span class="user-name">Руденко Александра</span>
+            <div class="user-icon">
+                <i class="la la-user-circle"></i>
+            </div>
+        </div>
+    </a>
+</header>
+
+
+    <div class="project-list-container">
+    <div class="add-project-button">
+        <a href="#add-project" rel="modal:open">Добавить проект</a>
+        </div>
+    
+
+        <div class="projects">
+            @foreach (var project in projects)
+            {
+                <div class="project-card @(GetStatusClass(project.ProjectStatus))">
+                    <h2 class="project-title">@project.Name</h2>
+                    <p class="project-description">@project.Description</p>
+                    <p class="project-status">Статус: @project.ConvertStatus(project.ProjectStatus)</p>
+                    <p class="project-deadline">Завершить до: @(project.DeadlineDate?.ToString("dd.MM.yyyy") ?? "не указано")</p>
+                <p class="project-created">Создана: @project.CreateDate.ToString("dd.MM.yyyy")</p>
+                </div>
+            }
+        </div>
+    </div>
+
+
+@functions {
+    private string GetStatusClass(ProjectStatus status)
+    {
+        switch (status)
         {
-            <a @* href="/Boards/Board/@project.ID" class="board-item" *@>@* @Board.StringCut(board.Name) *@</a>
+            case ProjectStatus.InProcess:
+                return "status-inprocess";
+            case ProjectStatus.Completed:
+                return "status-completed";
+            case ProjectStatus.Frozen:
+                return "status-frozen";
+            default:
+                return "";
         }
-    </div>
-</div>
-
-
-
-
-
-
-
+    }
+}
 
 <!--------------------------------------------------------------->
-<form asp-action="CreateBoard" asp-controller="Home" id="add-board" class="modal">
-    <label class="input-form__label">
-        <span class="input-placeholder">название</span>
-        <input class="form__input input-name" name="Name" autocomplete="off" required>
-    </label>
-    <button class="add-board-button">Добавить</button>
+<form asp-action="CreateProject" asp-controller="Project" id="add-project" class="modal">
+    <div class="modal-container">
+        <h1 class="modal-title">Новый проект</h1>
+        <label class="input-form__label add-project">
+            <span class="input-placeholder">название</span>
+            <input class="form__input input-name" name="Name" autocomplete="off" required>
+        </label>
+        <label class="input-form__label add-project">
+            <span class="input-placeholder">описание</span>
+            <textarea class="form__input form__textarea" name="Description" autocomplete="off"></textarea>
+        </label>
+
+        <label class="input-form__label add-project">
+            <span class="input-placeholder">срок</span>
+            <input class="form__input input-date" type="date" name="DeadlineDate" required value="@DateTime.Now.ToString("yyyy-MM-dd")">
+        </label>
+
+        <button class="add-button">Добавить</button>
+    </div>
     <a href="#" rel="modal:close"></a>
 </form>
