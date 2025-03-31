@@ -33,12 +33,69 @@
 }
 
 
-.project-list-container {
-    /*max-width: 1200px;
-    margin:20px;*/
+.filter-and-add-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-top: 10px;
 }
+
+
+.filter-buttons {
+    display: flex;
+    gap: 10px;
+}
+
+.filter-button {
+    cursor: pointer;
+    padding: 10px 20px;
+    border: solid 3px;
+    border-radius: 10px;
+    text-decoration: none;
+    color: #fff;
+    font-weight: bold;
+    transition: all 0.3s ease;
+}
+
+    .filter-button.all {
+        /*background-color: #40a7f2;*/
+        border-color: #40a7f2;
+        color: #40a7f2;
+    }
+
+    .filter-button.inprocess {
+        /*background-color: #5e9dcb;*/
+        border-color: #5e9dcb;
+        color: #5e9dcb;
+    }
+
+    .filter-button.completed {
+        /*background-color: #77be75;*/
+        border-color: #77be75;
+        color: #77be75;
+    }
+
+    .filter-button.frozen {
+        /*background-color: #e18a59;*/
+        border-color: #e18a59;
+        color: #e18a59;
+    }
+
+    .filter-button.active {
+        opacity: 0.8;
+        box-shadow: 0 4px 6px rgb(0 0 0 / 24%);
+    }
+
+
+    .filter-button:hover {
+        text-decoration: none;
+        opacity: 0.8;
+        box-shadow: 0 4px 6px rgb(0 0 0 / 24%);
+    }
+
+
 .add-project-button {
-    margin: 20px 0;
     display: flex;
     justify-content: flex-end;
 }

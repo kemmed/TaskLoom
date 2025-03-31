@@ -2,98 +2,46 @@
 @addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
 @model List<Project>
 
+
 @{
     Layout = "_Layout";
-    var projects = new List<Project>
-{
-    new Project
-    {
-        Name = "Редизайн веб-сайта",
-        Description = "Обновление дизайна и функционала веб-сайта.",
-        DeadlineDate = null,
-        CreateDate = DateTime.Now,
-        ProjectStatus = ProjectStatus.InProcess
-    },
-    new Project
-    {
-        Name = "Разработка мобильного приложения",
-        Description = "Создание кроссплатформенного мобильного приложения для iOS и Android.",
-        DeadlineDate = new DateTime(2024, 2, 1),
-        CreateDate = DateTime.Now,
-        ProjectStatus = ProjectStatus.Frozen
-    },
-    new Project
-    {
-        Name = "Маркетинговая кампания",
-        Description = "Запуск маркетинговой кампании для нового продукта.",
-        DeadlineDate = new DateTime(2023, 10, 20),
-        CreateDate = DateTime.Now,
-        ProjectStatus = ProjectStatus.Completed
-    },
-    new Project
-    {
-        Name = "Интеграция API",
-        Description = "Интеграция сторонних API в существующую систему.",
-        DeadlineDate = new DateTime(2023, 11, 10),
-        CreateDate = DateTime.Now,
-        ProjectStatus = ProjectStatus.InProcess
-    },
-    new Project
-    {
-        Name = "Разработка мобильного приложения",
-        Description = "Создание кроссплатформенного мобильного приложения для iOS и Android.",
-        DeadlineDate = new DateTime(2024, 2, 1),
-        CreateDate = DateTime.Now,
-        ProjectStatus = ProjectStatus.Frozen
-    },
-    new Project
-    {
-        Name = "Интеграция API",
-        Description = "Интеграция сторонних API в существующую систему.",
-        DeadlineDate = new DateTime(2023, 11, 10),
-        CreateDate = DateTime.Now,
-        ProjectStatus = ProjectStatus.InProcess
-    },
-    new Project
-    {
-        Name = "Маркетинговая кампания",
-        Description = "Запуск маркетинговой кампании для нового продукта.",
-        DeadlineDate = new DateTime(2023, 10, 20),
-        CreateDate = DateTime.Now,
-        ProjectStatus = ProjectStatus.Completed
-    },
-    new Project
-    {
-        Name = "Маркетинговая кампания",
-        Description = "Запуск маркетинговой кампании для нового продукта.",
-        DeadlineDate = new DateTime(2023, 10, 20),
-        CreateDate = DateTime.Now,
-        ProjectStatus = ProjectStatus.Completed
-    }
-};
 }
+<div class="filter-and-add-container">
 
+    <div class="filter-buttons">
+        <a href="/Projects/AllProjects" class="filter-button all @(ViewBag.StatusFilter == null ? "active" : "")">
+            Все (@(ViewBag.StatusCounts[ProjectStatus.InProcess] + ViewBag.StatusCounts[ProjectStatus.Completed] + ViewBag.StatusCounts[ProjectStatus.Frozen]))
+        </a>
+        <a href="/Projects/AllProjects?statusFilter=InProcess" class="filter-button inprocess @(ViewBag.StatusFilter == "InProcess" ? "active" : "")">
+            В процессе (@ViewBag.StatusCounts[ProjectStatus.InProcess])
+        </a>
+        <a href="/Projects/AllProjects?statusFilter=Frozen" class="filter-button frozen @(ViewBag.StatusFilter == "Frozen" ? "active" : "")">
+            Отложенные (@ViewBag.StatusCounts[ProjectStatus.Frozen])
+        </a>
+        <a href="/Projects/AllProjects?statusFilter=Completed" class="filter-button completed @(ViewBag.StatusFilter == "Completed" ? "active" : "")">
+            Завершенные (@ViewBag.StatusCounts[ProjectStatus.Completed])
+        </a>
+    </div>
 
-
-
-<div class="project-list-container">
     <div class="add-project-button">
         <a href="#add-project" rel="modal:open">Добавить проект</a>
     </div>
-
+</div>
 
     <div class="projects">
-        @* @foreach (var project in projects) *@
-
         @foreach (Project project in Model)
         {
-            <div class="project-card @(GetStatusClass(project.ProjectStatus))">
+            <div class="project-card @(GetStatusClass(project.Status))">
                 <h2 class="project-title">@project.Name</h2>
                 <p class="project-description">@project.Description</p>
-                <p class="project-status">Статус: @project.ConvertStatus(project.ProjectStatus)</p>
-                <p class="project-deadline">Завершить до: @(project.DeadlineDate?.ToString("dd.MM.yyyy") ?? "не указано")</p>
-                <p class="project-created">Создана: @project.CreateDate.ToString("dd.MM.yyyy")</p>
-
+                <p class="project-status">Статус: @project.ConvertStatus(project.Status)</p>
+                <p class="project-deadline">Завершить до @(project.DeadlineDate?.ToString("dd.MM.yyyy") ?? "не указано")</p>
+                
+                <p class="project-created">Создан @project.CreateDate.ToString("dd.MM.yyyy")</p>
+                @if (project.EndDate != null)
+                {
+                    <p class="project-created">Завершен @project.EndDate.Value.ToString("dd.MM.yyyy")</p>
+                }
                 <a href="#edit-project" rel="modal:open" class="edit-project-button" data-project-id="@project.ID">
                     <i class="las la-edit"></i>
                 </a>
@@ -144,55 +92,58 @@
 </form>
 
 <script>
-    document.addEventListener('DOMContentLoaded', function () {
+        document.addEventListener('DOMContentLoaded', function () {
         const buttons = document.querySelectorAll('.edit-project-button');
         buttons.forEach(button => {
             button.addEventListener('click', function () {
                 const projectID = this.getAttribute('data-project-id');
-                document.getElementById('projectID').value = projectID;
-
                 document.querySelectorAll('.projectform').forEach(element => {
-                    if (!element.classList.contains('hidden')) {
-                        element.classList.add('hidden');
-                    }
+                    element.classList.add('hidden');
                 });
-                document.getElementById('PROJECT'+projectID).classList.remove("hidden");
+                const selectedProjectForm = document.getElementById('PROJECT' + projectID);
+                if (selectedProjectForm) {
+                    selectedProjectForm.classList.remove('hidden');
+                }
+                document.getElementById('projectID').value = projectID;
             });
         });
     });
 </script>
-<form asp-action="EditProject" asp-controller="Projects" id="edit-project" class="modal">
+<div id="edit-project" class="modal">
     @foreach (Project project in Model)
     {
         <div ID="PROJECT@(@project.ID)" class="hidden projectform">
-            <div class="modal-container">
-                <h1 class="modal-title">Редактирование проекта</h1>
-                <label class="input-form__label add-project">
-                    <span class="input-placeholder">название</span>
-                    <input class="form__input input-name" name="Name" autocomplete="off" required value="@project.Name">
-                </label>
-                <label class="input-form__label add-project">
-                    <span class="input-placeholder">описание</span>
-                    <textarea class="form__input form__textarea" name="Description" autocomplete="off">@project.Description</textarea>
-                </label>
+            <form asp-action="EditProject" asp-controller="Projects" >
+                <input type="hidden" value="@project.ID" name="projectID" id="projectID" />
+                <div class="modal-container">
+                    <h1 class="modal-title">Редактирование проекта</h1>
+                    <label class="input-form__label add-project">
+                        <span class="input-placeholder">название</span>
+                        <input class="form__input input-name" name="Name" autocomplete="off" required value="@project.Name">
+                    </label>
+                    <label class="input-form__label add-project">
+                        <span class="input-placeholder">описание</span>
+                        <textarea class="form__input form__textarea" name="Description" autocomplete="off">@project.Description</textarea>
+                    </label>
         
-                <label class="input-form__label">
-                    <span class="input-placeholder">статус</span>
-                    <select class="form__input input-select" name="Priority" required>
-                        <!option value="0" @((project.ProjectStatus == ProjectStatus.Completed) ? "selected" : "")>Выполнен</!option>
-                        <!option value="1" @((project.ProjectStatus == ProjectStatus.InProcess) ? "selected" : "")>В процессе</!option>
-                        <!option value="2" @((project.ProjectStatus == ProjectStatus.Frozen) ? "selected" : "")>Отложен</!option>
-                    </select>
-                </label>
+                    <label class="input-form__label">
+                        <span class="input-placeholder">статус</span>
+                        <select class="form__input input-select" name="Status" required>
+                            <!option value="@ProjectStatus.InProcess" @((project.Status == ProjectStatus.InProcess) ? "selected" : "")>@project.ConvertStatus(ProjectStatus.InProcess)</!option>
+                            <!option value="@ProjectStatus.Frozen" @((project.Status == ProjectStatus.Frozen) ? "selected" : "")>@project.ConvertStatus(ProjectStatus.Frozen)</!option>
+                            <!option value="@ProjectStatus.Completed" @((project.Status == ProjectStatus.Completed) ? "selected" : "")>@project.ConvertStatus(ProjectStatus.Completed)</!option>
+                        </select>
+                    </label>
 
-                <label class="input-form__label add-project">
-                    <span class="input-placeholder">срок</span>
-                    <input class="form__input input-date" type="date" name="DeadlineDate" required value="@project.DeadlineDate.Value.ToString("yyyy-MM-dd")">
-                </label>
+                    <label class="input-form__label add-project">
+                        <span class="input-placeholder">срок</span>
+                        <input class="form__input input-date" type="date" name="DeadlineDate" required value="@project.DeadlineDate.Value.ToString("yyyy-MM-dd")">
+                    </label>
 
-                <button class="add-button">Сохранить</button>
-            </div>
+                    <button class="add-button">Сохранить</button>
+                </div>
+            </form>
         </div>
     }
     <a href="#" rel="modal:close"></a>
-</form>
+</div>

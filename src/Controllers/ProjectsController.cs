@@ -19,17 +19,38 @@ namespace diplom.Controllers
         {
             _context = context;
         }
-        public async Task<IActionResult> AllProjects()
+        public async Task<IActionResult> AllProjects(string statusFilter = null)
         {
             int? userLoggedInID = HttpContext.Session.GetInt32("UserID");
             if (userLoggedInID == null)
                 return Redirect("/Users/Authorization");
-            var projects = _context.Project.Where(x => x.CreatorID == userLoggedInID || 
-            _context.UserProject.Any(ub => ub.ProjectID == x.ID && ub.UserID == userLoggedInID)).ToList();
 
-            return View(projects);
+            var allProjects = _context.Project.Where(x => x.CreatorID == userLoggedInID ||
+                _context.UserProject.Any(ub => ub.ProjectID == x.ID && ub.UserID == userLoggedInID)).ToList();
+
+            var statusCounts = new Dictionary<ProjectStatus, int>
+    {
+        { ProjectStatus.InProcess, allProjects.Count(p => p.Status == ProjectStatus.InProcess) },
+        { ProjectStatus.Completed, allProjects.Count(p => p.Status == ProjectStatus.Completed) },
+        { ProjectStatus.Frozen, allProjects.Count(p => p.Status == ProjectStatus.Frozen) }
+    };
+
+            ViewBag.StatusCounts = statusCounts;
+            var filteredProjects = allProjects.AsQueryable();
+            if (!string.IsNullOrEmpty(statusFilter))
+            {
+                if (Enum.TryParse(statusFilter, out ProjectStatus filter))
+                {
+                    filteredProjects = filteredProjects.Where(p => p.Status == filter);
+                }
+            }
+
+            ViewBag.StatusFilter = statusFilter;
+
+            return View(filteredProjects.ToList());
         }
 
+        //Создание проекта
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> CreateProject([Bind("ID,Name,Description,DeadlineDate")] Project project)
@@ -43,7 +64,7 @@ namespace diplom.Controllers
                 project.DeadlineDate = DateTime.Now.Date;
             else
                 project.DeadlineDate = project.DeadlineDate;
-            project.ProjectStatus = ProjectStatus.InProcess;
+            project.Status = ProjectStatus.InProcess;
             project.CreateDate = DateTime.Now.Date;
             _context.Add(project);
 
@@ -104,6 +125,24 @@ namespace diplom.Controllers
             _context.Add(priorityType3);
             await _context.SaveChangesAsync();
 
+            return Redirect("AllProjects");
+        }
+
+        //Редактирование проекта
+        [HttpPost]
+        public async Task<IActionResult> EditProject([Bind("ID,Name,Description,Status,DeadlineDate")] Project project, IFormCollection formData, int projectID)
+        {
+            var currProject = await _context.Project.FindAsync(int.Parse(formData["projectID"]));
+            currProject.Name = project.Name;
+            currProject.Description = project.Description;
+            currProject.Status = project.Status;
+            if (project.DeadlineDate.Value.Date >= DateTime.Now.Date || project.DeadlineDate.Value.Date > currProject.DeadlineDate.Value.Date)
+                currProject.DeadlineDate = project.DeadlineDate.Value.Date;
+            if (currProject.Status == ProjectStatus.Completed)
+                currProject.EndDate = DateTime.Now.Date;
+            else
+                currProject.EndDate = null;
+            await _context.SaveChangesAsync();
             return Redirect("AllProjects");
         }
     }

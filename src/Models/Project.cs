@@ -11,7 +11,7 @@
         public DateTime? EndDate { get; set; }
         public DateTime? DeadlineDate { get; set; }
         public DateTime CreateDate { get; set; }
-        public ProjectStatus ProjectStatus { get; set; }
+        public ProjectStatus Status { get; set; }
         public bool IsDelete { get; set; }
 
         public int CreatorID { get; set; }
@@ -28,7 +28,7 @@
             switch (projectStatus)
             {
                 case ProjectStatus.Completed:
-                    return "Выполнен";
+                    return "Завершен";
                 case ProjectStatus.InProcess:
                     return "В процессе";
                 case ProjectStatus.Frozen:

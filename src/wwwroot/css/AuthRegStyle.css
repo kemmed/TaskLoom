@@ -16,9 +16,10 @@
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
-@media all and (min-width: 576px) {
+@media all and (min-width: 380px) {
     .authReg_window {
         padding: 49px 79px 29px;
+        min-width: 400px;
     }
 }
 
