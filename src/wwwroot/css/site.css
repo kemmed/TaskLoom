@@ -45,17 +45,19 @@ h1 {
     font-size: 24px;
     color: #333;
 }
-
 .jquery-modal .modal {
     position: fixed;
-    margin: 20px 0;
-    left: 35%;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
     width: auto;
+    max-width: 500px;
     height: auto;
     padding: 30px 45px;
     background-color: #ffffff;
     border: 1px solid #ddd;
     border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 .modal a.close-modal {

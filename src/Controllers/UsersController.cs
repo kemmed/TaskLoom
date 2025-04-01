@@ -49,6 +49,17 @@ namespace diplom.Controllers
         {
             return View();
         }
+        public async Task<IActionResult> UserProfile()
+        {
+            int? userSessionID = HttpContext.Session.GetInt32("UserID");
+            User currentUser = await _context.User.FindAsync(userSessionID);
+            if (currentUser != null)
+                return View(currentUser);
+            else
+                return NotFound();
+        }
+
+        //Восстановление пароля
         public IActionResult PasswordRecovery(string token)
         {
             ViewBag.token = token;
@@ -70,6 +81,7 @@ namespace diplom.Controllers
             
             return View();
         }
+        //Результат восстановления пароля
         public IActionResult PasswordRecoveryMessage(string message, bool success)
         {
             ViewBag.message = message;
@@ -77,6 +89,7 @@ namespace diplom.Controllers
 
             return View();
         }
+        //Ожидание восстановления пароля
         public IActionResult AwaitingPasswordRecovery(string email)
         {
             ViewBag.email = email;
@@ -182,19 +195,19 @@ namespace diplom.Controllers
                 return hashString.ToString();
             }
         }
-        // POST: Регистрация пользователя
+        // Регистрация пользователя
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("ID,FName,LName,Email,HashPass")] User user)
         {
-            _context.User.RemoveRange(_context.User);
-            await _context.SaveChangesAsync();
+            ////_context.User.RemoveRange(_context.User);
+            ////await _context.SaveChangesAsync();
 
             var existingUser = await _context.User.FirstOrDefaultAsync(u => u.Email == user.Email);
 
             if (existingUser != null)
             {
-                return Redirect("/Users/RegError?error=existingemail");
+                return Redirect("/Users/RegError?view=Registration");
             }
 
             user.HashPass = HashPassword(user.HashPass);
@@ -228,7 +241,6 @@ namespace diplom.Controllers
             return Redirect($"AwaitingConfirmation?email={user.Email}");
         }
 
-
         //Активация аккаунта пользователя
         [HttpGet]
         public  IActionResult ActivationUser(string token)
@@ -259,7 +271,52 @@ namespace diplom.Controllers
             return View();
         }
 
-        // Генерация токена при регистрации
+        // Изменение имени пользователя
+        [HttpPost]
+        public async Task<IActionResult> UpdateProfileName([Bind("ID,FName,LName")] User user)
+        {
+            int? userSessionID = HttpContext.Session.GetInt32("UserID");
+            var currentUser = _context.User.FirstOrDefault(x => x.ID == userSessionID);
+            currentUser.LName = user.LName;
+            currentUser.FName = user.FName;
+
+            await _context.SaveChangesAsync();
+            return Redirect("UserProfile");
+        }
+        // Изменение email пользователя
+        //[HttpPost]
+        //public async Task<IActionResult> UpdateProfileEmail([Bind("ID,Email")] User user)
+        //{
+        //    int? userSessionID = HttpContext.Session.GetInt32("UserID");
+        //    var currentUser = _context.User.FirstOrDefault(x => x.ID == userSessionID);
+        //    if ((_context.User.FirstOrDefault(x => x.Email == user.Email) == null))
+        //    {
+        //        currentUser.Email = user.Email;
+        //    }
+        //    else if (currentUser.Email == user.Email)
+        //    {
+        //        return Redirect("UserProfile");
+        //    }
+        //    else
+        //    {
+        //        return Redirect("/Users/RegError?view=UserProfile");
+        //    }
+        //    await _context.SaveChangesAsync();
+        //    return Redirect("UserProfile");
+        //}
+
+        // Изменение пароля пользователя
+        [HttpPost]
+        public async Task<IActionResult> UpdateProfilePassword([Bind("ID,HashPass")] User user)
+        {
+            int? userSessionID = HttpContext.Session.GetInt32("UserID");
+            var currentUser = _context.User.FirstOrDefault(x => x.ID == userSessionID);
+
+            currentUser.HashPass = HashPassword(user.HashPass);
+            await _context.SaveChangesAsync();
+            return Redirect("UserProfile");
+        }
+        // Генерация токена
         public string GenerateToken()
         {
             Random rnd = new Random();
@@ -271,11 +328,10 @@ namespace diplom.Controllers
             return token;
         }
         // Ошибка при регистрации на существующий в системе email
-        public IActionResult RegError(string error)
+        public IActionResult RegError(string view)
         {
-            if (error == "existingemail")
-                ViewBag.error = "На этот email уже зарегистрирован аккаунт.";
-            return View("Registration");
+            ViewBag.error = "На этот email уже зарегистрирован аккаунт.";
+            return View($"{view}");
         }
 
         // Ошибка при авторизации
@@ -285,7 +341,7 @@ namespace diplom.Controllers
                 ViewBag.error = "Неправильный email или пароль.";
             return View("Login");
         }
-        // Ошибка при отправке запроса на подтверждени
+        // Ошибка при отправке запроса на подтверждение
         public IActionResult PasswordRecoveryError(string error, string token)
         {
             if (error == "wrongemail")

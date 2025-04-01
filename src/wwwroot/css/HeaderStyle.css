@@ -1,0 +1,74 @@
+.site-title {
+    font-size: 34px;
+    color: #314ad5;
+    margin: 0;
+    font-weight: bold;
+    text-decoration: none;
+}
+
+.title-part {
+    color: #40a7f2;
+}
+
+.user-info {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.user-info-link {
+    text-decoration: none;
+    color: #333;
+}
+
+    .user-info-link :hover {
+        color: #60a7e7;
+    }
+
+.user-name {
+    margin-right: 10px;
+    margin-left: 10px;
+    font-size: 20px;
+}
+
+.user-icon {
+    font-size: 35px;
+}
+
+.dropdown-menu {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background-color: #fff;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    display: none; /* Скрыто по умолчанию */
+    z-index: 1000;
+}
+
+    .dropdown-menu ul {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+    }
+
+        .dropdown-menu ul li {
+            padding: 10px 20px;
+        }
+
+            .dropdown-menu ul li a {
+                text-decoration: none;
+                color: #333;
+                display: block;
+            }
+
+            .dropdown-menu ul li:hover {
+                background-color: #f0f0f0;
+            }
+
+    /* Активное состояние */
+    .dropdown-menu.active {
+        display: block;
+    }

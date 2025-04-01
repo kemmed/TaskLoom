@@ -29,11 +29,11 @@ namespace diplom.Controllers
                 _context.UserProject.Any(ub => ub.ProjectID == x.ID && ub.UserID == userLoggedInID)).ToList();
 
             var statusCounts = new Dictionary<ProjectStatus, int>
-    {
-        { ProjectStatus.InProcess, allProjects.Count(p => p.Status == ProjectStatus.InProcess) },
-        { ProjectStatus.Completed, allProjects.Count(p => p.Status == ProjectStatus.Completed) },
-        { ProjectStatus.Frozen, allProjects.Count(p => p.Status == ProjectStatus.Frozen) }
-    };
+            {
+                { ProjectStatus.InProcess, allProjects.Count(p => p.Status == ProjectStatus.InProcess) },
+                { ProjectStatus.Completed, allProjects.Count(p => p.Status == ProjectStatus.Completed) },
+                { ProjectStatus.Frozen, allProjects.Count(p => p.Status == ProjectStatus.Frozen) }
+            };
 
             ViewBag.StatusCounts = statusCounts;
             var filteredProjects = allProjects.AsQueryable();

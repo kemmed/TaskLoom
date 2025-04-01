@@ -3,11 +3,11 @@
 @{
     Layout = "_Layout_NoHeader";
 }
-<div class="authReg_background">
+<div class="Input_background">
     <h2 >Авторизация</h2>
-    <div class="authReg_window">
+    <div class="Input_window">
 
-        <form asp-action="Login" asp-controller="Users" class="auth-form" name="form-auth" method="post">
+        <form asp-action="Login" asp-controller="Users" class="input" name="form-auth" method="post">
 
             
             <label class="input-form__label">
@@ -18,22 +18,22 @@
             <label class="input-form__label">
                 <span class="input-placeholder">пароль</span>
                 <input class="form__input input-password" type="password" name="HashPass" autocomlete="off" required value="1">
-                <div class="auth-form__toggler">
-                    <i class="la la-eye auth-form__icon"></i>
-                    <input type="checkbox" class="auth-form__checkbox password-toggler">
+                <div class="input__toggler">
+                    <i class="la la-eye input__icon"></i>
+                    <input type="checkbox" class="input__checkbox password-toggler">
                 </div>
             </label>
 
             @if (ViewBag.error != null){
-                <div class="auth-form__answer">
+                <div class="input__answer">
                     <p class="text-danger">@ViewBag.error</p>
                 </div>
             }
 
-            <input class="auth-form__submit" type="submit" value="Войти">
+            <input class="input__submit" type="submit" value="Войти">
 
-            <a class="auth-form__link" href="/Users/PasswordRecoveryRequest">Забыли пароль?</a>
-            <div class="auth-form__bottom">
+            <a class="input__link" href="/Users/PasswordRecoveryRequest">Забыли пароль?</a>
+            <div class="input__bottom">
                 <span>У вас еще нет аккаунта?</span>
                 <a href="/Users/Registration">Создать новый</a>
             </div>
@@ -41,4 +41,4 @@
     </div>
 </div>
 
-<div class="hint"></div>
+

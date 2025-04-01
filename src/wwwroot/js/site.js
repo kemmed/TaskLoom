@@ -16,12 +16,13 @@
     //        }
     //    });
     //});
-    function Copy() {
-        var Url = document.createElement("textarea");
-        Url.innerHTML = window.location.href;
-        Copied = Url.createTextRange();
-        Copied.execCommand("Copy");
-    }
+
+    //function Copy() {
+    //    var Url = document.createElement("textarea");
+    //    Url.innerHTML = window.location.href;
+    //    Copied = Url.createTextRange();
+    //    Copied.execCommand("Copy");
+    //}
     (function () {
         const inputText = document.querySelectorAll('.form__input');
 
@@ -52,7 +53,7 @@
 
                 const toggler = this.parentElement,
                     input = toggler.parentElement.querySelector('.input-password'),
-                    icon = toggler.querySelector('.auth-form__icon');
+                    icon = toggler.querySelector('.input__icon');
 
                 if (checkbox.checked) {
                     input.type = 'text';

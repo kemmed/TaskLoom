@@ -1,0 +1,97 @@
+.hidden {
+    display: none;
+}
+
+.profile-view {
+    margin-bottom: 30px;
+    margin-top: 10px;
+    padding: 0px 40px;
+}
+
+    .profile-view p {
+        font-size: 16px;
+        color: #57606a;
+        margin-bottom: 10px;
+    }
+
+#edit-button, #cancel-button {
+    margin: auto 80px;
+}
+
+.profile-background {
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    background-color: #f9f9f9;
+    padding-top: 20px;
+}
+
+.profile-window {
+    box-sizing: border-box;
+    padding: 25px 15px;
+    margin-top: 0.5%;
+    margin-bottom: 5%;
+    border: 1px solid #ddd;
+    border-radius: 15px;
+    background-color: #ffffff;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 500px;
+}
+
+.profile-section {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 10px;
+    margin-left: 50px;
+    margin-right: 50px;
+}
+    .profile-section .input-form__label {
+        margin-bottom: 25px;
+    }
+    
+
+.section-title {
+    font-size: 18px;
+    color: #333;
+    margin-bottom: 25px;
+    border-bottom: 2px solid #ddd;
+    font-weight: bold;
+    text-align: center;
+    padding-bottom:2px;
+}
+.profile-form {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    letter-spacing: 1px;
+    margin-bottom:30px;
+}
+    .profile-form .input__submit {
+        margin: auto 80px;
+    }
+.profile__error {
+    word-wrap: break-word;
+    color: #333;
+}
+
+.text-danger {
+    text-align: center;
+    font-size: small;
+    color: #dc3545;
+}
+.password-link {
+    font-size: 20px;
+    color: #007bff;
+    text-align: center;
+    text-decoration: none;
+    margin-bottom: 15px;
+}
+    .password-link a:hover {
+            color: #0056b3;
+    }
+.update-pass{
+    width:300px;
+}

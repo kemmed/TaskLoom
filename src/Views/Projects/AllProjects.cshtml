@@ -2,12 +2,12 @@
 @addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
 @model List<Project>
 
-
 @{
     Layout = "_Layout";
+    ViewData["Title"] = "Ваши проекты";
 }
-<div class="filter-and-add-container">
 
+<div class="filter-and-add-container">
     <div class="filter-buttons">
         <a href="/Projects/AllProjects" class="filter-button all @(ViewBag.StatusFilter == null ? "active" : "")">
             Все (@(ViewBag.StatusCounts[ProjectStatus.InProcess] + ViewBag.StatusCounts[ProjectStatus.Completed] + ViewBag.StatusCounts[ProjectStatus.Frozen]))
@@ -24,10 +24,22 @@
     </div>
 
     <div class="add-project-button">
-        <a href="#add-project" rel="modal:open">Добавить проект</a>
+        <a href="#add-project" rel="modal:open" class="input__submit">Добавить проект</a>
     </div>
 </div>
 
+<!-- Проверка на пустой список проектов -->
+@if (Model.Count == 0)
+{
+    <div class="centered-container project-massage">
+        <div class="message-container ">
+            <h2>Здесь пока нет проектов.</h2>
+            <p>Создайте новый, чтобы начать работу!</p>
+        </div>
+    </div>
+}
+else
+{
     <div class="projects">
         @foreach (Project project in Model)
         {
@@ -36,7 +48,7 @@
                 <p class="project-description">@project.Description</p>
                 <p class="project-status">Статус: @project.ConvertStatus(project.Status)</p>
                 <p class="project-deadline">Завершить до @(project.DeadlineDate?.ToString("dd.MM.yyyy") ?? "не указано")</p>
-                
+
                 <p class="project-created">Создан @project.CreateDate.ToString("dd.MM.yyyy")</p>
                 @if (project.EndDate != null)
                 {
@@ -48,7 +60,7 @@
             </div>
         }
     </div>
-</div>
+}
 
 
 @functions {
@@ -86,7 +98,7 @@
             <input class="form__input input-date" type="date" name="DeadlineDate" required value="@DateTime.Now.ToString("yyyy-MM-dd")">
         </label>
 
-        <button class="add-button">Добавить</button>
+        <button class="input__submit confirm">Добавить</button>
     </div>
     <a href="#" rel="modal:close"></a>
 </form>
@@ -140,7 +152,7 @@
                         <input class="form__input input-date" type="date" name="DeadlineDate" required value="@project.DeadlineDate.Value.ToString("yyyy-MM-dd")">
                     </label>
 
-                    <button class="add-button">Сохранить</button>
+                    <button class="input__submit confirm">Сохранить</button>
                 </div>
             </form>
         </div>

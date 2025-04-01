@@ -1,0 +1,108 @@
+﻿@model diplom.Models.User
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+@{
+    Layout = "_Layout";
+}
+<script>
+        document.addEventListener('DOMContentLoaded', function () {
+        const viewMode = document.getElementById('view-mode');
+        const editMode = document.getElementById('edit-mode');
+        const editButton = document.getElementById('edit-button');
+        const cancelButton = document.getElementById('cancel-button');
+        editButton.addEventListener('click', function () {
+            viewMode.classList.add('hidden');
+            editMode.classList.remove('hidden');
+        });
+        cancelButton.addEventListener('click', function () {
+            viewMode.classList.remove('hidden');
+            editMode.classList.add('hidden');
+        });
+    });
+</script>
+
+<div class="profile-background">
+    <h2 class="profile-title">Профиль пользователя</h2>
+    <div class="profile-window">
+
+
+        <div id="view-mode" class="profile-view">
+            <div class="profile-section">
+                <h3 class="section-title">Личные данные</h3>
+                <p><strong>Имя:</strong> @Model.FName</p>
+                <p><strong>Фамилия:</strong> @Model.LName</p>
+            </div>
+
+            <div class="profile-section">
+                <h3 class="section-title">Контактные данные</h3>
+                <p><strong>Email:</strong> @Model.Email</p>
+            </div>
+
+            <button id="edit-button" class="input__submit">Редактировать</button>
+        </div>
+
+
+        <div id="edit-mode" class="profile-edit hidden">
+            <form asp-action="UpdateProfileName" asp-controller="Users" class="profile-form" method="post">
+                <div class="profile-section">
+                    <h3 class="section-title">Личные данные</h3>
+                    <label class="input-form__label">
+                        <span class="input-placeholder">Имя</span>
+                        <input class="form__input input-name" name="FName" value="@Model.FName" autocomplete="off" required>
+                    </label>
+
+                    <label class="input-form__label">
+                        <span class="input-placeholder">Фамилия</span>
+                        <input class="form__input input-name" name="LName" value="@Model.LName" autocomplete="off" required>
+                    </label>
+                </div>
+                <input class="input__submit confirm" type="submit" value="Сохранить">
+            </form>
+
+          @*   <form asp-action="UpdateProfileEmail" asp-controller="Users" class="profile-form" method="post">
+                <div class="profile-section">
+                    <h3 class="section-title">Контактные данные</h3>
+                    <label class="input-form__label">
+                        <span class="input-placeholder">Email</span>
+                        <input class="form__input input-email" type="email" name="Email" value="@Model.Email" autocomplete="off" required>
+                    </label>
+                </div>
+                <input class="input__submit confirm" type="submit" value="Подтвердить">
+                @if (ViewBag.EmailError != null)
+                {
+                    <div class="profile__error">
+                        <p class="text-danger">@ViewBag.EmailError</p>
+                    </div>
+                }
+            </form> *@
+            <div class="password-link">
+                <a class="password-link" href="#update-password" rel="modal:open">Сбросить пароль</a>
+            </div>
+
+            <button id="cancel-button" class="input__submit cancel">Отменить</button>
+        </div>
+
+    </div>
+</div>
+
+<!------------------------------------------------------------------------------------->
+<form asp-action="UpdateProfilePassword" asp-controller="Users" method="post" id="update-password" class="modal">
+    <div class="modal-container update-pass">
+        <label class="input-form__label">
+            <span class="input-placeholder">Новый пароль</span>
+            <input class="form__input input-password" type="password" name="HashPass" autocomplete="off" required>
+            <div class="input__toggler">
+                <i class="la la-eye input__icon"></i>
+                <input type="checkbox" class="input__checkbox password-toggler">
+            </div>
+        </label>
+        <input class="input__submit" type="submit" value="Сбросить пароль">
+    </div>
+    @if (ViewBag.PasswordError != null)
+    {
+        <div class="profile__error">
+            <p class="text-danger">@ViewBag.PasswordError</p>
+        </div>
+    }
+    <a href="#" rel="modal:close"></a>
+</form>

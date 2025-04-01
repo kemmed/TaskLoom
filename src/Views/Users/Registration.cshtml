@@ -4,11 +4,11 @@
 @{
     Layout = "_Layout_NoHeader";
 }
-<div class="authReg_background">
-    <h2 class="auth-form__title">Регистрация</h2>
-    <div class="authReg_window">
+<div class="Input_background">
+    <h2 class="input__title">Регистрация</h2>
+    <div class="Input_window">
 
-        <form asp-action="Create" asp-controller="Users" class="auth-form" name="form-auth" method="post">
+        <form asp-action="Create" asp-controller="Users" class="input" name="form-auth" method="post">
 
             <label class="input-form__label">
                 <span class="input-placeholder">имя</span>
@@ -29,22 +29,22 @@
             <label class="input-form__label">
                 <span class="input-placeholder">пароль</span>
                 <input class="form__input input-password" type="password" name="HashPass" autocomlete="off" required>
-                <div class="auth-form__toggler">
-                    <i class="la la-eye auth-form__icon"></i>
-                    <input type="checkbox" class="auth-form__checkbox password-toggler">
+                <div class="input__toggler">
+                    <i class="la la-eye input__icon"></i>
+                    <input type="checkbox" class="input__checkbox password-toggler">
                 </div>
             </label>
 
             @if (ViewBag.error != null)
             {
-                <div class="auth-form__answer">
+                <div class="input__answer">
                     <p class="text-danger">@ViewBag.error</p>
                 </div>
             }
 
-            <input class="auth-form__submit" type="submit" value="Создать">
+            <input class="input__submit" type="submit" value="Создать">
 
-            <div class="auth-form__bottom">
+            <div class="input__bottom">
                 <span>У вас уже есть аккаунт?</span>
                 <a href="/">Войти</a>
             </div>
@@ -53,4 +53,4 @@
     </div>
 </div>
 
-<div class="hint"></div>
+

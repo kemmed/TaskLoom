@@ -1,4 +1,4 @@
-.authReg_background {
+.Input_background {
     height: 100vh;
     display: flex;
     justify-content: center;
@@ -7,7 +7,7 @@
     background-color: #f9f9f9;
 }
 
-.authReg_window {
+.Input_window {
     box-sizing: border-box;
     padding: 29px;
     border: 1px solid #ddd;
@@ -17,38 +17,38 @@
 }
 
 @media all and (min-width: 380px) {
-    .authReg_window {
+    .Input_window {
         padding: 49px 79px 29px;
         min-width: 400px;
     }
 }
 
-.auth-form {
+.input {
     display: flex;
     flex-direction: column;
     letter-spacing: 1px;
 }
 
-.auth-form__toggler,
-.auth-form__icon,
-.auth-form__checkbox {
+.input__toggler,
+.input__icon,
+.input__checkbox {
     position: absolute;
     width: 18px;
     height: 18px;
 }
 
-.auth-form__toggler {
+.input__toggler {
     cursor: pointer;
     right: 2px;
     top: 50%;
     transform: translateY(-50%);
 }
 
-.auth-form__icon {
+.input__icon {
     color: #aaa;
 }
 
-.auth-form__toggler:hover .auth-form__icon {
+.input__toggler:hover .input__icon {
     color: #666;
 }
 
@@ -56,48 +56,74 @@
     opacity: 0;
 }
 
-.auth-form__submit {
+.input__submit {
     cursor: pointer;
-    border: 2px solid #9fb6cc;
+    /*border: 2px solid #9fb6cc;*/
     height: 50px;
     border-radius: 10px;
-    background: #cbd6e1;
-    color: #333;
+    /*background: #cbd6e1;
+    color: #333;*/
+
+    background: #40a7f2;
+    color: #ffffff;
+    border: 2px solid #40a7f2;
     outline: none;
     font-weight: bold;
     transition: all 0.3s ease;
 }
 
-    .auth-form__submit:hover {
-        background-color: #9fb6cc;
+    .input__submit:hover {
+        /*background-color: #9fb6cc;
         border-color: #9fb6cc;
-        color: #ffffff;
+        color: #ffffff;*/
         box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+
+        background-color: #314ad5;
+        border-color: #314ad5;
+        color: #ffffff;
+    }
+.cancel {
+    background: #b35a00;
+    border-color: #b35a00;
+}
+
+    .cancel:hover {
+        background: #b33900;
+        border-color: #b33900;
+    }
+.confirm {
+    background: #2ca840;
+    border-color: #2ca840;
+}
+
+    .confirm:hover {
+        background: #188229;
+        border-color: #188229;
     }
 
-.auth-form__bottom {
+.input__bottom {
     margin-top: 20px;
     font-size: 12px;
     color: #666;
     text-align: center;
 }
 
-.auth-form__bottom a {
+.input__bottom a {
     color: #007bff;
 }
 
-.auth-form__bottom
+.input__bottom
 
-.auth-form__bottom a:hover {
+.input__bottom a:hover {
     color: #0056b3;
 }
-.auth-form__link {
+.input__link {
     color: #007bff;
     margin-top: 10px;
     font-size: 12px;
     text-align: center;
 }
-.auth-form__answer {
+.input__answer {
     max-width: 250px;
     word-wrap: break-word;
     color: #333;
@@ -107,4 +133,5 @@
     text-align: center;
     font-size: small;
     color: #dc3545;
+    font-weight:600;
 }
