@@ -58,24 +58,18 @@
 
 .input__submit {
     cursor: pointer;
-    /*border: 2px solid #9fb6cc;*/
     height: 50px;
     border-radius: 10px;
-    /*background: #cbd6e1;
-    color: #333;*/
-
     background: #40a7f2;
     color: #ffffff;
     border: 2px solid #40a7f2;
     outline: none;
     font-weight: bold;
     transition: all 0.3s ease;
+    white-space: nowrap;
 }
 
     .input__submit:hover {
-        /*background-color: #9fb6cc;
-        border-color: #9fb6cc;
-        color: #ffffff;*/
         box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 
         background-color: #314ad5;
@@ -117,6 +111,20 @@
 .input__bottom a:hover {
     color: #0056b3;
 }
+
+.button-a {
+    display: flex;
+    gap: 10px;
+    margin-left: 10px;
+    text-align:center;
+}
+
+    .button-a a {
+        padding: 15px 20px;
+        outline: none;
+        text-decoration: none;
+    }
+
 .input__link {
     color: #007bff;
     margin-top: 10px;

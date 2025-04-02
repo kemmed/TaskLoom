@@ -16,6 +16,8 @@
     <link rel="stylesheet" href="~/css/InfoMessageStyle.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/AllProjectsStyle.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/UserProfileStyle.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/ProjectStyle.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/ProjectSettingsStyle.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/diplom.styles.css" asp-append-version="true" />
 
 
@@ -27,10 +29,10 @@
     <header>
         <a class ="site-title" href="/Projects/AllProjects" >Task<span class="title-part">Loom</span></a>
 
-        <a class="user-info-link" href="/Users/UserProfile">
-            <div class="user-info">
+        <a class="info-container-link" href="/Users/UserProfile">
+            <div class="info-container">
                 <span class="user-name">Имя Пользователя</span>
-                <div class="user-icon">
+                <div class="icon">
                     <i class="la la-user-circle"></i>
                 </div>
             </div>
@@ -45,6 +47,9 @@
 
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
+
     <script src="~/js/site.js" asp-append-version="true"></script>
 
     @await RenderSectionAsync("Scripts", required: false)

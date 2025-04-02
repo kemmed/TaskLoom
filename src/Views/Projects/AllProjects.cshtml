@@ -23,12 +23,11 @@
         </a>
     </div>
 
-    <div class="add-project-button">
+    <div class="button-a">
         <a href="#add-project" rel="modal:open" class="input__submit">Добавить проект</a>
     </div>
 </div>
 
-<!-- Проверка на пустой список проектов -->
 @if (Model.Count == 0)
 {
     <div class="centered-container project-massage">
@@ -43,19 +42,21 @@ else
     <div class="projects">
         @foreach (Project project in Model)
         {
-            <div class="project-card @(GetStatusClass(project.Status))">
-                <h2 class="project-title">@project.Name</h2>
-                <p class="project-description">@project.Description</p>
-                <p class="project-status">Статус: @project.ConvertStatus(project.Status)</p>
-                <p class="project-deadline">Завершить до @(project.DeadlineDate?.ToString("dd.MM.yyyy") ?? "не указано")</p>
+            <div class="project-card @(GetStatusClass(project.Status))" >
+                <a href="/Projects/Project">
+                    <h2 class="project-title">@project.Name</h2>
+                    <p class="project-description">@project.Description</p>
+                    <p class="project-status">Статус: @project.ConvertStatus(project.Status)</p>
+                    <p class="project-deadline">Завершить до @(project.DeadlineDate?.ToString("dd.MM.yyyy") ?? "не указано")</p>
 
-                <p class="project-created">Создан @project.CreateDate.ToString("dd.MM.yyyy")</p>
-                @if (project.EndDate != null)
-                {
-                    <p class="project-created">Завершен @project.EndDate.Value.ToString("dd.MM.yyyy")</p>
-                }
-                <a href="#edit-project" rel="modal:open" class="edit-project-button" data-project-id="@project.ID">
-                    <i class="las la-edit"></i>
+                    <p class="project-created">Создан @project.CreateDate.ToString("dd.MM.yyyy")</p>
+                    @if (project.EndDate != null)
+                    {
+                        <p class="project-created">Завершен @project.EndDate.Value.ToString("dd.MM.yyyy")</p>
+                    }
+                    <a href="#edit-project" rel="modal:open" class="edit-project-button" data-project-id="@project.ID">
+                        <i class="las la-edit"></i>
+                    </a>
                 </a>
             </div>
         }

@@ -50,6 +50,16 @@ namespace diplom.Controllers
             return View(filteredProjects.ToList());
         }
 
+        public IActionResult Project()
+        {
+            return View();
+        }
+        
+        public IActionResult ProjectSettings()
+        {
+            return View();
+        }
+
         //Создание проекта
         [HttpPost]
         [ValidateAntiForgeryToken]

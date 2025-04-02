@@ -1,0 +1,232 @@
+﻿@using diplom.Models
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+@{
+    Layout = "_Layout";
+
+    var inProcessStatus = new StatusType { ID = 1, Name = "В процессе" };
+    var completedStatus = new StatusType { ID = 2, Name = "На проверке" };
+    var frozenStatus = new StatusType { ID = 3, Name = "Отложенные" };
+    var status1 = new StatusType { ID = 3, Name = "Завершенные" };
+
+
+    var highPriority = new PriorityType { ID = 1, Name = "Высокий" };
+    var mediumPriority = new PriorityType { ID = 2, Name = "Средний" };
+    var lowPriority = new PriorityType { ID = 3, Name = "Низкий" };
+
+
+    var user1 = new User { ID = 1, FName = "Иван", LName = "Иванов" };
+    var user2 = new User { ID = 2, FName = "Мария", LName = "Петрова" };
+    var user3 = new User { ID = 3, FName = "Алексей", LName = "Сидоров" };
+
+
+    var testIssues = new List<Issue>
+    {
+        new Issue
+        {
+            ID = 1,
+            Name = "Разработать дизайн веб-приложения",
+            CreateDate = DateTime.Now.AddDays(-5),
+            DeadlineDate = DateTime.Now.AddDays(5),
+            CreatorID = user1.ID,
+            PerformerID = user1.ID,
+            PriorityTypeID = highPriority.ID,
+            StatusTypeID = inProcessStatus.ID,
+            Creator = user1,
+            Performer = user1,
+            PriorityType = highPriority,
+            StatusType = inProcessStatus
+        },
+        new Issue
+        {
+            ID = 2,
+            Name = "Написать документацию",
+            CreateDate = DateTime.Now.AddDays(-10),
+            DeadlineDate = DateTime.Now.AddDays(-2),
+            EndDate = DateTime.Now.AddDays(-2),
+            CreatorID = user2.ID,
+            PerformerID = user2.ID,
+            PriorityTypeID = mediumPriority.ID,
+            StatusTypeID = completedStatus.ID,
+            Creator = user2,
+            Performer = user2,
+            PriorityType = mediumPriority,
+            StatusType = completedStatus
+        },
+        new Issue
+        {
+            ID = 3,
+            Name = "Провести тестирование интерфейса приложения",
+            CreateDate = DateTime.Now.AddDays(-3),
+            DeadlineDate = DateTime.Now.AddDays(10),
+            CreatorID = user3.ID,
+            PerformerID = user3.ID,
+            PriorityTypeID = lowPriority.ID,
+            StatusTypeID = frozenStatus.ID,
+            Creator = user3,
+            Performer = user3,
+            PriorityType = lowPriority,
+            StatusType = frozenStatus
+        }
+        ,
+        new Issue
+        {
+            ID = 3,
+            Name = "Провести тестирование",
+            CreateDate = DateTime.Now.AddDays(-3),
+            DeadlineDate = DateTime.Now.AddDays(10),
+            CreatorID = user3.ID,
+            PerformerID = user3.ID,
+            PriorityTypeID = lowPriority.ID,
+            StatusTypeID = frozenStatus.ID,
+            Creator = user3,
+            Performer = user3,
+            PriorityType = lowPriority,
+            StatusType = status1
+        }
+    };
+    var project = new Project
+            {
+                ID = 1,
+                Name = "Тестовый проект",
+                Description = "Это тестовый проект для демонстрации интерфейса.",
+                CreateDate = DateTime.Now.AddDays(-15),
+                Status = ProjectStatus.InProcess,
+                CreatorID = user1.ID,
+                CreatorUser = user1,
+                Issues = testIssues,
+                PriorityTypes = new List<PriorityType> { highPriority, mediumPriority, lowPriority },
+                StatusTypes = new List<StatusType> { inProcessStatus, completedStatus, frozenStatus, status1 },
+                UserProjects = new List<UserProject>(),
+                Logs = new List<Log>()
+            };
+}
+
+<div class="project-page-container">
+    <div class="project-header">
+        <a class="info-container-link" href="/Projects/ProjectSettings">
+            <div class="info-container">
+                <span class="project-name">@project.Name</span>
+                <div class="icon">
+                    <i class="las la-cog"></i>
+                </div>
+            </div>
+        </a>
+
+        <div class="button-a">
+            <a href="#add-task" rel="modal:open" class="input__submit">Добавить задачу</a>
+            <a href="#add-user" rel="modal:open" class="input__submit">Добавить пользователя</a>
+        </div>
+    </div>
+
+    <div class="task-filter-tabs">
+        <a href="/Projects/ProjectDetails?filter=all" class="filter-button all @(ViewBag.TaskFilter == "all" ? "active" : "")">Показать все</a>
+        <a href="/Projects/ProjectDetails?filter=myTasks" class="filter-button inprocess @(ViewBag.TaskFilter == "myTasks" ? "active" : "")">Мои задачи</a>
+    </div>
+
+    <div class="task-columns-container">
+        <div class="task-columns">
+            @foreach (var status in project.StatusTypes)
+            {
+                <div class="task-column" data-status="@status.Name">
+                    <h2>@status.Name</h2>
+                    <ul class="task-list">
+                        @foreach (var task in project.Issues.Where(t => t.StatusType.Name == status.Name))
+                        {
+                            <li class="task-card draggable @GetPriorityClass(task.PriorityTypeID)" data-task-id="@task.ID">
+                                <a href="#add-task" rel="modal:open" class="edit-task-link">
+                                    <h3>@task.Name</h3>
+                                    <p>Приоритет: <span class="priority-text">@(task.PriorityType.Name)</span></p>
+                                    <p>Завершить до: @(task.DeadlineDate?.ToString("dd.MM.yyyy") ?? "не указано")</p>
+                                </a>
+                            </li>
+                        }
+
+                    </ul>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@functions {
+    private string GetPriorityClass(int priorityId)
+    {
+        switch (priorityId)
+        {
+            case 1: return "priority-high";
+            case 2: return "priority-medium";
+            case 3: return "priority-low";
+            default: return "";
+        }
+    }
+}
+
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const taskColumns = document.querySelectorAll('.task-list');
+        taskColumns.forEach(column => {
+            Sortable.create(column, {
+                group: 'tasks',
+                animation: 150,
+                ghostClass: 'sortable-ghost',
+                // chosenClass: 'sortable-chosen',
+                emptyInsertThreshold: 250
+            });
+        });
+    });
+</script>
+
+<div id="add-task" class="modal">
+    <form asp-action="AddTask" asp-controller="Projects">
+        <div class="modal-container">
+            <h1 class="modal-title">Новая задача</h1>
+            <label class="input-form__label add-project">
+                <span class="input-placeholder">название</span>
+                <input class="form__input input-name" name="Name" autocomplete="off" required>
+            </label>
+            <label class="input-form__label add-project">
+                <span class="input-placeholder">описание</span>
+                <textarea class="form__input form__textarea" name="Description" autocomplete="off"></textarea>
+            </label>
+
+            <label class="input-form__label">
+                <span class="input-placeholder">приоритет</span>
+                <select class="form__input input-select" name="Status" required>
+                    <!option>низкий</!option>
+                    <!option>средний</!option>
+                    <!option>высокий</!option>
+                </select>
+            </label>
+
+            <label class="input-form__label">
+                <span class="input-placeholder">категория</span>
+                <select class="form__input input-select" name="Category">
+                    <!option>---не выбрана---</!option>
+                    <!option>тестирование</!option>
+                    <!option>разработка</!option>
+                    
+                </select>
+            </label>
+
+            <label class="input-form__label">
+                <span class="input-placeholder">ответственный</span>
+                <select class="form__input input-select" name="Category">
+                    <!option>Иванов Иван</!option>
+                    <!option>Петров Александр</!option>
+                    <!option>Новикова Елена</!option>
+                </select>
+            </label>
+
+            <label class="input-form__label add-project">
+                <span class="input-placeholder">срок</span>
+                <input class="form__input input-date" type="date" name="DeadlineDate" value="@DateTime.Now.ToString("yyyy-MM-dd")" required>
+            </label>
+
+            <button class="input__submit confirm">Сохранить</button>
+        </div>
+    </form>
+
+    <a href="#" rel="modal:close"></a>
+</div>
