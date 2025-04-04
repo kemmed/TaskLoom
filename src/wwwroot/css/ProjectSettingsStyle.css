@@ -1,5 +1,6 @@
-.settings-container{
-    margin:0% 20%;
+.settings-container {
+    margin: 0% 20%;
+    margin-bottom: 30px;
 }
 .settings-header {
     margin: 20px 0px;
@@ -23,6 +24,9 @@
         width: 300px;
     }
 
+.categories-list{
+    margin: 20px 0px;
+}
 .categories-list ul {
     list-style-type: none;
     padding: 0;
@@ -34,12 +38,12 @@
     border-radius: 5px;
     padding: 10px;
     margin-bottom: 10px;
-    font-size: 14px;
+    font-size: 16px;
     color: #333;
 }
 
 
-.employees-table {
+.users-table {
     width: 100%;
     margin: 20px 0px;
     border: 2px solid #ddd;
@@ -57,22 +61,46 @@
     width: 150px;
 }
 
-.employees-table th,
-.employees-table td {
+.config-title-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    gap: 15px;
+}
+
+.users-table th,
+.users-table td {
     border: 1px solid #ddd;
     padding: 10px;
     text-align: center;
 }
 
-    .employees-table th {
+    .users-table th {
         background-color: #f9f9f9;
         font-weight: bold;
     }
 
-    .employees-table tr:nth-child(even) {
+    .users-table tr:nth-child(even) {
         background-color: #f9f9f9;
     }
 
-    .employees-table tr:hover {
+    .users-table tr:hover {
         background-color: #eaeaea;
     }
+
+
+.config-tabel-title {
+    text-align: center;
+    font-weight: bold;
+}
+.no-margin{
+    margin:0;
+}
+.category-item-container {
+    display: flex;
+    justify-content: space-between;
+    gap:10px;
+}
+.category-name{
+    flex-grow:1;
+}

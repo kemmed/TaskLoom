@@ -2,8 +2,6 @@
 .project-page-container {
     padding: 20px 0px;
 }
-
-
 .project-header {
     display: flex;
     justify-content: space-between;
@@ -29,7 +27,10 @@
     gap: 10px;
     margin-bottom: 20px;
 }
-
+.filter-button.my-task {
+    color: #7183d6;
+    border-color: #7183d6;
+}
 
 .task-columns-container {
     /*overflow-x: auto;*/

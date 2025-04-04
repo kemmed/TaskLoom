@@ -3,6 +3,7 @@
 
 @{
     Layout = "_Layout";
+
     var project = new Project
     {
         ID = 1,
@@ -16,24 +17,36 @@
             new UserProject
             {
                 User = new User { LName = "Иванов", FName = "Иван", Email = "ivanov@example.com" },
-                UserRole = UserRoles.Admin
+                UserRole = UserRoles.Admin,
+                CategoryTypes = new List<CategoryType>
+                {
+                    new CategoryType { Name = "Фронтенд разработка" },
+                    new CategoryType { Name = "Тестирование" }
+                }
             },
             new UserProject
             {
                 User = new User { LName = "Петров", FName = "Петр", Email = "petrov@example.com" },
-                UserRole = UserRoles.Employee
+                UserRole = UserRoles.Employee,
+                CategoryTypes = new List<CategoryType>
+                {
+                    new CategoryType { Name = "Документирование" }
+                }
+            },
+            new UserProject
+            {
+                User = new User { LName = "Сидоров", FName = "Алексей", Email = "sidorov@example.com" },
+                UserRole = UserRoles.Employee,
+                CategoryTypes = new List<CategoryType>() 
             }
         }
     };
 
     var categories = new List<CategoryType>
     {
-        new CategoryType { Name = "Разработка" },
-        new CategoryType { Name = "Разработка" },
-        new CategoryType { Name = "Разработка" },
-        new CategoryType { Name = "Разработка" },
-
-        new CategoryType { Name = "Тестирование" }
+        new CategoryType { Name = "Фронтенд разработка" },
+        new CategoryType { Name = "Тестирование" },
+        new CategoryType { Name = "Документирование" }
     };
 }
 
@@ -41,52 +54,58 @@
 
     <div class="settings-header">
         <div class="button-a">
-            <a href="/Projects/Archive/@project.ID" class="input__submit">Архив задач</a>
-            <a href="/Projects/History/@project.ID" class="input__submit">История действий</a>
-            <a href="/Projects/Statistics/@project.ID" class="input__submit">Статистика проекта</a>
-            <a href="/Projects/LeaveProject/@project.ID" class="input__submit cancel">Покинуть проект</a>
+            <a href="/Projects/Archive/@project.ID" class="input__submit">Архив задач <i class="las la-archive"></i></i></a>
+            <a href="/Projects/History/@project.ID" class="input__submit">История действий <i class="las la-history"></i></a>
+            <a href="/Projects/Statistics/@project.ID" class="input__submit">Статистика проекта <i class="las la-chart-bar"></i></a>
+            <a href="/Projects/LeaveProject/@project.ID" class="input__submit cancel">Покинуть проект <i class="las la-sign-out-alt"></i></a>
         </div>
     </div>
-
 
     <div class="project-details">
         <h2 class="modal-title">Основная информация</h2>
         <form asp-action="UpdateProject" asp-controller="Projects" method="post" class="update-project-container">
             <input type="hidden" name="ProjectID" value="@project.ID" />
             <label class="input-form__label add-project">
-                <span class="input-placeholder">название</span>
+                <span class="input-placeholder">Название</span>
                 <input class="form__input input-name" name="Name" autocomplete="off" required value="@project.Name">
             </label>
             <label class="input-form__label add-project">
-                <span class="input-placeholder">описание</span>
+                <span class="input-placeholder">Описание</span>
                 <textarea class="form__input form__textarea" name="Description" autocomplete="off">@project.Description</textarea>
             </label>
             <label class="input-form__label">
-                <span class="input-placeholder">статус</span>
+                <span class="input-placeholder">Статус</span>
                 <select class="form__input input-select" name="Status" required>
                     @foreach (var status in Enum.GetValues(typeof(ProjectStatus)))
                     {
-                        @*  <option value="@status" @(project.Status.ToString() == status.ToString() ? "selected" : "")>
+                        @* <option value="@status" @(project.Status.ToString() == status.ToString() ? "selected" : "")>
                             @project.ConvertStatus((ProjectStatus)status)
                         </option> *@
                     }
                 </select>
             </label>
             <label class="input-form__label add-project">
-                <span class="input-placeholder">срок завершения</span>
+                <span class="input-placeholder">Срок завершения</span>
                 <input class="form__input input-date" type="date" name="DeadlineDate" required value="@project.DeadlineDate.Value.ToString("yyyy-MM-dd")">
             </label>
-            <button class="input__submit confirm">Сохранить изменения</button>
+            <button class="input__submit confirm no-margin">Сохранить изменения <i class="las la-save"></i></button>
         </form>
     </div>
 
-    <div class="employees-section">
-        <h2 class="modal-title">Сотрудники</h2>
-        <table class="employees-table">
+    <div class="users-section">
+        <div class="config-title-container">
+            <h2 class="config-title">Сотрудники</h2>
+            <div class="button-a">
+                <a href="#add-user" rel="modal:open" class="input__submit mini">
+                    <i class="las la-user-plus"></i>
+                </a>
+            </div>
+        </div>
+        <table class="users-table">
             <thead>
                 <tr>
-                    <th>Фамилия</th>
                     <th>Имя</th>
+                    <th>Категории</th>
                     <th>Почта</th>
                     <th>Роль</th>
                     <th></th>
@@ -96,18 +115,34 @@
                 @foreach (var userProject in project.UserProjects)
                 {
                     <tr>
-                        <td>@userProject.User.LName</td>
-                        <td>@userProject.User.FName</td>
-                        <td>@userProject.User.Email</td>
-                        <td>@userProject.UserRole</td>
-                        @if (@userProject.UserRole != UserRoles.Admin)
-                        {
-                            <td class="exclude-user">
-                                <div class="button-exclude-user">
-                                <a href="/Projects/LeaveProject/@project.ID" class="input__submit cancel">Исключить</a>
-                            </div>
+                        <td>@userProject.User.LName @userProject.User.FName</td>
+                        <td>
+                            @if (userProject.CategoryTypes != null && userProject.CategoryTypes.Any())
+                            {
+                                <ul class="category-list" >
+                                    @foreach (var category in userProject.CategoryTypes)
+                                    {
+                                        <li>@category.Name </li>
+                                    }
+                                </ul>
+                            }
+                            else
+                            {
+                                <span>Нет категорий</span>
+                            }
                         </td>
-                        }
+                        <td>@userProject.User.Email</td>
+                        <td>@userProject.UserRole <i class="las la-pen"></i></td>
+                        <td class="exclude-user">
+                            @if (userProject.UserRole != UserRoles.Admin)
+                            {
+                                <div class="button-a">
+                                    <a href="/Projects/ExcludeUser?userId=@userProject.User.ID&projectId=@project.ID" class="input__submit cancel mini">
+                                        <i class="las la-user-times"></i>
+                                    </a>
+                                </div>
+                            }
+                        </td>
                     </tr>
                 }
             </tbody>
@@ -115,7 +150,12 @@
     </div>
 
     <div class="categories-section">
-        <h2 class="modal-title">Категории задач</h2>
+        <div class="config-title-container">
+            <h2 class="config-title">Категории задач</h2>
+            <div class="button-a">
+                <a href="#add-category" rel="modal:open" class="input__submit mini"><i class="las la-plus-circle"></i></a>
+            </div>
+        </div>
         <div class="categories-list">
             @if (categories.Count == 0)
             {
@@ -126,27 +166,32 @@
                 <ul>
                     @foreach (var category in categories)
                     {
-                        <li>@category.Name</li>
+                        <div class="category-item-container">
+                        <a class="category-name" href="">
+                            <li >@category.Name</li>
+                        </a>
+                        
+
+                            <div class="button-a">
+                            <a href="#delet-category" rel="modal:open" class="input__submit cancel mini"><i class="las la-trash-alt"></i></a>
+                            </div>
+                        </div>
                     }
                 </ul>
             }
         </div>
-        <a href="#add-category" rel="modal:open" class="input__submit add-button">Добавить категорию</a>
     </div>
 
 
-    
-
-
-
-<form asp-action="AddCategory" asp-controller="Projects" id="add-category" class="modal">
-    <div class="modal-container">
-        <h1 class="modal-title">Добавить категорию</h1>
-        <label class="input-form__label add-project">
-            <span class="input-placeholder">название</span>
-            <input class="form__input input-name" name="CategoryName" autocomplete="off" required>
-        </label>
-        <button class="input__submit confirm">Добавить</button>
-    </div>
-    <a href="#" rel="modal:close"></a>
-</form>
+    <form asp-action="AddCategory" asp-controller="Projects" id="add-category" class="modal">
+        <div class="modal-container">
+            <h1 class="modal-title">Добавить категорию</h1>
+            <label class="input-form__label add-project">
+                <span class="input-placeholder">Название категории</span>
+                <input class="form__input input-name" name="CategoryName" autocomplete="off" required>
+            </label>
+            <button class="input__submit confirm">Добавить <i class="las la-clipboard-check"></i></button>
+        </div>
+        <a href="#" rel="modal:close"></a>
+    </form>
+</div>

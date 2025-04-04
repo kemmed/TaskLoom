@@ -3,9 +3,7 @@
 }
 
 .profile-view {
-    margin-bottom: 30px;
-    margin-top: 10px;
-    padding: 0px 40px;
+    margin: 10px 0px;
 }
 
     .profile-view p {
@@ -14,18 +12,14 @@
         margin-bottom: 10px;
     }
 
-#edit-button, #cancel-button {
-    margin: auto 80px;
-}
 
 .profile-background {
     height: 100vh;
     display: flex;
-    justify-content: center;
     align-items: center;
     flex-direction: column;
     background-color: #f9f9f9;
-    padding-top: 20px;
+    padding-top: 5%;
 }
 
 .profile-window {
@@ -39,18 +33,23 @@
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     width: 100%;
     max-width: 500px;
+
+    display: flex;
+    flex-direction: column;
 }
 
 .profile-section {
     display: flex;
     flex-direction: column;
-    margin-bottom: 10px;
     margin-left: 50px;
     margin-right: 50px;
 }
     .profile-section .input-form__label {
         margin-bottom: 25px;
     }
+        .profile-section .last {
+            margin-bottom: 5px;
+        }
     
 
 .section-title {
@@ -70,11 +69,16 @@
     margin-bottom:30px;
 }
     .profile-form .input__submit {
-        margin: auto 80px;
+        margin: auto;
     }
 .profile__error {
     word-wrap: break-word;
     color: #333;
+}
+.profile-edit {
+}
+#edit-button{
+    margin:auto;
 }
 
 .text-danger {
@@ -82,16 +86,6 @@
     font-size: small;
     color: #dc3545;
 }
-.password-link {
-    font-size: 20px;
-    color: #007bff;
-    text-align: center;
-    text-decoration: none;
-    margin-bottom: 15px;
-}
-    .password-link a:hover {
-            color: #0056b3;
-    }
 .update-pass{
     width:300px;
 }

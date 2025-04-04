@@ -114,18 +114,18 @@
         </a>
 
         <div class="button-a">
-            <a href="#add-task" rel="modal:open" class="input__submit">Добавить задачу</a>
-            <a href="#add-user" rel="modal:open" class="input__submit">Добавить пользователя</a>
+            <a href="#add-task" rel="modal:open" class="input__submit">Добавить задачу <i class="las la-thumbtack"></i></a>
         </div>
     </div>
 
     <div class="task-filter-tabs">
-        <a href="/Projects/ProjectDetails?filter=all" class="filter-button all @(ViewBag.TaskFilter == "all" ? "active" : "")">Показать все</a>
-        <a href="/Projects/ProjectDetails?filter=myTasks" class="filter-button inprocess @(ViewBag.TaskFilter == "myTasks" ? "active" : "")">Мои задачи</a>
+        <a href="/Projects/ProjectDetails?filter=all" class="filter-button all @(ViewBag.TaskFilter == "all" ? "active" : "")">Все</a>
+        <a href="/Projects/ProjectDetails?filter=myTasks" class="filter-button my-task @(ViewBag.TaskFilter == "myTasks" ? "active" : "")">Мои <i class="las la-user-alt"></i></a>
+        <a href="/Projects/ProjectDetails?filter=myCategory" class="filter-button my-category @(ViewBag.TaskFilter == "myTasks" ? "active" : "")">Моей категории <i class="las la-stream"></i></a>
     </div>
 
     <div class="task-columns-container">
-        <div class="task-columns">
+        <div class="task-columns"> 
             @foreach (var status in project.StatusTypes)
             {
                 <div class="task-column" data-status="@status.Name">
@@ -224,7 +224,7 @@
                 <input class="form__input input-date" type="date" name="DeadlineDate" value="@DateTime.Now.ToString("yyyy-MM-dd")" required>
             </label>
 
-            <button class="input__submit confirm">Сохранить</button>
+            <button class="input__submit confirm">Добавить <i class="las la-clipboard-check"></i></button>
         </div>
     </form>
 

@@ -8,11 +8,21 @@
 
         @if (ViewBag.success)
         {
-            <a href="/">Войти</a>
+            <div class="button-a">
+                <a href="/" class="input__submit">
+                    Войти
+                    <i class="las la-sign-in-alt"></i>
+                </a>
+            </div>
         }
         else if (!ViewBag.success)
         {
-            <a href="Registration">Регистрация</a>
+            <div class="button-a">
+                <a href="Registration" class="input__submit">
+                    Регистрация
+                    <i class="las la-user-check"></i>
+                </a>
+            </div>
         }
         
     </div>

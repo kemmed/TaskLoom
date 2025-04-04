@@ -33,7 +33,7 @@
         color: #007bff;
     }
 
-    .message-container a {
+    /*.message-container a {
         display: inline-block;
         text-decoration: none;
         padding: 12px 24px;
@@ -53,4 +53,4 @@
             border-color: #9fb6cc;
             color: #ffffff;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
+        }*/

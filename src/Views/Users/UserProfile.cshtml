@@ -38,7 +38,7 @@
                 <p><strong>Email:</strong> @Model.Email</p>
             </div>
 
-            <button id="edit-button" class="input__submit">Редактировать</button>
+             <button id="edit-button" class="input__submit">Редактировать <i class="las la-pen"></i></button>
         </div>
 
 
@@ -51,35 +51,17 @@
                         <input class="form__input input-name" name="FName" value="@Model.FName" autocomplete="off" required>
                     </label>
 
-                    <label class="input-form__label">
+                    <label class="input-form__label last">
                         <span class="input-placeholder">Фамилия</span>
                         <input class="form__input input-name" name="LName" value="@Model.LName" autocomplete="off" required>
                     </label>
                 </div>
-                <input class="input__submit confirm" type="submit" value="Сохранить">
+                <button class="input__submit confirm">Сохранить <i class="las la-save"></i></button>
             </form>
-
-          @*   <form asp-action="UpdateProfileEmail" asp-controller="Users" class="profile-form" method="post">
-                <div class="profile-section">
-                    <h3 class="section-title">Контактные данные</h3>
-                    <label class="input-form__label">
-                        <span class="input-placeholder">Email</span>
-                        <input class="form__input input-email" type="email" name="Email" value="@Model.Email" autocomplete="off" required>
-                    </label>
-                </div>
-                <input class="input__submit confirm" type="submit" value="Подтвердить">
-                @if (ViewBag.EmailError != null)
-                {
-                    <div class="profile__error">
-                        <p class="text-danger">@ViewBag.EmailError</p>
-                    </div>
-                }
-            </form> *@
-            <div class="password-link">
-                <a class="password-link" href="#update-password" rel="modal:open">Сбросить пароль</a>
+            <div class="button-a">
+                <button id="cancel-button" class="input__submit cancel">Отменa</button>
+                <a class="input__submit" href="#update-password" rel="modal:open">Сбросить пароль <i class="las la-key"></i></a>
             </div>
-
-            <button id="cancel-button" class="input__submit cancel">Отменить</button>
         </div>
 
     </div>
@@ -96,7 +78,7 @@
                 <input type="checkbox" class="input__checkbox password-toggler">
             </div>
         </label>
-        <input class="input__submit" type="submit" value="Сбросить пароль">
+        <button class="input__submit">Сбросить пароль <i class="las la-key"></i></button>
     </div>
     @if (ViewBag.PasswordError != null)
     {

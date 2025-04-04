@@ -13,18 +13,20 @@
             Все (@(ViewBag.StatusCounts[ProjectStatus.InProcess] + ViewBag.StatusCounts[ProjectStatus.Completed] + ViewBag.StatusCounts[ProjectStatus.Frozen]))
         </a>
         <a href="/Projects/AllProjects?statusFilter=InProcess" class="filter-button inprocess @(ViewBag.StatusFilter == "InProcess" ? "active" : "")">
-            В процессе (@ViewBag.StatusCounts[ProjectStatus.InProcess])
+            В процессе <i class="las la-cogs"></i> (@ViewBag.StatusCounts[ProjectStatus.InProcess])
         </a>
         <a href="/Projects/AllProjects?statusFilter=Frozen" class="filter-button frozen @(ViewBag.StatusFilter == "Frozen" ? "active" : "")">
-            Отложенные (@ViewBag.StatusCounts[ProjectStatus.Frozen])
+            Отложенные <i class="las la-clock"></i> (@ViewBag.StatusCounts[ProjectStatus.Frozen])
         </a>
         <a href="/Projects/AllProjects?statusFilter=Completed" class="filter-button completed @(ViewBag.StatusFilter == "Completed" ? "active" : "")">
-            Завершенные (@ViewBag.StatusCounts[ProjectStatus.Completed])
+            Завершенные <i class="las la-chevron-down"></i> (@ViewBag.StatusCounts[ProjectStatus.Completed])
         </a>
     </div>
 
     <div class="button-a">
-        <a href="#add-project" rel="modal:open" class="input__submit">Добавить проект</a>
+        <a href="#add-project" rel="modal:open" class="input__submit">Новый проект 
+            <i class="las la-briefcase"></i>
+        </a>
     </div>
 </div>
 
@@ -55,7 +57,7 @@ else
                         <p class="project-created">Завершен @project.EndDate.Value.ToString("dd.MM.yyyy")</p>
                     }
                     <a href="#edit-project" rel="modal:open" class="edit-project-button" data-project-id="@project.ID">
-                        <i class="las la-edit"></i>
+                        <i class="las la-pen"></i>
                     </a>
                 </a>
             </div>
@@ -99,7 +101,7 @@ else
             <input class="form__input input-date" type="date" name="DeadlineDate" required value="@DateTime.Now.ToString("yyyy-MM-dd")">
         </label>
 
-        <button class="input__submit confirm">Добавить</button>
+        <button class="input__submit confirm">Добавить <i class="las la-clipboard-check"></i></button>
     </div>
     <a href="#" rel="modal:close"></a>
 </form>
@@ -153,7 +155,7 @@ else
                         <input class="form__input input-date" type="date" name="DeadlineDate" required value="@project.DeadlineDate.Value.ToString("yyyy-MM-dd")">
                     </label>
 
-                    <button class="input__submit confirm">Сохранить</button>
+                    <button class="input__submit confirm">Сохранить <i class="las la-save"></i></button>
                 </div>
             </form>
         </div>
