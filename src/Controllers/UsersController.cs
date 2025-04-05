@@ -12,6 +12,7 @@ using System.Text;
 using System.Security.Cryptography;
 using NuGet.Common;
 using System.Net;
+using Microsoft.AspNetCore.Http;
 
 namespace diplom.Controllers
 {
@@ -110,6 +111,7 @@ namespace diplom.Controllers
             else
             {
                 HttpContext.Session.SetInt32("UserID", logUser.ID);
+                HttpContext.Session.SetString("UserName", logUser.FName);
                 return Redirect("/Projects/AllProjects");
             }
         }

@@ -3,6 +3,7 @@
 
 @{
     Layout = "_Layout";
+    ViewData["Username"] = Context.Session.GetString("UserName");
 }
 <script>
         document.addEventListener('DOMContentLoaded', function () {

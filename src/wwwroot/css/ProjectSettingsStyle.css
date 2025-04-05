@@ -36,8 +36,7 @@
     background-color: #f9f9f9;
     border: 1px solid #ddd;
     border-radius: 5px;
-    padding: 10px;
-    margin-bottom: 10px;
+    padding: 15px;
     font-size: 16px;
     color: #333;
 }
@@ -99,8 +98,26 @@
 .category-item-container {
     display: flex;
     justify-content: space-between;
-    gap:10px;
+    gap: 10px;
+    align-items: center;
+    margin-bottom:10px;
+    
 }
-.category-name{
+    .category-item-container .category-name-container {
+        text-decoration: none;
+        color: #333;
+    }
+.category-name-container:hover {
+    color: #60a7e7;
+}
+    .category-name{
     flex-grow:1;
+    text-decoration: none;
 }
+.user-role-edit {
+    text-decoration: none;
+    color: #333;
+}
+    .user-role-edit:hover {
+        color: #60a7e7;
+    }

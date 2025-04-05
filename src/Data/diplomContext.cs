@@ -28,6 +28,11 @@ namespace diplom.Data
                 .WithMany()
                 .HasForeignKey(i => i.PerformerID)
                 .OnDelete(DeleteBehavior.SetNull);
+
+            //modelBuilder.Entity<Project>()
+            //   .HasMany(p => p.CategoryTypes)
+            //   .WithOne(ct => ct.Project)
+            //   .HasForeignKey(ct => ct.ProjectID);
         }
 
 

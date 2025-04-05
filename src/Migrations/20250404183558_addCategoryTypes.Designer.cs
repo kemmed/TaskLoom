@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using diplom.Data;
 
@@ -10,9 +11,11 @@ using diplom.Data;
 namespace diplom.Migrations
 {
     [DbContext(typeof(diplomContext))]
-    partial class diplomContextModelSnapshot : ModelSnapshot
+    [Migration("20250404183558_addCategoryTypes")]
+    partial class addCategoryTypes
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "8.0.11");
@@ -209,9 +212,14 @@ namespace diplom.Migrations
                     b.Property<int>("ProjectID")
                         .HasColumnType("INTEGER");
 
+                    b.Property<int?>("ProjectID1")
+                        .HasColumnType("INTEGER");
+
                     b.HasKey("ID");
 
                     b.HasIndex("ProjectID");
+
+                    b.HasIndex("ProjectID1");
 
                     b.ToTable("StatusType");
                 });
@@ -298,7 +306,7 @@ namespace diplom.Migrations
             modelBuilder.Entity("diplom.Models.CategoryType", b =>
                 {
                     b.HasOne("diplom.Models.Project", "Project")
-                        .WithMany("CategoryTypes")
+                        .WithMany()
                         .HasForeignKey("ProjectID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -390,10 +398,14 @@ namespace diplom.Migrations
             modelBuilder.Entity("diplom.Models.StatusType", b =>
                 {
                     b.HasOne("diplom.Models.Project", "Project")
-                        .WithMany("StatusTypes")
+                        .WithMany("CategoryTypes")
                         .HasForeignKey("ProjectID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.HasOne("diplom.Models.Project", null)
+                        .WithMany("StatusTypes")
+                        .HasForeignKey("ProjectID1");
 
                     b.Navigation("Project");
                 });

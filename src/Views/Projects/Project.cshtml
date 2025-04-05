@@ -1,112 +1,18 @@
 ﻿@using diplom.Models
+@using diplom.Controllers
 @addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@model List<StatusType>
 
 @{
     Layout = "_Layout";
-
-    var inProcessStatus = new StatusType { ID = 1, Name = "В процессе" };
-    var completedStatus = new StatusType { ID = 2, Name = "На проверке" };
-    var frozenStatus = new StatusType { ID = 3, Name = "Отложенные" };
-    var status1 = new StatusType { ID = 3, Name = "Завершенные" };
-
-
-    var highPriority = new PriorityType { ID = 1, Name = "Высокий" };
-    var mediumPriority = new PriorityType { ID = 2, Name = "Средний" };
-    var lowPriority = new PriorityType { ID = 3, Name = "Низкий" };
-
-
-    var user1 = new User { ID = 1, FName = "Иван", LName = "Иванов" };
-    var user2 = new User { ID = 2, FName = "Мария", LName = "Петрова" };
-    var user3 = new User { ID = 3, FName = "Алексей", LName = "Сидоров" };
-
-
-    var testIssues = new List<Issue>
-    {
-        new Issue
-        {
-            ID = 1,
-            Name = "Разработать дизайн веб-приложения",
-            CreateDate = DateTime.Now.AddDays(-5),
-            DeadlineDate = DateTime.Now.AddDays(5),
-            CreatorID = user1.ID,
-            PerformerID = user1.ID,
-            PriorityTypeID = highPriority.ID,
-            StatusTypeID = inProcessStatus.ID,
-            Creator = user1,
-            Performer = user1,
-            PriorityType = highPriority,
-            StatusType = inProcessStatus
-        },
-        new Issue
-        {
-            ID = 2,
-            Name = "Написать документацию",
-            CreateDate = DateTime.Now.AddDays(-10),
-            DeadlineDate = DateTime.Now.AddDays(-2),
-            EndDate = DateTime.Now.AddDays(-2),
-            CreatorID = user2.ID,
-            PerformerID = user2.ID,
-            PriorityTypeID = mediumPriority.ID,
-            StatusTypeID = completedStatus.ID,
-            Creator = user2,
-            Performer = user2,
-            PriorityType = mediumPriority,
-            StatusType = completedStatus
-        },
-        new Issue
-        {
-            ID = 3,
-            Name = "Провести тестирование интерфейса приложения",
-            CreateDate = DateTime.Now.AddDays(-3),
-            DeadlineDate = DateTime.Now.AddDays(10),
-            CreatorID = user3.ID,
-            PerformerID = user3.ID,
-            PriorityTypeID = lowPriority.ID,
-            StatusTypeID = frozenStatus.ID,
-            Creator = user3,
-            Performer = user3,
-            PriorityType = lowPriority,
-            StatusType = frozenStatus
-        }
-        ,
-        new Issue
-        {
-            ID = 3,
-            Name = "Провести тестирование",
-            CreateDate = DateTime.Now.AddDays(-3),
-            DeadlineDate = DateTime.Now.AddDays(10),
-            CreatorID = user3.ID,
-            PerformerID = user3.ID,
-            PriorityTypeID = lowPriority.ID,
-            StatusTypeID = frozenStatus.ID,
-            Creator = user3,
-            Performer = user3,
-            PriorityType = lowPriority,
-            StatusType = status1
-        }
-    };
-    var project = new Project
-            {
-                ID = 1,
-                Name = "Тестовый проект",
-                Description = "Это тестовый проект для демонстрации интерфейса.",
-                CreateDate = DateTime.Now.AddDays(-15),
-                Status = ProjectStatus.InProcess,
-                CreatorID = user1.ID,
-                CreatorUser = user1,
-                Issues = testIssues,
-                PriorityTypes = new List<PriorityType> { highPriority, mediumPriority, lowPriority },
-                StatusTypes = new List<StatusType> { inProcessStatus, completedStatus, frozenStatus, status1 },
-                UserProjects = new List<UserProject>(),
-                Logs = new List<Log>()
-            };
+    ViewData["Username"] = Context.Session.GetString("UserName");
 }
 
 <div class="project-page-container">
     <div class="project-header">
-        <a class="info-container-link" href="/Projects/ProjectSettings">
+        <a class="info-container-link" href="/Projects/ProjectSettings/@ViewBag.ProjectID">
             <div class="info-container">
-                <span class="project-name">@project.Name</span>
+                <span class="project-name">@ViewBag.ProjectName</span>
                 <div class="icon">
                     <i class="las la-cog"></i>
                 </div>
@@ -125,23 +31,25 @@
     </div>
 
     <div class="task-columns-container">
-        <div class="task-columns"> 
-            @foreach (var status in project.StatusTypes)
+        <div class="task-columns">
+            @foreach (StatusType statusType in Model)
             {
-                <div class="task-column" data-status="@status.Name">
-                    <h2>@status.Name</h2>
+                <div class="task-column" data-status="@statusType.Name" data-status-id="@statusType.ID">
+                    <h2>@statusType.Name</h2>
                     <ul class="task-list">
-                        @foreach (var task in project.Issues.Where(t => t.StatusType.Name == status.Name))
+                        @foreach (Issue task in statusType.Issues.Where(t => t.StatusType.Name == statusType.Name))
                         {
-                            <li class="task-card draggable @GetPriorityClass(task.PriorityTypeID)" data-task-id="@task.ID">
-                                <a href="#add-task" rel="modal:open" class="edit-task-link">
+                            <li class="task-card draggable @GetPriorityClass(task.PriorityType)" data-task-id="@task.ID">
+                                <a href="#edit-task" rel="modal:open" class="edit-task-link" data-issue-id="@task.ID">
                                     <h3>@task.Name</h3>
                                     <p>Приоритет: <span class="priority-text">@(task.PriorityType.Name)</span></p>
                                     <p>Завершить до: @(task.DeadlineDate?.ToString("dd.MM.yyyy") ?? "не указано")</p>
                                 </a>
+                                <a href="#delete-task" rel="modal:open" class="delet-task-button" data-task-id="@task.ID">
+                                    <i class="las la-trash-alt"></i>
+                                </a>
                             </li>
                         }
-
                     </ul>
                 </div>
             }
@@ -150,13 +58,13 @@
 </div>
 
 @functions {
-    private string GetPriorityClass(int priorityId)
+    private string GetPriorityClass(PriorityType priority)
     {
-        switch (priorityId)
+        switch (priority.Name)
         {
-            case 1: return "priority-high";
-            case 2: return "priority-medium";
-            case 3: return "priority-low";
+            case "Высокий": return "priority-high";
+            case "Средний": return "priority-medium";
+            case "Низкий": return "priority-low";
             default: return "";
         }
     }
@@ -166,61 +74,91 @@
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         const taskColumns = document.querySelectorAll('.task-list');
+
         taskColumns.forEach(column => {
             Sortable.create(column, {
                 group: 'tasks',
                 animation: 150,
                 ghostClass: 'sortable-ghost',
-                // chosenClass: 'sortable-chosen',
-                emptyInsertThreshold: 250
+                emptyInsertThreshold: 250,
+
+                onEnd: function (evt) {
+                    const draggedTask = evt.item;
+                    const issueID = draggedTask.dataset.taskId;
+                    const targetColumn = evt.to;
+                    const statusID = targetColumn.closest('.task-column').dataset.statusId;
+
+                    fetch(`/Projects/UpdateIssueStatus?currIssueID=${encodeURIComponent(issueID)}&currStatusID=${encodeURIComponent(statusID)}`)
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error('Network response was not ok');
+                            }
+                            return response.json();
+                        })
+                        .then(data => {
+                            console.log('Status updated:', data);
+                        })
+                        .catch(error => {
+                            console.error('Error updating status:', error);
+                        });
+                }
             });
         });
     });
 </script>
 
+
+
 <div id="add-task" class="modal">
-    <form asp-action="AddTask" asp-controller="Projects">
+    <form asp-action="CreateIssue" asp-controller="Projects" method="post">
+        <input type="hidden" name="projectID" value="@ViewBag.ProjectID" />
+
         <div class="modal-container">
             <h1 class="modal-title">Новая задача</h1>
+
             <label class="input-form__label add-project">
                 <span class="input-placeholder">название</span>
                 <input class="form__input input-name" name="Name" autocomplete="off" required>
             </label>
+
             <label class="input-form__label add-project">
                 <span class="input-placeholder">описание</span>
                 <textarea class="form__input form__textarea" name="Description" autocomplete="off"></textarea>
             </label>
 
             <label class="input-form__label">
-                <span class="input-placeholder">приоритет</span>
-                <select class="form__input input-select" name="Status" required>
-                    <!option>низкий</!option>
-                    <!option>средний</!option>
-                    <!option>высокий</!option>
+                <span class="input-placeholder select-date">приоритет</span>
+                <select class="form__input input-select" name="PriorityTypeID" required>
+                    @foreach (SelectListItem option in ViewBag.Priorities)
+                    {
+                        <option value="@option.Value">@option.Text</option>
+                    }
                 </select>
             </label>
 
             <label class="input-form__label">
-                <span class="input-placeholder">категория</span>
-                <select class="form__input input-select" name="Category">
-                    <!option>---не выбрана---</!option>
-                    <!option>тестирование</!option>
-                    <!option>разработка</!option>
-                    
+                <span class="input-placeholder select-date">категория</span>
+                <select class="form__input input-select" name="CategoryTypeID">
+                    <option value="">---без категории---</option>
+                    @foreach (SelectListItem option in ViewBag.Categories)
+                    {
+                        <option value="@option.Value">@option.Text</option>
+                    }
                 </select>
             </label>
 
             <label class="input-form__label">
-                <span class="input-placeholder">ответственный</span>
-                <select class="form__input input-select" name="Category">
-                    <!option>Иванов Иван</!option>
-                    <!option>Петров Александр</!option>
-                    <!option>Новикова Елена</!option>
+                <span class="input-placeholder select-date">ответственный</span>
+                <select class="form__input input-select" name="PerformerID" required>
+                    @foreach (SelectListItem option in ViewBag.Responsibilities)
+                    {
+                        <option value="@option.Value">@option.Text</option>
+                    }
                 </select>
             </label>
 
             <label class="input-form__label add-project">
-                <span class="input-placeholder">срок</span>
+                <span class="input-placeholder select-date">срок</span>
                 <input class="form__input input-date" type="date" name="DeadlineDate" value="@DateTime.Now.ToString("yyyy-MM-dd")" required>
             </label>
 
@@ -230,3 +168,133 @@
 
     <a href="#" rel="modal:close"></a>
 </div>
+
+<script>
+       document.addEventListener('DOMContentLoaded', function () {
+        const editButtons = document.querySelectorAll('.edit-task-link');
+        editButtons.forEach(button => {
+            button.addEventListener('click', function () {
+                const issueID = this.getAttribute('data-issue-id');
+                document.querySelectorAll('.issueform').forEach(element => {
+                    element.classList.add('hidden');
+                });
+                const selectedEditForm = document.getElementById('EDIT_ISSUE' + issueID);
+                if (selectedEditForm) {
+                    selectedEditForm.classList.remove('hidden');
+                }
+            });
+        });
+
+        const deleteButtons = document.querySelectorAll('.delet-task-button');
+        deleteButtons.forEach(button => {
+            button.addEventListener('click', function () {
+                const issueID = this.getAttribute('data-task-id');
+                document.querySelectorAll('.issueform').forEach(element => {
+                    element.classList.add('hidden');
+                });
+                const selectedDeleteForm = document.getElementById('DELETE_ISSUE' + issueID);
+                if (selectedDeleteForm) {
+                    selectedDeleteForm.classList.remove('hidden');
+                }
+            });
+        });
+    });
+</script>
+
+
+<div id="delete-task" class="modal">
+    @foreach (var status in Model)
+    {
+        @foreach (var issue in status.Issues)
+        {
+            <div id="DELETE_ISSUE@(issue.ID)" class="hidden issueform">
+                <form asp-action="DeleteIssue" asp-controller="Projects">
+                    <input type="hidden" value="@issue.ID" name="issueID" id="issueID" />
+                    <div class="modal-container">
+                        <h1 class="modal-title">Подтвердите удаление задачи</h1>
+                        <p class="delete-text">После удаления задача будет перемещена в архив.</p>
+                        <button class="input__submit cancel">Удалить <i class="las la-trash-alt"></i></button>
+                    </div>
+                </form>
+            </div>
+        }
+    }
+    <a href="#" rel="modal:close"></a>
+</div>
+
+
+<div id="edit-task" class="modal">
+    @foreach (var status in Model)
+    {
+        @foreach (var issue in status.Issues)
+        {
+            <div id="EDIT_ISSUE@(issue.ID)" class="hidden issueform">
+                <form asp-action="UpdateIssue" asp-controller="Projects">
+                    <input type="hidden" value="@issue.ID" name="issueID" id="issueID" />
+                    <div class="modal-container">
+                        <h1 class="modal-title">Редактирование задачи</h1>
+                        <label class="input-form__label add-project">
+                            <span class="input-placeholder">название</span>
+                            <input class="form__input input-name" name="Name" autocomplete="off" value="@issue.Name" required>
+                        </label>
+                        <label class="input-form__label add-project">
+                            <span class="input-placeholder">описание</span>
+                            <textarea class="form__input form__textarea" name="Description" autocomplete="off">@issue.Description</textarea>
+                        </label>
+
+                        <label class="input-form__label">
+                            <span class="input-placeholder select-date">приоритет</span>
+                            <select class="form__input input-select" name="PriorityTypeID" required>
+                                @foreach (var option in ViewBag.Priorities)
+                                {
+                                    <!option value="@option.Value" @((issue.PriorityTypeID.ToString() == option.Value) ? "selected" : "")>@option.Text</!option>
+                                }
+                            </select>
+                        </label>
+
+                        <label class="input-form__label">
+                            <span class="input-placeholder select-date">статус</span>
+                            <select class="form__input input-select" name="StatusTypeID">
+                                @foreach (var option in ViewBag.Statuses)
+                                {
+                                    <!option value="@option.Value" @((issue.StatusTypeID.ToString() == option.Value) ? "selected" : "")>@option.Text</!option>
+                                }
+                            </select>
+                        </label>
+
+                        <label class="input-form__label">
+                            <span class="input-placeholder select-date">категория</span>
+                            <select class="form__input input-select" name="CategoryTypeID">
+                                <option value="">---без категории---</option>
+                                @foreach (var option in ViewBag.Categories)
+                                {
+                                    <!option value="@option.Value" @((issue.CategoryTypeID?.ToString() == option.Value) ? "selected" : "")>@option.Text</!option>
+                                }
+                            </select>
+                        </label>
+
+                        <label class="input-form__label">
+                            <span class="input-placeholder select-date">ответственный</span>
+                            <select class="form__input input-select" name="PerformerID">
+                                @foreach (var option in ViewBag.Responsibilities)
+                                {
+                                    <!option value="@option.Value" @((issue.Performer.ID.ToString() == option.Value) ? "selected" : "")>@option.Text</!option>
+                                }
+                            </select>
+                        </label>
+
+                        <label class="input-form__label add-project">
+                            <span class="input-placeholder select-date">срок</span>
+                            <input class="form__input input-date" type="date" name="DeadlineDate" value="@(issue.DeadlineDate?.ToString("yyyy-MM-dd") ?? DateTime.Now.ToString("yyyy-MM-dd"))" required>
+                        </label>
+
+                        <button class="input__submit confirm">Сохранить <i class="las la-clipboard-check"></i></button>
+                    </div>
+                </form>
+            </div>
+        }
+    }
+    <a href="#" rel="modal:close"></a>
+</div> 
+
+

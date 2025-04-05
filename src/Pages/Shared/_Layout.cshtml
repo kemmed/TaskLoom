@@ -27,17 +27,44 @@
 </head>
 <body>
     <header>
-        <a class ="site-title" href="/Projects/AllProjects" >Task<span class="title-part">Loom</span></a>
-
-        <a class="info-container-link" href="/Users/UserProfile">
-            <div class="info-container">
-                <span class="user-name">Имя Пользователя</span>
-                <div class="icon">
-                    <i class="la la-user-circle"></i>
+        <a class="site-title" href="/Projects/AllProjects">
+            Task<span class="title-part">Loom</span>
+        </a>
+        <div class="profile-container">
+            <div class="info-container-link" id="profile-menu-button">
+                <div class="info-container">
+                    <span class="user-name">@ViewData["Username"]</span>
+                    <div class="icon">
+                        <i class="la la-user-circle"></i>
+                    </div>
                 </div>
             </div>
-        </a>
+
+            <div class="menu hidden" id="profile-menu">
+                <a href="/Users/UserProfile" class="dropdown-item">Профиль <i class="las la-id-card"></i></i></a>
+                <a href="/Logout" class="dropdown-item">Выйти <i class="las la-sign-out-alt"></i></a>
+            </div>
+        </div>
     </header>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const profileMenuButton = document.getElementById("profile-menu-button");
+            const profileMenu = document.getElementById("profile-menu");
+            profileMenuButton.addEventListener("click", function (event) {
+                event.preventDefault();
+                profileMenu.classList.toggle("hidden");
+            });
+            document.addEventListener("click", function (event) {
+                if (
+                    !profileMenuButton.contains(event.target) &&
+                    !profileMenu.contains(event.target)
+                ) {
+                    profileMenu.classList.add("hidden");
+                }
+            });
+        });
+    </script>
 
     <div class="container">
         <main role="main" class="pb-3">

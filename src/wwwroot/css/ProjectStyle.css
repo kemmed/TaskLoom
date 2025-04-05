@@ -79,7 +79,22 @@
 .edit-task-link:hover {
     color: #333;
 }
+.delet-task-button {
+    right: 5px;
+    bottom: 5px;
+    position: absolute;
+    border-radius: 500px;
+    padding: 5px 10px;
+    font-size: 25px;
+    text-decoration: none;
+    color: #acacac;
+}
+    .delet-task-button:hover {
+        color: #b35a00;
+    }
+
 .task-card {
+    position: relative;
     background-color: #ffffff;
     border: 1px solid #ddd;
     border-radius: 10px;

@@ -5,6 +5,7 @@
 @{
     Layout = "_Layout";
     ViewData["Title"] = "Ваши проекты";
+    ViewData["Username"] = Context.Session.GetString("UserName");
 }
 
 <div class="filter-and-add-container">
@@ -45,7 +46,7 @@ else
         @foreach (Project project in Model)
         {
             <div class="project-card @(GetStatusClass(project.Status))" >
-                <a href="/Projects/Project">
+                <a href="/Projects/Project/@project.ID">
                     <h2 class="project-title">@project.Name</h2>
                     <p class="project-description">@project.Description</p>
                     <p class="project-status">Статус: @project.ConvertStatus(project.Status)</p>
@@ -97,7 +98,7 @@ else
         </label>
 
         <label class="input-form__label add-project">
-            <span class="input-placeholder">срок</span>
+            <span class="input-placeholder select-date">срок</span>
             <input class="form__input input-date" type="date" name="DeadlineDate" required value="@DateTime.Now.ToString("yyyy-MM-dd")">
         </label>
 
@@ -124,12 +125,14 @@ else
         });
     });
 </script>
+
 <div id="edit-project" class="modal">
     @foreach (Project project in Model)
     {
         <div ID="PROJECT@(@project.ID)" class="hidden projectform">
             <form asp-action="EditProject" asp-controller="Projects" >
-                <input type="hidden" value="@project.ID" name="projectID" id="projectID" />
+                <input type="hidden" value="@project.ID" name="projectID" id="projectID"/>
+                <input type="hidden" name="returnUrl" value="/Projects/AllProjects"/>
                 <div class="modal-container">
                     <h1 class="modal-title">Редактирование проекта</h1>
                     <label class="input-form__label add-project">
@@ -142,7 +145,7 @@ else
                     </label>
         
                     <label class="input-form__label">
-                        <span class="input-placeholder">статус</span>
+                        <span class="input-placeholder select-date">статус</span>
                         <select class="form__input input-select" name="Status" required>
                             <!option value="@ProjectStatus.InProcess" @((project.Status == ProjectStatus.InProcess) ? "selected" : "")>@project.ConvertStatus(ProjectStatus.InProcess)</!option>
                             <!option value="@ProjectStatus.Frozen" @((project.Status == ProjectStatus.Frozen) ? "selected" : "")>@project.ConvertStatus(ProjectStatus.Frozen)</!option>
@@ -151,7 +154,7 @@ else
                     </label>
 
                     <label class="input-form__label add-project">
-                        <span class="input-placeholder">срок</span>
+                        <span class="input-placeholder select-date">срок</span>
                         <input class="form__input input-date" type="date" name="DeadlineDate" required value="@project.DeadlineDate.Value.ToString("yyyy-MM-dd")">
                     </label>
 

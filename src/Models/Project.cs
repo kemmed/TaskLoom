@@ -20,6 +20,7 @@
         public List<Issue> Issues { get; set; }
         public List<PriorityType> PriorityTypes { get; set; }
         public List<StatusType> StatusTypes { get; set; }
+        public List<CategoryType> CategoryTypes { get; set; }
         public List<UserProject> UserProjects { get; set; }
         public List<Log> Logs { get; set; }
 

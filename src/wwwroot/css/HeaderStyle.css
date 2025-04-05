@@ -1,3 +1,13 @@
+
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 20px;
+    border-bottom: 3px solid #ddd;
+    background: #f9f9f9;
+    gap: 50px;
+}
 .site-title {
     font-size: 34px;
     color: #314ad5;
@@ -36,3 +46,38 @@
 .icon {
     font-size: 35px;
 }
+.menu {
+    position: absolute;
+    top: 50px;
+    right: 100px;
+    margin-top: 10px;
+    width: 150px;
+    background-color: white;
+    border: 3px solid white;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    z-index: 10;
+}
+
+    .menu a {
+        display: flex;
+        padding: 10px 15px;
+        font-weight: bold;
+        align-items: center;
+        flex-direction: row;
+        justify-content: center;
+        gap: 5px;
+    }
+
+    .menu :hover {
+        background-color: #ddd;
+    }
+
+.dropdown-item {
+    background-color: white;
+}
+
+    .dropdown-item i {
+        font-size: 20px;
+    }
