@@ -79,7 +79,7 @@
 .edit-task-link:hover {
     color: #333;
 }
-.delet-task-button {
+.delete-task-button {
     right: 5px;
     bottom: 5px;
     position: absolute;
@@ -89,7 +89,7 @@
     text-decoration: none;
     color: #acacac;
 }
-    .delet-task-button:hover {
+    .delete-task-button:hover {
         color: #b35a00;
     }
 

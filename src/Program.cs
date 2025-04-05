@@ -18,6 +18,7 @@ namespace diplom
             builder.Services.AddRazorPages();
 
             builder.Services.AddSingleton<MailService>();
+            builder.Services.AddSingleton<TokenService>();
 
             builder.Services.AddSession(options =>
             {

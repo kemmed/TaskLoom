@@ -1,0 +1,19 @@
+﻿@{
+    Layout = "_Layout_NoHeader";
+}
+
+<div class="centered-container">
+    <div class="message-container">
+        <h2>@Html.Raw(ViewBag.message)</h2>
+
+        @if (ViewBag.success)
+        {
+            <div class="button-a">
+                <a href="/" class="input__submit">
+                    Войти
+                    <i class="las la-sign-in-alt"></i>
+                </a>
+            </div>
+        }
+    </div>
+</div>

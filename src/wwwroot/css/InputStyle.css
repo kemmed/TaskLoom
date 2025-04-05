@@ -23,6 +23,11 @@
     }
 }
 
+input[disabled], textarea[disabled], select[disabled] {
+    border-color: #ccc; 
+    cursor: not-allowed; 
+    color: #666;
+}
 .input {
     display: flex;
     flex-direction: column;

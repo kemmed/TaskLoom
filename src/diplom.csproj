@@ -8,6 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Content Remove="wwwroot\emailMessages\inviteUser.html" />
     <Content Remove="wwwroot\emailMessages\passRecovery.html" />
   </ItemGroup>
 
@@ -16,6 +17,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Include="wwwroot\emailMessages\inviteUser.html" />
     <None Include="wwwroot\emailMessages\passRecovery.html" />
     <None Include="wwwroot\emailMessages\аctivation.html" />
   </ItemGroup>

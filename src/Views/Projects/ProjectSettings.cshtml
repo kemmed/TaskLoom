@@ -10,10 +10,13 @@
 
     <div class="settings-header">
         <div class="button-a">
-            <a href="/Projects/Archive/@ViewBag.ProjectID" class="input__submit">Архив задач <i class="las la-archive"></i></i></a>
-            <a href="/Projects/History/@ViewBag.ProjectID" class="input__submit">История действий <i class="las la-history"></i></a>
-            <a href="/Projects/Statistics/@ViewBag.ProjectID" class="input__submit">Статистика проекта <i class="las la-chart-bar"></i></a>
-            <a href="/Projects/LeaveProject/@ViewBag.ProjectID" class="input__submit cancel">Покинуть проект <i class="las la-sign-out-alt"></i></a>
+            @if (ViewBag.UserRole == UserRoles.Admin)
+            {
+                <a href="/Projects/Archive/@ViewBag.ProjectID" class="input__submit">Архив задач <i class="las la-archive"></i></a>
+                <a href="/Projects/History/@ViewBag.ProjectID" class="input__submit">История действий <i class="las la-history"></i></a>
+                <a href="/Projects/Statistics/@ViewBag.ProjectID" class="input__submit">Статистика проекта <i class="las la-chart-bar"></i></a>
+            }
+            <a href="#leave-project" class="input__submit cancel" rel="modal:open">Покинуть проект <i class="las la-sign-out-alt"></i></a>
         </div>
     </div>
 
@@ -22,38 +25,67 @@
         <form asp-action="EditProject" asp-controller="Projects" method="post" class="update-project-container">
             <input type="hidden" name="projectID" value="@ViewBag.ProjectID" />
             <input type="hidden" name="returnUrl" value="/Projects/ProjectSettings/@Model.ID" />
-            <label class="input-form__label add-project">
-                <span class="input-placeholder">название</span>
-                <input class="form__input input-name" name="Name" autocomplete="off" required value="@Model.Name">
-            </label>
-            <label class="input-form__label add-project">
-                <span class="input-placeholder">описание</span>
-                <textarea class="form__input form__textarea" name="Description" autocomplete="off">@Model.Description</textarea>
-            </label>
-            <label class="input-form__label">
-                <span class="input-placeholder select-date">статус</span>
-                <select class="form__input input-select" name="Status" required>
-                    <!option value="@ProjectStatus.InProcess" @((Model.Status == ProjectStatus.InProcess) ? "selected" : "")>@Model.ConvertStatus(ProjectStatus.InProcess)</!option>
-                    <!option value="@ProjectStatus.Frozen" @((Model.Status == ProjectStatus.Frozen) ? "selected" : "")>@Model.ConvertStatus(ProjectStatus.Frozen)</!option>
-                    <!option value="@ProjectStatus.Completed" @((Model.Status == ProjectStatus.Completed) ? "selected" : "")>@Model.ConvertStatus(ProjectStatus.Completed)</!option>
-                </select>
-            </label>
-            <label class="input-form__label add-project">
-                <span class="input-placeholder select-date">срок</span>
-                <input class="form__input input-date" type="date" name="DeadlineDate" required value="@Model.DeadlineDate.Value.ToString("yyyy-MM-dd")">
-            </label>
-            <button class="input__submit confirm no-margin">Сохранить <i class="las la-save"></i></button>
+            @if (ViewBag.UserRole == UserRoles.Admin)
+            {
+                <label class="input-form__label add-project">
+                    <span class="input-placeholder">название</span>
+                    <input class="form__input input-name" name="Name" autocomplete="off" required value="@Model.Name">
+                </label>
+                <label class="input-form__label add-project">
+                    <span class="input-placeholder">описание</span>
+                    <textarea class="form__input form__textarea" name="Description" autocomplete="off">@Model.Description</textarea>
+                </label>
+                <label class="input-form__label">
+                    <span class="input-placeholder select-date">статус</span>
+                    <select class="form__input input-select" name="Status" required>
+                        <!option value="@ProjectStatus.InProcess" @((Model.Status == ProjectStatus.InProcess) ? "selected" : "")>@Model.ConvertStatus(ProjectStatus.InProcess)</!option>
+                        <!option value="@ProjectStatus.Frozen" @((Model.Status == ProjectStatus.Frozen) ? "selected" : "")>@Model.ConvertStatus(ProjectStatus.Frozen)</!option>
+                        <!option value="@ProjectStatus.Completed" @((Model.Status == ProjectStatus.Completed) ? "selected" : "")>@Model.ConvertStatus(ProjectStatus.Completed)</!option>
+                    </select>
+                </label>
+                <label class="input-form__label add-project">
+                    <span class="input-placeholder select-date">срок</span>
+                    <input class="form__input input-date" type="date" name="DeadlineDate" required value="@Model.DeadlineDate.Value.ToString("yyyy-MM-dd")">
+                </label>
+                <button class="input__submit confirm no-margin">Сохранить <i class="las la-save"></i></button>
+            }
+            else
+            {
+                <label class="input-form__label add-project">
+                    <span class="input-placeholder">название</span>
+                    <input class="form__input input-name" value="@Model.Name" disabled>
+                </label>
+                <label class="input-form__label add-project">
+                    <span class="input-placeholder">описание</span>
+                    <textarea class="form__input form__textarea" disabled>@Model.Description</textarea>
+                </label>
+                <label class="input-form__label">
+                    <span class="input-placeholder select-date">статус</span>
+                    <select class="form__input input-select" disabled>
+                        <!option value="@ProjectStatus.InProcess" @((Model.Status == ProjectStatus.InProcess) ? "selected" : "")>@Model.ConvertStatus(ProjectStatus.InProcess)</!option>
+                        <!option value="@ProjectStatus.Frozen" @((Model.Status == ProjectStatus.Frozen) ? "selected" : "")>@Model.ConvertStatus(ProjectStatus.Frozen)</!option>
+                        <!option value="@ProjectStatus.Completed" @((Model.Status == ProjectStatus.Completed) ? "selected" : "")>@Model.ConvertStatus(ProjectStatus.Completed)</!option>
+                    </select>
+                </label>
+                <label class="input-form__label add-project">
+                    <span class="input-placeholder select-date">срок</span>
+                    <input class="form__input input-date" type="date" value="@Model.DeadlineDate.Value.ToString("yyyy-MM-dd")" disabled>
+                </label>
+            }
         </form>
     </div>
 
     <div class="users-section">
         <div class="config-title-container">
             <h2 class="config-title">Сотрудники</h2>
-            <div class="button-a">
-                <a href="#add-user" rel="modal:open" class="input__submit mini">
-                    <i class="las la-user-plus"></i>
-                </a>
-            </div>
+            @if (ViewBag.UserRole == UserRoles.Admin)
+            {
+                <div class="button-a">
+                    <a href="#invite-user" rel="modal:open" class="input__submit mini">
+                        <i class="las la-user-plus"></i>
+                    </a>
+                </div>
+            }
         </div>
         <table class="users-table">
             <thead>
@@ -76,7 +108,7 @@
                                 <ul class="category-list">
                                     @foreach (var category in userProject.CategoryTypes)
                                     {
-                                        <li>@category.Name </li>
+                                        <li>@category.Name</li>
                                     }
                                 </ul>
                             }
@@ -87,15 +119,22 @@
                         </td>
                         <td>@userProject.User.Email</td>
                         <td class="user-role">
-                            <a class="user-role-edit">
-                                @userProject.UserRole <i class="las la-pen"></i>
-                            </a>
+                            @if (ViewBag.UserRole == UserRoles.Admin && userProject.UserRole != UserRoles.Admin)
+                            {
+                                <a href="#edit-role" class="user-role-edit" rel="modal:open" data-user-id="@userProject.ID">
+                                    @userProject.ConvertRoles(userProject.UserRole) <i class="las la-pen"></i>
+                                </a>
+                            }
+                            else
+                            {
+                                <span>@userProject.ConvertRoles(userProject.UserRole)</span>
+                            }
                         </td>
                         <td class="exclude-user">
-                            @if (userProject.UserRole != UserRoles.Admin)
+                            @if (ViewBag.UserRole == UserRoles.Admin && userProject.UserRole != UserRoles.Admin)
                             {
                                 <div class="button-a">
-                                    <a href="/Projects/ExcludeUser?userId=@userProject.User.ID&projectId=@Model.ID" class="input__submit cancel mini">
+                                    <a href="#remove-user" rel="modal:open" class="input__submit cancel mini delete-user-button" data-user-id="@userProject.ID">
                                         <i class="las la-user-times"></i>
                                     </a>
                                 </div>
@@ -110,11 +149,14 @@
     <div class="categories-section">
         <div class="config-title-container">
             <h2 class="config-title">Категории задач</h2>
-            <div class="button-a">
-                <a href="#add-category" rel="modal:open" class="input__submit mini">
-                    <i class="las la-plus-circle"></i>
-                </a>
-            </div>
+            @if (ViewBag.UserRole == UserRoles.Admin || ViewBag.UserRole == UserRoles.Manager)
+            {
+                <div class="button-a">
+                    <a href="#add-category" rel="modal:open" class="input__submit mini">
+                        <i class="las la-plus-circle"></i>
+                    </a>
+                </div>
+            }
         </div>
         <div class="categories-list">
             @if (Model.CategoryTypes == null || !Model.CategoryTypes.Any())
@@ -127,104 +169,225 @@
                     @foreach (var category in Model.CategoryTypes)
                     {
                         <li class="category-item-container">
-                            <a class="category-name-container edit-category-link" href="#edit-category" rel="modal:open" data-category-id="@category.ID">
-                                @category.Name <i class="las la-pen"></i>
-                            </a>
-                            <div class="button-a">
-                                <a href="#delete-category" rel="modal:open" class="input__submit cancel mini delete-category-button" data-category-id="@category.ID">
-                                    <i class="las la-trash-alt"></i>
+                            @if (ViewBag.UserRole == UserRoles.Admin || ViewBag.UserRole == UserRoles.Manager)
+                            {
+                                <a class="category-name-container edit-category-link" href="#edit-category" rel="modal:open" data-category-id="@category.ID">
+                                    @category.Name <i class="las la-pen"></i>
                                 </a>
-                            </div>
+                                <div class="button-a">
+                                    <a href="#delete-category" rel="modal:open" class="input__submit cancel mini delete-category-button" data-category-id="@category.ID">
+                                        <i class="las la-trash-alt"></i>
+                                    </a>
+                                </div>
+                            }
+                            else
+                            {
+                                <span>@category.Name</span>
+                            }
                         </li>
                     }
                 </ul>
             }
         </div>
     </div>
+</div>
 
 
-    <form asp-action="AddCategory" asp-controller="Projects" id="add-category" class="modal">
-        <input type="hidden" name="projectID" value="@ViewBag.ProjectID" />
-        <div class="modal-container">
-            <h1 class="modal-title">Добавить категорию</h1>
-            <label class="input-form__label add-project">
-                <span class="input-placeholder">название категории</span>
-                <input class="form__input input-name" name="Name" autocomplete="off" required>
-            </label>
-            <button class="input__submit confirm">Добавить <i class="las la-clipboard-check"></i></button>
+<form asp-action="AddCategory" asp-controller="Projects" id="add-category" class="modal">
+    <input type="hidden" name="projectID" value="@ViewBag.ProjectID" />
+    <div class="modal-container">
+        <h1 class="modal-title">Добавить категорию</h1>
+        <label class="input-form__label add-project">
+            <span class="input-placeholder">название категории</span>
+            <input class="form__input input-name" name="Name" autocomplete="off" required>
+        </label>
+        <button class="input__submit confirm">Добавить <i class="las la-clipboard-check"></i></button>
+    </div>
+    <a href="#" rel="modal:close"></a>
+</form>
+
+<div id="edit-category" class="modal">
+    @foreach (var category in Model.CategoryTypes)
+    {
+        <div id="EDIT_CATEGORY@(category.ID)" class="hidden categoryform">
+            <form asp-action="EditCategory" asp-controller="Projects">
+                <input type="hidden" value="@category.ID" name="categoryID" />
+                <div class="modal-container">
+                    <h1 class="modal-title">Редактировать категорию</h1>
+                    <label class="input-form__label add-project">
+                        <span class="input-placeholder">название категории</span>
+                        <input class="form__input input-name" name="Name" autocomplete="off" value="@category.Name" required>
+                    </label>
+                    <button class="input__submit confirm">Сохранить<i class="las la-save"></i></button>
+                </div>
+            </form>
         </div>
-        <a href="#" rel="modal:close"></a>
-    </form>
+    }
+    <a href="#" rel="modal:close"></a>
+</div>
+<div id="delete-category" class="modal">
+    @foreach (var category in Model.CategoryTypes)
+    {
+        <div id="DELETE_CATEGORY@(category.ID)" class="hidden categoryform">
+            <form asp-action="DeleteCategory" asp-controller="Projects">
+                <input type="hidden" value="@category.ID" name="categoryID" />
+                <div class="modal-container">
+                    <h1 class="modal-title">Подтвердите удаление категории</h1>
+                    <p class="delete-text">После удаления категория будет перемещена в архив.</p>
+                    <button class="input__submit cancel">Удалить <i class="las la-trash-alt"></i></button>
+                </div>
+            </form>
+        </div>
+    }
+    <a href="#" rel="modal:close"></a>
+</div>
 
-    <div id="edit-category" class="modal">
-        @foreach (var category in Model.CategoryTypes)
-        {
-            <div id="EDIT_CATEGORY@(category.ID)" class="hidden categoryform">
-                <form asp-action="EditCategory" asp-controller="Projects">
-                    <input type="hidden" value="@category.ID" name="categoryID" />
-                    <div class="modal-container">
-                        <h1 class="modal-title">Редактировать категорию</h1>
-                        <label class="input-form__label add-project">
-                            <span class="input-placeholder">название категории</span>
-                            <input class="form__input input-name" name="Name" autocomplete="off" value="@category.Name" required>
-                        </label>
-                        <button class="input__submit confirm">Сохранить <i class="las la-clipboard-check"></i></button>
-                    </div>
-                </form>
-            </div>
-        }
-        <a href="#" rel="modal:close"></a>
-    </div>
-    <div id="delete-category" class="modal">
-        @foreach (var category in Model.CategoryTypes)
-        {
-            <div id="DELETE_CATEGORY@(category.ID)" class="hidden categoryform">
-                <form asp-action="DeleteCategory" asp-controller="Projects">
-                    <input type="hidden" value="@category.ID" name="categoryID" />
-                    <div class="modal-container">
-                        <h1 class="modal-title">Подтвердите удаление категории</h1>
-                        <p class="delete-text">После удаления категория будет перемещена в архив.</p>
-                        <button class="input__submit cancel">Удалить <i class="las la-trash-alt"></i></button>
-                    </div>
-                </form>
-            </div>
-        }
-        <a href="#" rel="modal:close"></a>
-    </div>
+<script>
+        document.addEventListener('DOMContentLoaded', function () {
+        //редактированиу категории
+        const editButtons = document.querySelectorAll('.edit-category-link');
+        editButtons.forEach(button => {
+            button.addEventListener('click', function (event) {
+                event.preventDefault();
 
-    <script>
-            document.addEventListener('DOMContentLoaded', function () {
-            const editButtons = document.querySelectorAll('.edit-category-link');
-            editButtons.forEach(button => {
-                button.addEventListener('click', function (event) {
-                    event.preventDefault();
-
-                    const categoryID = this.getAttribute('data-category-id');
-                    document.querySelectorAll('.categoryform').forEach(element => {
-                        element.classList.add('hidden');
-                    });
-                    const selectedEditForm = document.getElementById('EDIT_CATEGORY' + categoryID);
-                    if (selectedEditForm) {
-                        selectedEditForm.classList.remove('hidden');
-                    }
+                const categoryID = this.getAttribute('data-category-id');
+                document.querySelectorAll('.categoryform').forEach(element => {
+                    element.classList.add('hidden');
                 });
-            });
-            const deleteButtons = document.querySelectorAll('.delete-category-button');
-            deleteButtons.forEach(button => {
-                button.addEventListener('click', function (event) {
-                    event.preventDefault();
-
-                    const categoryID = this.getAttribute('data-category-id');
-
-                    document.querySelectorAll('.categoryform').forEach(element => {
-                        element.classList.add('hidden');
-                    });
-                    const selectedDeleteForm = document.getElementById('DELETE_CATEGORY' + categoryID);
-                    if (selectedDeleteForm) {
-                        selectedDeleteForm.classList.remove('hidden');
-                    }
-                });
+                const selectedEditForm = document.getElementById('EDIT_CATEGORY' + categoryID);
+                if (selectedEditForm) {
+                    selectedEditForm.classList.remove('hidden');
+                }
             });
         });
-    </script>
 
+        //удаление категории
+        const deleteCategoryButtons = document.querySelectorAll('.delete-category-button');
+        deleteCategoryButtons.forEach(button => {
+            button.addEventListener('click', function (event) {
+                event.preventDefault();
+
+                const categoryID = this.getAttribute('data-category-id');
+                document.querySelectorAll('.categoryform').forEach(element => {
+                    element.classList.add('hidden');
+                });
+                const selectedDeleteForm = document.getElementById('DELETE_CATEGORY' + categoryID);
+                if (selectedDeleteForm) {
+                    selectedDeleteForm.classList.remove('hidden');
+                }
+            });
+        });
+
+        //удаление пользователя
+        const deleteUserButtons = document.querySelectorAll('.delete-user-button');
+        deleteUserButtons.forEach(button => {
+            button.addEventListener('click', function (event) {
+                event.preventDefault();
+
+                const userID = this.getAttribute('data-user-id');
+                document.querySelectorAll('.userform').forEach(element => {
+                    element.classList.add('hidden');
+                });
+                const selectedDeleteForm = document.getElementById('REMOVE_USER' + userID);
+                if (selectedDeleteForm) {
+                    selectedDeleteForm.classList.remove('hidden');
+                }
+            });
+        });
+
+        // редактироване роли пользователя
+        const editRoleButtons = document.querySelectorAll('.user-role-edit');
+        editRoleButtons.forEach(button => {
+            button.addEventListener('click', function (event) {
+                event.preventDefault();
+
+                const userID = this.getAttribute('data-user-id');
+                document.querySelectorAll('.userform').forEach(element => {
+                    element.classList.add('hidden');
+                });
+                const selectedEditForm = document.getElementById('EDIT_ROLE' + userID);
+                if (selectedEditForm) {
+                    selectedEditForm.classList.remove('hidden');
+                }
+            });
+        });
+    });
+</script>
+
+<form asp-action="InviteUser" asp-controller="Projects" method="post" id="invite-user" class="modal">
+    <input type="hidden" name="projectID" value="@ViewBag.ProjectID" />
+    <div class="modal-container">
+        <h1 class="modal-title">Введите email пользователя</h1>
+        <label class="input-form__label">
+            <span class="input-placeholder">email</span>
+            <input class="form__input input-email" type="email" name="Email" autocomplete="off" required>
+        </label>
+        <button class="input__submit confirm">Отправить приглашение <i class="las la-user-check"></i></button>
+    </div>
+    <a href="#" rel="modal:close"></a>
+</form>
+
+<div id="remove-user" class="modal">
+    @foreach (var userProject in Model.UserProjects)
+    {
+        <div id="REMOVE_USER@(userProject.ID)" class="hidden userform">
+            <form asp-action="RemoveUserFromProject" asp-controller="Projects">
+                <input type="hidden" value="@userProject.ID" name="userProjectID" />
+                <input type="hidden" value="@Model.ID" name="projectID" />
+                <div class="modal-container">
+                    <h1 class="modal-title">Подтвердите удаление пользователя</h1>
+                    <p class="delete-text">Пользователь будет удален с доски.</p>
+                    <button class="input__submit cancel">Удалить <i class="las la-trash-alt"></i></button>
+                </div>
+            </form>
+        </div>
+    }
+    <a href="#" rel="modal:close"></a>
+</div>
+
+<div id="edit-role" class="modal">
+    @foreach (var userProject in Model.UserProjects)
+    {
+        <div id="EDIT_ROLE@(userProject.ID)" class="hidden userform">
+            <form asp-action="EditUserRole" asp-controller="Projects">
+                <input type="hidden" value="@userProject.ID" name="userProjectID" />
+                <input type="hidden" value="@Model.ID" name="projectID" />
+                <div class="modal-container">
+                    <h1 class="modal-title">Редактирование роли пользователя</h1>
+                    <label class="input-form__label">
+                        <span class="input-placeholder select-date">Роль</span>
+                        <select class="form__input input-select" name="newRole" required>
+                            @* <!option value="@UserRoles.Admin" @(userProject.UserRole == UserRoles.Admin ? "selected" : "")>@userProject.ConvertRoles(UserRoles.Admin)</!option> *@
+                            <!option value="@UserRoles.Manager" @(userProject.UserRole == UserRoles.Manager ? "selected" : "")>@userProject.ConvertRoles(UserRoles.Manager)</!option>
+                            <!option value="@UserRoles.Employee" @(userProject.UserRole == UserRoles.Employee ? "selected" : "")>@userProject.ConvertRoles(UserRoles.Employee)</!option>
+                        </select>
+                    </label>
+                    <button class="input__submit confirm">Сохранить <i class="las la-save"></i></button>
+                </div>
+            </form>
+        </div>
+    }
+    <a href="#" rel="modal:close"></a>
+</div>
+
+
+<div id="leave-project" class="modal">
+    @if (ViewBag.UserRole != UserRoles.Admin)
+    {
+        <form asp-action="LeaveProject" asp-controller="Projects">
+            <input type="hidden" value="@Model.ID" name="projectID" />
+            <div class="modal-container">
+                <h1 class="modal-title">Подтвердите выход из проекта</h1>
+                <button class="input__submit cancel">Покинуть проект<i class="las la-sign-out-alt"></i></button>
+            </div>
+        </form>
+    }
+    else{
+    <div class="modal-container">
+        <h1 class="modal-title">Вы не можете покинуть проект</h1>
+        <p class="delete-text">Вы являетесь администратором проекта.</p>
+        <p class="delete-text">Для выхода из проекта необходимо передать права администратора другому пользователю.</p>
+    </div>
+    }
+    <a href="#" rel="modal:close"></a>
+</div>

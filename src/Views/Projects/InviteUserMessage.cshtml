@@ -1,0 +1,19 @@
+﻿@{
+    Layout = "_Layout_NoHeader";
+}
+
+<div class="centered-container">
+    <div class="message-container">
+        @if (!string.IsNullOrEmpty(ViewBag.Message))
+        {
+            <h2>@ViewBag.Message</h2>
+        }
+
+        <div class="button-a">
+            <a href="/Projects/ProjectSettings/@ViewBag.projectID" class="input__submit">
+                Вернуться к проекту
+                <i class="las la-sign-in-alt"></i>
+            </a>
+        </div>
+    </div>
+</div>

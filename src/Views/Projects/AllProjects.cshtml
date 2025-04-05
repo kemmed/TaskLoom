@@ -25,7 +25,8 @@
     </div>
 
     <div class="button-a">
-        <a href="#add-project" rel="modal:open" class="input__submit">Новый проект 
+        <a href="#add-project" rel="modal:open" class="input__submit">
+            Новый проект
             <i class="las la-briefcase"></i>
         </a>
     </div>
@@ -45,7 +46,7 @@ else
     <div class="projects">
         @foreach (Project project in Model)
         {
-            <div class="project-card @(GetStatusClass(project.Status))" >
+            <div class="project-card @(GetStatusClass(project.Status))">
                 <a href="/Projects/Project/@project.ID">
                     <h2 class="project-title">@project.Name</h2>
                     <p class="project-description">@project.Description</p>
@@ -57,9 +58,19 @@ else
                     {
                         <p class="project-created">Завершен @project.EndDate.Value.ToString("dd.MM.yyyy")</p>
                     }
-                    <a href="#edit-project" rel="modal:open" class="edit-project-button" data-project-id="@project.ID">
-                        <i class="las la-pen"></i>
-                    </a>
+
+                    @if (project.CreatorID == ViewBag.UserID)
+                    {
+                        <a href="#edit-project" rel="modal:open" class="edit-project-button" data-project-id="@project.ID">
+                            <i class="las la-pen"></i>
+                        </a>
+                    }
+                    else
+                    {
+                        <a href="#edit-project" rel="modal:open" class="edit-project-button" data-project-id="@project.ID">
+                            <i class="las la-info-circle"></i>
+                        </a>
+                    }
                 </a>
             </div>
         }
@@ -130,23 +141,30 @@ else
     @foreach (Project project in Model)
     {
         <div ID="PROJECT@(@project.ID)" class="hidden projectform">
-            <form asp-action="EditProject" asp-controller="Projects" >
+            <form asp-action="EditProject" asp-controller="Projects">
                 <input type="hidden" value="@project.ID" name="projectID" id="projectID"/>
                 <input type="hidden" name="returnUrl" value="/Projects/AllProjects"/>
                 <div class="modal-container">
-                    <h1 class="modal-title">Редактирование проекта</h1>
+                    <h1 class="modal-title">
+                        @(project.CreatorID == ViewBag.UserID ? "Редактирование проекта" : "Просмотр проекта")
+                    </h1>
                     <label class="input-form__label add-project">
                         <span class="input-placeholder">название</span>
-                        <input class="form__input input-name" name="Name" autocomplete="off" required value="@project.Name">
+                        <input class="form__input input-name" name="Name" autocomplete="off" required value="@project.Name"
+                               @(project.CreatorID != ViewBag.UserID ? "disabled" : "")>
                     </label>
+
                     <label class="input-form__label add-project">
                         <span class="input-placeholder">описание</span>
-                        <textarea class="form__input form__textarea" name="Description" autocomplete="off">@project.Description</textarea>
+                        <textarea class="form__input form__textarea" name="Description" autocomplete="off"
+                                  @(project.CreatorID != ViewBag.UserID ? "disabled" : "")>@project.Description</textarea>
                     </label>
-        
+
+
                     <label class="input-form__label">
                         <span class="input-placeholder select-date">статус</span>
-                        <select class="form__input input-select" name="Status" required>
+                        <select class="form__input input-select" name="Status" required
+                                @(project.CreatorID != ViewBag.UserID ? "disabled" : "")>
                             <!option value="@ProjectStatus.InProcess" @((project.Status == ProjectStatus.InProcess) ? "selected" : "")>@project.ConvertStatus(ProjectStatus.InProcess)</!option>
                             <!option value="@ProjectStatus.Frozen" @((project.Status == ProjectStatus.Frozen) ? "selected" : "")>@project.ConvertStatus(ProjectStatus.Frozen)</!option>
                             <!option value="@ProjectStatus.Completed" @((project.Status == ProjectStatus.Completed) ? "selected" : "")>@project.ConvertStatus(ProjectStatus.Completed)</!option>
@@ -155,10 +173,15 @@ else
 
                     <label class="input-form__label add-project">
                         <span class="input-placeholder select-date">срок</span>
-                        <input class="form__input input-date" type="date" name="DeadlineDate" required value="@project.DeadlineDate.Value.ToString("yyyy-MM-dd")">
+                        <input class="form__input input-date" type="date" name="DeadlineDate" required
+                               value="@project.DeadlineDate.Value.ToString("yyyy-MM-dd")"
+                               @(project.CreatorID != ViewBag.UserID ? "disabled" : "")>
                     </label>
 
-                    <button class="input__submit confirm">Сохранить <i class="las la-save"></i></button>
+                    @if (project.CreatorID == ViewBag.UserID)
+                    {
+                        <button class="input__submit confirm">Сохранить <i class="las la-save"></i></button>
+                    }
                 </div>
             </form>
         </div>

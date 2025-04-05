@@ -10,16 +10,30 @@ using diplom.Models;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Microsoft.CodeAnalysis;
 using Microsoft.Build.Evaluation;
+using diplom.Services;
+using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages.Manage;
+using System.Net;
 
 namespace diplom.Controllers
 {
     public class ProjectsController : Controller
     {
         private readonly diplomContext _context;
+        private readonly MailService _mailService;
+        private readonly TokenService _tokenService;
 
-        public ProjectsController(diplomContext context)
+
+        public ProjectsController(diplomContext context, MailService mailService, TokenService tokenService)
         {
             _context = context;
+            _mailService = mailService;
+            _tokenService = tokenService;
+        }
+        public IActionResult InviteUserMessage(string message, int projectID)
+        {
+            ViewBag.message = message;
+            ViewBag.projectID = projectID;
+            return View();
         }
         public async Task<IActionResult> AllProjects(string statusFilter = null)
         {
@@ -48,7 +62,7 @@ namespace diplom.Controllers
             }
 
             ViewBag.StatusFilter = statusFilter;
-
+            ViewBag.UserID = _context.User.FirstOrDefault(x => x.ID == HttpContext.Session.GetInt32("UserID")).ID;
             return View(filteredProjects.ToList());
         }
 
@@ -118,6 +132,7 @@ namespace diplom.Controllers
             List<Issue> issues = new List<Issue>();
             issues = _context.Issue.Where(x => x.ProjectID == projectID && !x.IsDelete).ToList();
             ViewBag.projectIssues = issues;
+            ViewBag.UserID = _context.User.FirstOrDefault(x => x.ID == HttpContext.Session.GetInt32("UserID")).ID;
             return View(columns);
         }
 
@@ -130,15 +145,25 @@ namespace diplom.Controllers
             {
                 return NotFound();
             }
+
             var project = await _context.Project
-                .Include(p => p.UserProjects)
+                .Include(p => p.UserProjects.Where(up => up.IsActive))
                 .ThenInclude(up => up.User)
-                .Include(p => p.UserProjects)
-                .Include(up => up.CategoryTypes)
-                .Include(pt => pt.PriorityTypes)
-                .Include(st => st.StatusTypes)
+                .Include(p => p.CategoryTypes)
+                .Include(p => p.PriorityTypes)
+                .Include(p => p.StatusTypes)
                 .FirstOrDefaultAsync(x => x.ID == projectID);
-            ViewBag.ProjectID = _context.Project.FirstOrDefault(x => x.ID == projectID).ID;
+
+            if (project == null)
+            {
+                return NotFound();
+            }
+            project.UserProjects = project.UserProjects
+                .OrderByDescending(up => up.UserRole)
+                .ToList();
+
+            ViewBag.ProjectID = projectID;
+            ViewBag.UserRole = _context.UserProject.FirstOrDefault(x => x.UserID == HttpContext.Session.GetInt32("UserID")).UserRole;
             return View(project);
         }
 
@@ -168,6 +193,7 @@ namespace diplom.Controllers
             userProject.UserID = creator.ID;
             userProject.User = creator;
             userProject.UserRole = UserRoles.Admin;
+            userProject.IsActive = true;
             _context.Add(userProject);
 
             await _context.SaveChangesAsync();
@@ -237,7 +263,119 @@ namespace diplom.Controllers
             await _context.SaveChangesAsync();
             return Redirect(string.IsNullOrEmpty(returnUrl) ? "/Projects/AllProjects" : returnUrl);
         }
-        
+
+        //Отправка приглашения на присоединение к проектку
+        [HttpPost]
+        public async Task<IActionResult> InviteUser([Bind("Email")] User user, int projectID)
+        {
+            string message;
+            var invitedUser = await _context.User
+                .FirstOrDefaultAsync(m => m.Email == user.Email);
+
+            if (invitedUser == null || !invitedUser.IsActive)
+            {
+                message = "Пользователя с таким email не существует в системе.";
+                return RedirectToAction("InviteUserMessage", new { message, projectID });
+            }
+            var existingUserProject = await _context.UserProject
+                .FirstOrDefaultAsync(up => up.UserID == invitedUser.ID && up.ProjectID == projectID);
+
+            if (existingUserProject != null)
+            {
+                message = "Этот пользователь уже присоединен к проекту.";
+                return RedirectToAction("InviteUserMessage", new { message, projectID });
+            }
+
+            string inviteToken = _tokenService.GenerateToken();
+
+            var userProject = new UserProject
+            {
+                UserID = invitedUser.ID,
+                ProjectID = projectID,
+                UserRole = UserRoles.Employee,
+                InviteToken = inviteToken,
+                InviteTokenDate = DateTime.Now,
+                IsActive = false
+            };
+
+            _context.UserProject.Add(userProject);
+
+            string inviteLink = $"https://localhost:7297/Projects/AcceptInvite?token={inviteToken}&projectID={projectID}";
+
+            string templatePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "emailMessages", "inviteUser.html");
+            string emailTemplate = System.IO.File.ReadAllText(templatePath);
+
+            string emailBody = emailTemplate.Replace("{inviteLink}", inviteLink);
+            emailBody = emailBody.Replace("{FName}", invitedUser.FName);
+            emailBody = emailBody.Replace("{LName}", invitedUser.LName);
+
+            _mailService.SendEmail(emailBody, "Приглашение в проект", invitedUser.Email);
+
+            await _context.SaveChangesAsync();
+
+            message = "Приглашение успешно отправлено. Дождитесь, пока пользователь примет ваше приглашение.";
+            return RedirectToAction("InviteUserMessage", new { message, projectID });
+        }
+        //Принятие приглашения
+        [HttpGet]
+        public IActionResult AcceptInvite(string token)
+        {
+            UserProject userProject = _context.UserProject.FirstOrDefault(u => u.InviteToken == token);
+            if (userProject == null)
+            {
+                ViewBag.message = "Ошибка присоединения к проекту.";
+                ViewBag.success = false;
+            }
+            else if ((DateTime.Now - userProject.InviteTokenDate).Value.Hours >= 24)
+            {
+                ViewBag.message = "Время действия приглашения истекло.<br/>Попробуйте снова.";
+                ViewBag.success = false;
+            }
+            else if (!userProject.IsActive)
+            {
+                ViewBag.message = "Вы успешно присоеденены к проекту.";
+                userProject.IsActive = true;
+                ViewBag.success = true;
+            }
+            else
+            {
+                ViewBag.message = "Вы уже состоите в проекте.";
+                ViewBag.success = true;
+            }
+            _context.SaveChanges();
+            return View();
+        }
+        //Удаление пользователя
+        [HttpPost]
+        public async Task<IActionResult> RemoveUserFromProject(int userProjectID)
+        {
+            UserProject userProject = _context.UserProject.FirstOrDefault(x => x.ID == userProjectID);
+            int projectID = userProject.ProjectID;
+            _context.UserProject.Remove(userProject);
+            _context.SaveChanges();
+            return Redirect($"/Projects/ProjectSettings/{projectID}");
+        }
+        //Выход из доски
+        [HttpPost]
+        public async Task<IActionResult> LeaveProject(int projectID)
+        {
+            int? userSessionID = HttpContext.Session.GetInt32("UserID");
+            var userProject = await _context.UserProject.FirstOrDefaultAsync(up => up.ProjectID == projectID && up.UserID == userSessionID);
+            _context.UserProject.Remove(userProject);
+            await _context.SaveChangesAsync();
+            return Redirect("/Projects/AllProjects");
+        }
+        //Изменение роли пользователя
+        [HttpPost]
+        public async Task<IActionResult> EditUserRole(int userProjectID, UserRoles newRole)
+        {
+            UserProject userProject = _context.UserProject.FirstOrDefault(x => x.ID == userProjectID);
+            userProject.UserRole = newRole;
+
+            _context.SaveChanges();
+            return Redirect($"/Projects/ProjectSettings/{userProject.ProjectID}");
+        }
+
         //Добавление категории
         [HttpPost]
         public async Task<IActionResult> AddCategory([Bind("ID,Name")] CategoryType categoryType, IFormCollection formData, int projectID)

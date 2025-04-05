@@ -13,6 +13,7 @@ using System.Security.Cryptography;
 using NuGet.Common;
 using System.Net;
 using Microsoft.AspNetCore.Http;
+using Microsoft.CodeAnalysis;
 
 namespace diplom.Controllers
 {
@@ -20,11 +21,13 @@ namespace diplom.Controllers
     {
         private readonly diplomContext _context;
         private readonly MailService _mailService;
+        private readonly TokenService _tokenService;
 
-        public UsersController(diplomContext context, MailService mailService)
+        public UsersController(diplomContext context, MailService mailService, TokenService tokenService)
         {
             _context = context;
             _mailService = mailService;
+            _tokenService = tokenService;
         }
 
         public IActionResult Login()
@@ -115,6 +118,14 @@ namespace diplom.Controllers
                 return Redirect("/Projects/AllProjects");
             }
         }
+        //Выход пользователя
+        [HttpGet]
+        public IActionResult Logout()
+        {
+            HttpContext.Session.Remove("UserID");
+            HttpContext.Session.Remove("UserName");
+            return Redirect("/");
+        }
         //Запрос на восстановление пароля
         [HttpPost]
         public async Task<IActionResult> PasswordRecoveryRequest([Bind("ID,Email")] User user)
@@ -127,7 +138,7 @@ namespace diplom.Controllers
             }
             else
             {
-                    recoveryUser.PassRecoveryToken = GenerateToken();
+                    recoveryUser.PassRecoveryToken = _tokenService.GenerateToken();
                     recoveryUser.PassRecoveryTokenDate = DateTime.Now;
 
                     string templatePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "emailMessages", "passRecovery.html");
@@ -220,7 +231,7 @@ namespace diplom.Controllers
 
             try
             {
-                user.RegToken = GenerateToken();
+                user.RegToken = _tokenService.GenerateToken();
                 user.RegTokenDate = DateTime.Now;
 
                 string templatePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "emailMessages", "аctivation.html");
@@ -318,17 +329,7 @@ namespace diplom.Controllers
             await _context.SaveChangesAsync();
             return Redirect("UserProfile");
         }
-        // Генерация токена
-        public string GenerateToken()
-        {
-            Random rnd = new Random();
-            string token = "";
-            for (int i=0; i<16; i++)
-            {
-                token += 'a' + rnd.Next(0, 28);
-            }
-            return token;
-        }
+        
         // Ошибка при регистрации на существующий в системе email
         public IActionResult RegError(string view)
         {
