@@ -1,0 +1,80 @@
+@startuml usecaseDiagram
+left to right direction
+
+actor Мереджер as Manager
+actor Админ as Admin
+actor Сотрудник as Employee
+package "Система управления проектами" {
+    rectangle "Работать с пользователями" {
+        usecase "Регистрация" as RegUC
+        usecase "Авторизация" as AuthUC
+        usecase "Восстановление пароля" as RecoveryUC
+
+        usecase "Редактировать профиль" as UserUC
+            usecase "Сбросить пароль" as PassUC
+            usecase "Изменить имя" as NameUC
+    }
+
+    rectangle "Работа с проектами" {
+        usecase "Работать с проектами" as BoardUC
+            usecase "Создать проект" as BoardCreateUC
+            usecase "Изменить проект" as BoardEditUC
+            usecase "Удалить проект" as BoardDeleteUC
+    }
+    rectangle "Работа с катогориями" {
+        usecase "Работать с катогориями" as СategoryUC
+            usecase "Создать катогорию" as СategoryCreateUC
+            usecase "Изменить катогорию" as СategoryEditUC
+            usecase "Удалить катогорию" as СategoryDeleteUC
+    }
+
+    rectangle "Работа с задачами" {
+        usecase "Работать с задачами" as TaskUC
+            usecase "Добавить задачу" as TaskCreateUC
+            usecase "Редактировать задачу" as TaskEditUC
+            usecase "Удалить задачу" as TaskDeletetUC
+            usecase "Переместить задачу" as TaskMoveUC
+    }
+
+    rectangle "Совместная работа" {
+        usecase "Совместная работа" as СollaborationUC
+            usecase "Пригласить пользователя на доску" as InviteUC
+            usecase "Удалить пользователя из доски" as RemoveUC
+            usecase "Редактировать роль" as UpdateUC
+    }
+
+
+Admin .|> Manager
+Manager .|> Employee
+
+Employee -- RegUC
+Employee -- AuthUC
+Employee -- UserUC
+Employee -- RecoveryUC
+
+    UserUC ..> PassUC: "include"
+    UserUC ..> NameUC: "include"
+
+Manager -- СategoryUC
+    СategoryUC ..> СategoryCreateUC: "include"
+    СategoryUC ..> СategoryEditUC: "include"
+    СategoryUC ..> СategoryDeleteUC: "include"
+
+Employee -- TaskUC
+    TaskUC ..> TaskCreateUC: "include"
+    TaskUC ..> TaskEditUC: "include"
+    TaskUC ..> TaskDeletetUC: "include"
+    TaskUC ..> TaskMoveUC: "include"
+
+Admin -- СollaborationUC
+    СollaborationUC ..> InviteUC: "include"
+    СollaborationUC ..> RemoveUC: "include"
+    СollaborationUC ..> UpdateUC: "include"
+
+
+Admin -- BoardUC
+    BoardUC ..> BoardCreateUC: "include"
+    BoardUC ..> BoardEditUC: "include"
+    BoardUC ..> BoardDeleteUC: "include"
+}
+@enduml
