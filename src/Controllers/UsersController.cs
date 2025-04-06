@@ -292,6 +292,7 @@ namespace diplom.Controllers
             var currentUser = _context.User.FirstOrDefault(x => x.ID == userSessionID);
             currentUser.LName = user.LName;
             currentUser.FName = user.FName;
+            HttpContext.Session.SetString("UserName", user.FName);
 
             await _context.SaveChangesAsync();
             return Redirect("UserProfile");

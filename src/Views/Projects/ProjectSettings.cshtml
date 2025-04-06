@@ -10,7 +10,7 @@
 
     <div class="settings-header">
         <div class="button-a">
-            @if (ViewBag.UserRole == UserRoles.Manager)
+            @if (ViewBag.UserRole != UserRoles.Employee)
             {
                 <a href="/Projects/Archive/@ViewBag.ProjectID" class="input__submit">Архив задач <i class="las la-archive"></i></a>
                 @if (ViewBag.UserRole == UserRoles.Admin)
@@ -236,7 +236,7 @@
                 <input type="hidden" value="@category.ID" name="categoryID" />
                 <div class="modal-container">
                     <h1 class="modal-title">Подтвердите удаление категории</h1>
-                    <p class="delete-text">После удаления категория будет перемещена в архив.</p>
+                    <p class="delete-text">После удаления категорию невозможно будет восстановить.</p>
                     <button class="input__submit cancel">Удалить <i class="las la-trash-alt"></i></button>
                 </div>
             </form>
@@ -339,7 +339,7 @@
                 <input type="hidden" value="@Model.ID" name="projectID" />
                 <div class="modal-container">
                     <h1 class="modal-title">Подтвердите удаление пользователя</h1>
-                    <p class="delete-text">Пользователь будет удален с доски.</p>
+                    <p class="delete-text">Пользователь будет исключен из проекта.</p>
                     <button class="input__submit cancel">Удалить <i class="las la-trash-alt"></i></button>
                 </div>
             </form>

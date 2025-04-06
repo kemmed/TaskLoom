@@ -190,7 +190,7 @@
             });
         });
 
-        const deleteButtons = document.querySelectorAll('.delet-task-button');
+        const deleteButtons = document.querySelectorAll('.delete-task-button');
         deleteButtons.forEach(button => {
             button.addEventListener('click', function () {
                 const issueID = this.getAttribute('data-task-id');
@@ -303,8 +303,6 @@
                                    value="@(issue.DeadlineDate?.ToString("yyyy-MM-dd") ?? DateTime.Now.ToString("yyyy-MM-dd"))"
                                    required @(issue.CreatorID != ViewBag.UserID ? "disabled" : "")>
                         </label>
-
-                        <!-- Кнопка сохранения -->
                         @if (issue.CreatorID == ViewBag.UserID)
                         {
                             <button class="input__submit confirm">Сохранить <i class="las la-clipboard-check"></i></button>
