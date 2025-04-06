@@ -10,11 +10,14 @@
 
     <div class="settings-header">
         <div class="button-a">
-            @if (ViewBag.UserRole == UserRoles.Admin)
+            @if (ViewBag.UserRole == UserRoles.Manager)
             {
                 <a href="/Projects/Archive/@ViewBag.ProjectID" class="input__submit">Архив задач <i class="las la-archive"></i></a>
-                <a href="/Projects/History/@ViewBag.ProjectID" class="input__submit">История действий <i class="las la-history"></i></a>
-                <a href="/Projects/Statistics/@ViewBag.ProjectID" class="input__submit">Статистика проекта <i class="las la-chart-bar"></i></a>
+                @if (ViewBag.UserRole == UserRoles.Admin)
+                {
+                    <a href="/Projects/History/@ViewBag.ProjectID" class="input__submit">История действий <i class="las la-history"></i></a>
+                    <a href="/Projects/Statistics/@ViewBag.ProjectID" class="input__submit">Статистика проекта <i class="las la-chart-bar"></i></a>
+                }
             }
             <a href="#leave-project" class="input__submit cancel" rel="modal:open">Покинуть проект <i class="las la-sign-out-alt"></i></a>
         </div>

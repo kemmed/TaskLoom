@@ -42,7 +42,10 @@ namespace diplom.Controllers
                 return Redirect("/Users/Authorization");
 
             var allProjects = _context.Project.Where(x => x.CreatorID == userLoggedInID ||
-                _context.UserProject.Any(ub => ub.ProjectID == x.ID && ub.UserID == userLoggedInID)).ToList();
+                _context.UserProject.Any(ub => ub.ProjectID == x.ID 
+                && ub.UserID == userLoggedInID 
+                && ub.IsActive))
+                .ToList();
 
             var statusCounts = new Dictionary<ProjectStatus, int>
             {
