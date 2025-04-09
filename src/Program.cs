@@ -19,6 +19,7 @@ namespace diplom
 
             builder.Services.AddSingleton<MailService>();
             builder.Services.AddSingleton<TokenService>();
+            builder.Services.AddScoped<LogService>();
 
             builder.Services.AddSession(options =>
             {

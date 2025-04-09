@@ -2,13 +2,6 @@
 .project-page-container {
     padding: 20px 0px;
 }
-.project-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
-    gap: 100px;
-}
 
 .project-settings {
     text-decoration: none;

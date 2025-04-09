@@ -1,0 +1,78 @@
+﻿@using diplom.Models
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@model List<Issue>
+@{
+    Layout = "_Layout";
+    ViewData["Username"] = Context.Session.GetString("UserName");
+}
+<div class="container">
+    <h2 class="modal-title">Архив задач</h2>
+    <table class="project-table">
+        <thead>
+            <tr>
+                <th>Название</th>
+                <th>Описание</th>
+                <th>Категория</th>
+                <th>Ответственный</th>
+                <th>Срок</th>
+                <th>Удалена</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model.Count != 0 )
+            {
+                @foreach (var task in Model)
+                {
+                    <tr>
+                        <td>@task.Name</td>
+                        <td>@task.Description</td>
+                        <td>@task.CategoryType?.Name</td>
+                        <td>@task.Performer?.LName @task.Performer?.FName</td>
+                        <td>@task.DeadlineDate?.ToString("dd.MM.yyyy")</td>
+                        <td>@task.DeleteDate.Value.ToString("dd.MM.yyyy HH:mm")</td>
+                        <td class="exclude-user">
+                            <div class="button-a">
+                                <a href="#restore-task" rel="modal:open" class="input__submit confirm restore-task-button" data-task-id="@task.ID">
+                                    Восстановить <i class="las la-undo"></i>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            }
+            else
+            {
+                <div class="centered-container project-massage">
+                    <div class="message-container">
+                        <h2>Здесь пока задач</h2>
+                        <p>Из прокекта пока не удалено ни одной задачи.</p>
+                    </div>
+                </div>
+            }
+        </tbody>
+    </table>
+</div>
+
+
+<div id="restore-task" class="jquery-modal modal hidden">
+    <form asp-action="RestoreIssue" asp-controller="Projects" method="post">
+        <input type="hidden" id="issue-id" name="issueID" value="" />
+        <div class="modal-container">
+            <h1 class="modal-title">Подтвердите восстановление задачи</h1>
+            <p class="delete-text">После восстановления задача будет перемещена обратно в проект.</p>
+            <div class="button-a">
+                <button type="submit" class="input__submit confirm">Восстановить <i class="las la-undo"></i></button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<script>
+    document.querySelectorAll('.restore-task-button').forEach(button => {
+        button.addEventListener('click', function () {
+            const taskId = this.getAttribute('data-task-id');
+            document.getElementById('issue-id').value = taskId;
+        });
+    });
+</script>

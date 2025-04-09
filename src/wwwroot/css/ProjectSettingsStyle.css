@@ -42,7 +42,7 @@
 }
 
 
-.users-table {
+.project-table {
     width: 100%;
     margin: 20px 0px;
     border: 2px solid #ddd;
@@ -66,27 +66,6 @@
     justify-content: center;
     gap: 15px;
 }
-
-.users-table th,
-.users-table td {
-    border: 1px solid #ddd;
-    padding: 10px;
-    text-align: center;
-}
-
-    .users-table th {
-        background-color: #f9f9f9;
-        font-weight: bold;
-    }
-
-    .users-table tr:nth-child(even) {
-        background-color: #f9f9f9;
-    }
-
-    .users-table tr:hover {
-        background-color: #eaeaea;
-    }
-
 
 .config-tabel-title {
     text-align: center;

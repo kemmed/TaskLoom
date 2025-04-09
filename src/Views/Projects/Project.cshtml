@@ -175,18 +175,12 @@
 </div>
 
 <script>
-       document.addEventListener('DOMContentLoaded', function () {
+    document.addEventListener('DOMContentLoaded', function () {
         const editButtons = document.querySelectorAll('.edit-task-link');
         editButtons.forEach(button => {
             button.addEventListener('click', function () {
                 const issueID = this.getAttribute('data-issue-id');
-                document.querySelectorAll('.issueform').forEach(element => {
-                    element.classList.add('hidden');
-                });
-                const selectedEditForm = document.getElementById('EDIT_ISSUE' + issueID);
-                if (selectedEditForm) {
-                    selectedEditForm.classList.remove('hidden');
-                }
+                resetAndPopulateForm(issueID, 'EDIT_ISSUE');
             });
         });
 
@@ -194,15 +188,35 @@
         deleteButtons.forEach(button => {
             button.addEventListener('click', function () {
                 const issueID = this.getAttribute('data-task-id');
-                document.querySelectorAll('.issueform').forEach(element => {
-                    element.classList.add('hidden');
-                });
-                const selectedDeleteForm = document.getElementById('DELETE_ISSUE' + issueID);
-                if (selectedDeleteForm) {
-                    selectedDeleteForm.classList.remove('hidden');
-                }
+                resetAndPopulateForm(issueID, 'DELETE_ISSUE');
             });
         });
+        function resetAndPopulateForm(issueID, formPrefix) {
+            document.querySelectorAll('.issueform').forEach(element => {
+                element.classList.add('hidden');
+            });
+            const selectedForm = document.getElementById(formPrefix + issueID);
+            if (selectedForm) {
+                const form = selectedForm.querySelector('form');
+                form.reset();
+                populateFormWithData(form, issueID);
+                selectedForm.classList.remove('hidden');
+            }
+        }
+            function populateFormWithData(form, issueID) {
+        fetch(`/api/issues/${issueID}`)
+            .then(response => response.json())
+            .then(data => {
+                form.querySelector('[name="Name"]').value = data.Name;
+                form.querySelector('[name="Description"]').value = data.Description;
+                form.querySelector('[name="PriorityTypeID"]').value = data.PriorityTypeID;
+                form.querySelector('[name="StatusTypeID"]').value = data.StatusTypeID;
+                form.querySelector('[name="CategoryTypeID"]').value = data.CategoryTypeID || '';
+                form.querySelector('[name="PerformerID"]').value = data.PerformerID;
+                form.querySelector('[name="DeadlineDate"]').value = data.DeadlineDate.split('T')[0];
+            })
+            .catch(error => console.error('Ошибка при получении данных:', error));
+    }
     });
 </script>
 

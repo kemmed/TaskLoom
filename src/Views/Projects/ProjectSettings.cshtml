@@ -12,10 +12,10 @@
         <div class="button-a">
             @if (ViewBag.UserRole != UserRoles.Employee)
             {
-                <a href="/Projects/Archive/@ViewBag.ProjectID" class="input__submit">Архив задач <i class="las la-archive"></i></a>
+                <a href="/Projects/DeletedIssueArchive/@ViewBag.ProjectID" class="input__submit">Архив задач <i class="las la-archive"></i></a>
                 @if (ViewBag.UserRole == UserRoles.Admin)
                 {
-                    <a href="/Projects/History/@ViewBag.ProjectID" class="input__submit">История действий <i class="las la-history"></i></a>
+                    <a href="/Projects/ProjectHistory/@ViewBag.ProjectID" class="input__submit">История действий <i class="las la-history"></i></a>
                     <a href="/Projects/Statistics/@ViewBag.ProjectID" class="input__submit">Статистика проекта <i class="las la-chart-bar"></i></a>
                 }
             }
@@ -90,7 +90,7 @@
                 </div>
             }
         </div>
-        <table class="users-table">
+        <table class="project-table">
             <thead>
                 <tr>
                     <th>Имя</th>

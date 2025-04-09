@@ -1,0 +1,48 @@
+﻿@using diplom.Models
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@model List<Log>
+@{
+    Layout = "_Layout";
+    ViewData["Username"] = Context.Session.GetString("UserName");
+}
+<div class="project-page-container">
+    <div class="project-header history-header">
+        <div class="button-a">
+            <a href="/Projects/DownloadHistory/@ViewBag.ProjectID" class="input__submit download-button">
+                Скачать историю <i class="las la-download"></i>
+            </a>
+        </div>
+    </div>
+
+
+    <h2 class="modal-title">История действий</h2>
+    @if (Model != null && Model.Any())
+    {
+        <table class="project-table left">
+            <thead>
+                <tr>
+                    <th>Действие</th>
+                    <th>Время</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var log in Model)
+                {
+                    <tr>
+                        <td>@log.Event</td>
+                        <td>@log.DateTime.ToString("dd.MM.yyyy HH:mm")</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+    else
+    {
+        <div class="centered-container project-massage">
+            <div class="message-container">
+                <h2>Здесь пока нет записей</h2>
+                <p>В истории проекта пока нет ни одного действия.</p>
+            </div>
+        </div>
+    }
+</div>

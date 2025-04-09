@@ -13,6 +13,8 @@ using Microsoft.Build.Evaluation;
 using diplom.Services;
 using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages.Manage;
 using System.Net;
+using Microsoft.AspNetCore.Components.Forms;
+using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.Blazor;
 
 namespace diplom.Controllers
 {
@@ -21,13 +23,15 @@ namespace diplom.Controllers
         private readonly diplomContext _context;
         private readonly MailService _mailService;
         private readonly TokenService _tokenService;
+        private readonly LogService _logService;
 
 
-        public ProjectsController(diplomContext context, MailService mailService, TokenService tokenService)
+        public ProjectsController(diplomContext context, MailService mailService, TokenService tokenService, LogService logService)
         {
             _context = context;
             _mailService = mailService;
             _tokenService = tokenService;
+            _logService = logService;
         }
         public IActionResult InviteUserMessage(string message, int projectID)
         {
@@ -139,7 +143,22 @@ namespace diplom.Controllers
             return View(columns);
         }
 
-        [HttpGet("/Projects/ProjectSettings/{projectID}")]
+        [HttpGet("/Projects/ProjectHistory/{projectID}")]
+        public async Task<IActionResult> ProjectHistory(int projectID)
+        {
+            if (_context.Project.FirstOrDefault(x => x.ID == projectID) == null ||
+              HttpContext.Session.GetInt32("UserID") == null ||
+              _context.UserProject.FirstOrDefault(x => x.UserID == HttpContext.Session.GetInt32("UserID")) == null)
+            {
+                return NotFound();
+            }
+            var log = _context.Log.Where(x => x.ProjectID == projectID).OrderByDescending(x => x.DateTime) .ToList();
+
+            ViewBag.ProjectID = projectID;
+            return View(log);
+        }
+
+            [HttpGet("/Projects/ProjectSettings/{projectID}")]
         public async Task<IActionResult> ProjectSettings(int projectID)
         {
             if (_context.Project.FirstOrDefault(x => x.ID == projectID) == null ||
@@ -169,6 +188,28 @@ namespace diplom.Controllers
             ViewBag.UserRole = _context.UserProject.FirstOrDefault(x => x.UserID == HttpContext.Session.GetInt32("UserID")).UserRole;
             return View(project);
         }
+        [HttpGet("/Projects/DeletedIssueArchive/{projectID}")]
+        public async Task<IActionResult> DeletedIssueArchive(int projectID)
+        {
+            if (_context.Project.FirstOrDefault(x => x.ID == projectID) == null ||
+                HttpContext.Session.GetInt32("UserID") == null ||
+                _context.UserProject.FirstOrDefault(x => x.UserID == HttpContext.Session.GetInt32("UserID")) == null)
+            {
+                return NotFound();
+            }
+
+            var issue =  _context.Issue.Where(x => x.ProjectID == projectID && x.IsDelete)
+                .Include(x => x.CategoryType)
+                .Include(x => x.Performer)
+                .ToList();
+
+            if (issue == null)
+            {
+                return NotFound();
+            }
+            return View(issue);
+        }
+
 
         //Создание проекта
         [HttpPost]
@@ -180,10 +221,8 @@ namespace diplom.Controllers
             User creator = _context.User.FirstOrDefault(x => x.ID == userSessionID);
             project.CreatorUser = creator;
             project.CreatorID = creator.ID;
-            if (project.DeadlineDate.Value.Date < DateTime.Now.Date)
-                project.DeadlineDate = DateTime.Now.Date;
-            else
-                project.DeadlineDate = project.DeadlineDate;
+            project.DeadlineDate = project.DeadlineDate.Value.Date < DateTime.Now.Date ? DateTime.Now.Date : project.DeadlineDate;
+            project.DeadlineDate = project.DeadlineDate;
             project.Status = ProjectStatus.InProcess;
             project.CreateDate = DateTime.Now.Date;
             _context.Add(project);
@@ -201,49 +240,25 @@ namespace diplom.Controllers
 
             await _context.SaveChangesAsync();
 
-            StatusType statusType1 = new StatusType();
-            statusType1.Name = "В процессе";
-            statusType1.Project = project;
-            statusType1.ProjectID = project.ID;
+            var statusTypes = new List<StatusType>
+            {
+                new StatusType { Name = "В процессе", ProjectID = project.ID },
+                new StatusType { Name = "На проверке", ProjectID = project.ID },
+                new StatusType { Name = "Отложенные", ProjectID = project.ID },
+                new StatusType { Name = "Завершенные", ProjectID = project.ID }
+            };
+            _context.AddRange(statusTypes);
+            var priorityTypes = new List<PriorityType>
+            {
+                new PriorityType { Name = "Низкий", ProjectID = project.ID },
+                new PriorityType { Name = "Средний", ProjectID = project.ID },
+                new PriorityType { Name = "Высокий", ProjectID = project.ID }
+            };
+            _context.AddRange(priorityTypes);
 
-            StatusType statusType2 = new StatusType();
-            statusType2.Name = "На проверке";
-            statusType2.Project = project;
-            statusType2.ProjectID = project.ID;
+            // Добавление записи в лог
+            _logService.LogAction(project.ID, $"создал проект \"{project.Name}\"", creator.ID);
 
-            StatusType statusType3 = new StatusType();
-            statusType3.Name = "Отложенные";
-            statusType3.Project = project;
-            statusType3.ProjectID = project.ID;
-
-            StatusType statusType4 = new StatusType();
-            statusType4.Name = "Завершенные";
-            statusType4.Project = project;
-            statusType4.ProjectID = project.ID;
-
-            _context.Add(statusType1);
-            _context.Add(statusType2);
-            _context.Add(statusType3);
-            _context.Add(statusType4);
-
-            PriorityType priorityType1 = new PriorityType();
-            priorityType1.Name = "Низкий";
-            priorityType1.Project = project;
-            priorityType1.ProjectID = project.ID;
-
-            PriorityType priorityType2 = new PriorityType();
-            priorityType2.Name = "Средний";
-            priorityType2.Project = project;
-            priorityType2.ProjectID = project.ID;
-
-            PriorityType priorityType3 = new PriorityType();
-            priorityType3.Name = "Высокий";
-            priorityType3.Project = project;
-            priorityType3.ProjectID = project.ID;
-
-            _context.Add(priorityType1);
-            _context.Add(priorityType2);
-            _context.Add(priorityType3);
             await _context.SaveChangesAsync();
 
             return Redirect("AllProjects");
@@ -254,6 +269,13 @@ namespace diplom.Controllers
         public async Task<IActionResult> EditProject([Bind("ID,Name,Description,Status,DeadlineDate")] Models.Project project, IFormCollection formData, int projectID, string returnUrl = null)
         {
             var currProject = await _context.Project.FindAsync(int.Parse(formData["projectID"]));
+
+            string oldName = currProject.Name;
+            string oldDescription = currProject.Description;
+            ProjectStatus oldStatus = currProject.Status;
+            DateTime? oldDeadlineDate = currProject.DeadlineDate;
+
+
             currProject.Name = project.Name;
             currProject.Description = project.Description;
             currProject.Status = project.Status;
@@ -263,6 +285,25 @@ namespace diplom.Controllers
                 currProject.EndDate = DateTime.Now.Date;
             else
                 currProject.EndDate = null;
+
+            List<string> changes = new List<string>();
+            if (oldName != currProject.Name)
+                changes.Add($"Название изменено с \"{oldName}\" на \"{currProject.Name}\".");
+            if (oldDescription != currProject.Description)
+                changes.Add($"Описание изменено.");
+            if (oldStatus != currProject.Status)
+                changes.Add($"Статус изменен с \"{currProject.ConvertStatus(oldStatus)}\" на \"{currProject.ConvertStatus(currProject.Status)}\".");
+            if (oldDeadlineDate != currProject.DeadlineDate)
+                changes.Add($"Срок изменен с \"{oldDeadlineDate?.ToString("dd.MM.yyyy")}\" на \"{currProject.DeadlineDate?.ToString("dd.MM.yyyy")}\".");
+
+            int? userSessionID = HttpContext.Session.GetInt32("UserID");
+            if (changes.Any())
+            {
+                string changeMessage = string.Join(" ", changes);
+                // Добавление записи в лог
+                _logService.LogAction(currProject.ID, $"отредактировал проект \"{oldName}\". Изменения: {changeMessage}", userSessionID);
+            }
+
             await _context.SaveChangesAsync();
             return Redirect(string.IsNullOrEmpty(returnUrl) ? "/Projects/AllProjects" : returnUrl);
         }
@@ -314,11 +355,18 @@ namespace diplom.Controllers
 
             _mailService.SendEmail(emailBody, "Приглашение в проект", invitedUser.Email);
 
+            int? userSessionID = HttpContext.Session.GetInt32("UserID");
+            User inviter = _context.User.FirstOrDefault(x => x.ID == userSessionID);
+
+            // Добавление записи в лог
+            _logService.LogAction(projectID,$"отправил приглашение пользователю {invitedUser.FName} {invitedUser.LName} на присоединение к проекту",userSessionID);
+
             await _context.SaveChangesAsync();
 
             message = "Приглашение успешно отправлено. Дождитесь, пока пользователь примет ваше приглашение.";
             return RedirectToAction("InviteUserMessage", new { message, projectID });
         }
+
         //Принятие приглашения
         [HttpGet]
         public IActionResult AcceptInvite(string token)
@@ -339,6 +387,13 @@ namespace diplom.Controllers
                 ViewBag.message = "Вы успешно присоеденены к проекту.";
                 userProject.IsActive = true;
                 ViewBag.success = true;
+
+                var project = _context.Project.FirstOrDefault(p => p.ID == userProject.ProjectID);
+                var user = _context.User.FirstOrDefault(u => u.ID == userProject.UserID);
+
+                // Добавление записи в лог
+                _logService.LogAction(project.ID,$"присоединился к проекту \"{project.Name}\"",user.ID);
+
             }
             else
             {
@@ -355,16 +410,28 @@ namespace diplom.Controllers
             UserProject userProject = _context.UserProject.FirstOrDefault(x => x.ID == userProjectID);
             int projectID = userProject.ProjectID;
             _context.UserProject.Remove(userProject);
+
+            int? userSessionID = HttpContext.Session.GetInt32("UserID");
+            User remover = _context.User.FirstOrDefault(x => x.ID == userSessionID);
+
+            // Добавление записи в лог
+            _logService.LogAction(projectID,$"исключил пользователя {userProject.User.FName} {userProject.User.LName} из проекта.",userSessionID);
+
             _context.SaveChanges();
             return Redirect($"/Projects/ProjectSettings/{projectID}");
         }
-        //Выход из доски
+        //Выход из проекта
         [HttpPost]
         public async Task<IActionResult> LeaveProject(int projectID)
         {
             int? userSessionID = HttpContext.Session.GetInt32("UserID");
+            User leaver = _context.User.FirstOrDefault(x => x.ID == userSessionID);
             var userProject = await _context.UserProject.FirstOrDefaultAsync(up => up.ProjectID == projectID && up.UserID == userSessionID);
             _context.UserProject.Remove(userProject);
+
+            // Добавление записи в лог
+            _logService.LogAction(projectID,$"покинул проект",userSessionID);
+
             await _context.SaveChangesAsync();
             return Redirect("/Projects/AllProjects");
         }
@@ -373,7 +440,14 @@ namespace diplom.Controllers
         public async Task<IActionResult> EditUserRole(int userProjectID, UserRoles newRole)
         {
             UserProject userProject = _context.UserProject.FirstOrDefault(x => x.ID == userProjectID);
+            string oldRole = userProject.UserRole.ToString();
             userProject.UserRole = newRole;
+
+            int? userSessionID = HttpContext.Session.GetInt32("UserID");
+            User editor = _context.User.FirstOrDefault(x => x.ID == userSessionID);
+
+            // Добавление записи в лог
+            _logService.LogAction(userProject.ProjectID,$"изменил роль пользователя {userProject.User.FName} {userProject.User.LName} с \"{oldRole}\" на \"{newRole}\"",userSessionID);
 
             _context.SaveChanges();
             return Redirect($"/Projects/ProjectSettings/{userProject.ProjectID}");
@@ -387,7 +461,14 @@ namespace diplom.Controllers
             categoryType.Project = currProject;
             categoryType.ProjectID = currProject.ID;
 
+            int? userSessionID = HttpContext.Session.GetInt32("UserID");
+            User creator = _context.User.FirstOrDefault(x => x.ID == userSessionID);
+
             _context.Add(categoryType);
+
+            // Добавление записи в лог
+            _logService.LogAction(currProject.ID,$"добавил категорию \"{categoryType.Name}\"",userSessionID);
+
             _context.SaveChanges();
             var c = _context.CategoryType.ToList();
             return Redirect($"/Projects/ProjectSettings/{currProject.ID}");
@@ -397,7 +478,14 @@ namespace diplom.Controllers
         public async Task<IActionResult> EditCategory([Bind("ID,Name")] CategoryType categoryType, int categoryID)
         {
             CategoryType category = _context.CategoryType.FirstOrDefault(x => x.ID == categoryID);
+            string oldName = category.Name;
             category.Name = categoryType.Name;
+
+            int? userSessionID = HttpContext.Session.GetInt32("UserID");
+            User editor = _context.User.FirstOrDefault(x => x.ID == userSessionID);
+
+            // Добавление записи в лог
+            _logService.LogAction(category.ProjectID,$"изменил название категории с \"{oldName}\" на \"{category.Name}\"", userSessionID);
 
             _context.SaveChangesAsync();
             return Redirect($"/Projects/ProjectSettings/{category.ProjectID}");
@@ -417,6 +505,13 @@ namespace diplom.Controllers
                 }
             }
             _context.SaveChanges();
+
+            int? userSessionID = HttpContext.Session.GetInt32("UserID");
+            User deleter = _context.User.FirstOrDefault(x => x.ID == userSessionID);
+
+            // Добавление записи в лог
+            _logService.LogAction(projectID,$"удалил категорию \"{category.Name}\"",userSessionID);
+
             _context.CategoryType.Remove(category);
             _context.SaveChanges();
             return Redirect($"/Projects/ProjectSettings/{projectID}");
@@ -429,6 +524,7 @@ namespace diplom.Controllers
         {
             int? userSessionID = HttpContext.Session.GetInt32("UserID");
             var project = _context.Project.Include(x => x.StatusTypes).FirstOrDefault(x => x.ID == projectID);
+            User creator = _context.User.FirstOrDefault(x => x.ID == userSessionID);
 
             Issue newIssue = new Issue();
 
@@ -445,6 +541,10 @@ namespace diplom.Controllers
             newIssue.IsDelete = false;
 
             _context.Add(newIssue);
+
+            // Добавление записи в лог
+            _logService.LogAction(projectID,$"создал задачу \"{newIssue.Name}\"",userSessionID);
+
             _context.SaveChanges();
 
             return Redirect($"/Projects/Project/{projectID}");
@@ -454,17 +554,68 @@ namespace diplom.Controllers
         public IActionResult UpdateIssue([Bind("ID, Name, Description, DeadlineDate, PerformerID, PriorityTypeID, StatusTypeID, CategoryTypeID")] Issue issue, int issueID)
         {
             Issue currIssue = _context.Issue.FirstOrDefault(x => x.ID == issueID);
+
+            string oldName = currIssue.Name;
+            string oldDescription = currIssue.Description;
+            DateTime? oldDeadlineDate = currIssue.DeadlineDate;
+            int? oldPerformerID = currIssue.PerformerID;
+            int? oldPriorityTypeID = currIssue.PriorityTypeID;
+            int? oldStatusTypeID = currIssue.StatusTypeID;
+            int? oldCategoryTypeID = currIssue.CategoryTypeID;
+
             currIssue.Name = issue.Name;
             currIssue.Description = issue.Description ?? "";
-            currIssue.CreateDate = DateTime.Now;
-            currIssue.DeadlineDate = issue.DeadlineDate?.Date < DateTime.Now.Date ? DateTime.Now.Date : issue.DeadlineDate?.Date;
+
+            if (currIssue.DeadlineDate.Value.Date >= DateTime.Now.Date || currIssue.DeadlineDate.Value.Date > currIssue.DeadlineDate.Value.Date)
+                currIssue.DeadlineDate = currIssue.DeadlineDate.Value.Date;
 
             currIssue.PerformerID = issue.PerformerID;
             currIssue.PriorityTypeID = issue.PriorityTypeID;
             currIssue.StatusTypeID = issue.StatusTypeID;
             currIssue.CategoryTypeID = issue.CategoryTypeID;
             currIssue.IsDelete = false;
+
+            List<string> changes = new List<string>();
+            if (oldName != currIssue.Name)
+                changes.Add($"Название изменено с \"{oldName}\" на \"{currIssue.Name}\";");
+            if (oldDescription != currIssue.Description)
+                changes.Add($"Описание изменено;");
+            if (oldDeadlineDate != currIssue.DeadlineDate)
+                changes.Add($"Срок изменен с \"{oldDeadlineDate?.ToString("dd.MM.yyyy")}\" на \"{currIssue.DeadlineDate?.ToString("dd.MM.yyyy")}\";");
+            if (oldPerformerID != currIssue.PerformerID)
+            {
+                var oldPerformer = _context.User.FirstOrDefault(u => u.ID == oldPerformerID);
+                var newPerformer = _context.User.FirstOrDefault(u => u.ID == currIssue.PerformerID);
+                changes.Add($"Ответственный изменен с \"{oldPerformer?.FName} {oldPerformer?.LName}\" на \"{newPerformer?.FName} {newPerformer?.LName}\";");
+            }
+            if (oldPriorityTypeID != currIssue.PriorityTypeID)
+            {
+                var oldPriority = _context.PriorityType.FirstOrDefault(p => p.ID == oldPriorityTypeID);
+                var newPriority = _context.PriorityType.FirstOrDefault(p => p.ID == currIssue.PriorityTypeID);
+                changes.Add($"Приоритет изменен с \"{oldPriority?.Name}\" на \"{newPriority?.Name}\";");
+            }
+            if (oldStatusTypeID != currIssue.StatusTypeID)
+            {
+                var oldStatus = _context.StatusType.FirstOrDefault(s => s.ID == oldStatusTypeID);
+                var newStatus = _context.StatusType.FirstOrDefault(s => s.ID == currIssue.StatusTypeID);
+                changes.Add($"Статус изменен с \"{oldStatus?.Name}\" на \"{newStatus?.Name}\";");
+            }
+            if (oldCategoryTypeID != currIssue.CategoryTypeID)
+            {
+                var oldCategory = _context.CategoryType.FirstOrDefault(c => c.ID == oldCategoryTypeID);
+                var newCategory = _context.CategoryType.FirstOrDefault(c => c.ID == currIssue.CategoryTypeID);
+                changes.Add($"Категория изменена с \"{oldCategory?.Name}\" на \"{newCategory?.Name}\"");
+            }
             _context.SaveChanges();
+
+            
+            int? userSessionID = HttpContext.Session.GetInt32("UserID");
+            if (changes.Any())
+            {
+                // Добавление записи в лог
+                string changeMessage = string.Join(" ", changes);
+                _logService.LogAction(currIssue.ProjectID, $"отредактировал задачу \"{oldName}\". Изменения: {changeMessage}", userSessionID);
+            }
 
             return Redirect($"/Projects/Project/{currIssue.ProjectID}");
         }
@@ -475,22 +626,98 @@ namespace diplom.Controllers
         {
             Issue currIssue = _context.Issue.FirstOrDefault(x => x.ID == issueID);
             currIssue.IsDelete = true;
+            currIssue.DeleteDate = DateTime.Now;
+
+            int? userSessionID = HttpContext.Session.GetInt32("UserID");
+            User deleter = _context.User.FirstOrDefault(x => x.ID == userSessionID);
+
+            // Добавление записи в лог
+            _logService.LogAction(currIssue.ProjectID,$"удалил задачу \"{currIssue.Name}\"",userSessionID);
 
             await _context.SaveChangesAsync();
             return Redirect($"/Projects/Project/{currIssue.ProjectID}");
+        }
+        //Восстановление задачи
+        [HttpPost]
+        public async Task<IActionResult> RestoreIssue(int issueID)
+        {
+            Issue currIssue = _context.Issue.FirstOrDefault(x => x.ID == issueID);
+            currIssue.IsDelete = false;
+            currIssue.DeleteDate = null;
+
+            int? userSessionID = HttpContext.Session.GetInt32("UserID");
+            User restorer = _context.User.FirstOrDefault(x => x.ID == userSessionID);
+
+            // Добавление записи в лог
+            _logService.LogAction(currIssue.ProjectID,$"восстановил задачу \"{currIssue.Name}\"",userSessionID);
+
+            await _context.SaveChangesAsync();
+            return Redirect($"/Projects/DeletedIssueArchive/{currIssue.ProjectID}");
         }
 
         //Перетаскивание задачи
         [HttpGet]
         public IActionResult UpdateIssueStatus(int currIssueID, int currStatusID)
         {
-            Issue issue = _context.Issue.FirstOrDefault(x => x.ID == currIssueID);
-            StatusType status = _context.StatusType.FirstOrDefault(x => x.ID == currStatusID);
+            Issue issue = _context.Issue.Include(i => i.StatusType).FirstOrDefault(x => x.ID == currIssueID);
 
-            issue.StatusType = status;
-            issue.StatusTypeID = status.ID;
+            StatusType newStatus = _context.StatusType.FirstOrDefault(x => x.ID == currStatusID);
+
+            if (issue.StatusTypeID == currStatusID)
+            {
+                return Redirect($"/Projects/Project/{issue.ProjectID}");
+            }
+            string oldStatusName = issue.StatusType?.Name;
+            issue.StatusTypeID = currStatusID;
+
+            int? userSessionID = HttpContext.Session.GetInt32("UserID");
+            User editor = _context.User.FirstOrDefault(x => x.ID == userSessionID);
+
+            // Добавление записи в лог
+            _logService.LogAction(issue.ProjectID, $"изменил статус задачи \"{issue.Name}\" с \"{oldStatusName}\" на \"{newStatus.Name}\"", userSessionID);
+
             _context.SaveChanges();
             return Redirect($"/Projects/Project/{issue.ProjectID}");
+        }
+
+        //Сохранение лога
+        [HttpGet("/Projects/DownloadHistory/{projectID}")]
+        public IActionResult DownloadHistory(int projectID)
+        {
+            var logs = _context.Log.Where(x => x.ProjectID == projectID).OrderByDescending(x => x.DateTime).ToList();
+            Models.Project project = _context.Project.FirstOrDefault(x => x.ID == projectID);
+
+            using (var workbook = new ClosedXML.Excel.XLWorkbook())
+            {
+                var worksheet = workbook.Worksheets.Add("Project History");
+                worksheet.Cell(1, 1).Value = "ДАТА";
+                worksheet.Cell(1, 2).Value = "ДЕЙСТВИЕ";
+
+                var headerRange = worksheet.Range("A1:B1");
+                headerRange.Style.Font.Bold = true;
+                headerRange.Style.Alignment.Horizontal = ClosedXML.Excel.XLAlignmentHorizontalValues.Center;
+
+                int row = 2;
+                foreach (var log in logs)
+                {
+                    worksheet.Cell(row, 1).Value = log.DateTime.ToString("dd.MM.yyyy HH:mm");
+                    worksheet.Cell(row, 2).Value = log.Event;
+                    row++;
+                }
+                worksheet.Columns().AdjustToContents();
+
+                using (var stream = new MemoryStream())
+                {
+                    workbook.SaveAs(stream);
+                    var content = stream.ToArray();
+
+                    return File(
+                        content,
+                        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                        $"ProjectHistory_{project.Name}.xlsx"
+                    );
+                }
+            }
         }
     }
 }

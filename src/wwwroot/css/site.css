@@ -139,4 +139,38 @@ h1 {
         font-size: 25px;
     }
 
+.project-table th,
+.project-table td {
+    border: 1px solid #ddd;
+    padding: 10px;
+    text-align: center;
+}
+.left td {
+    text-align: left;
+}
+
+.project-table th {
+    background-color: #f9f9f9;
+    font-weight: bold;
+}
+
+.project-table tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+.project-table tr:hover {
+    background-color: #eaeaea;
+}
+
+.project-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    gap: 100px;
+}
+.history-header {
+    justify-content: flex-end;
+}
+
 

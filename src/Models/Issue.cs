@@ -16,6 +16,7 @@
         public int PriorityTypeID { get; set; } 
 
         public bool IsDelete { get; set; }
+        public DateTime? DeleteDate { get; set; }
         public int? CategoryTypeID { get; set; }
         public int StatusTypeID { get; set; }
 
