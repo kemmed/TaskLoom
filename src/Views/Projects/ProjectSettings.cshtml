@@ -106,18 +106,40 @@
                     <tr>
                         <td>@userProject.User.LName @userProject.User.FName</td>
                         <td>
-                            @if (userProject.CategoryTypes != null && userProject.CategoryTypes.Any())
+                            @if (ViewBag.UserRole == UserRoles.Admin)
                             {
-                                <ul class="category-list">
-                                    @foreach (var category in userProject.CategoryTypes)
+                                <a href="#user-category" rel="modal:open" class="category-link" data-userproj-id="@userProject.ID">
+                                    @if (userProject.CategoryTypes != null && userProject.CategoryTypes.Any())
                                     {
-                                        <li>@category.Name</li>
+                                        <ul class="category-list">
+                                            @foreach (var category in userProject.CategoryTypes)
+                                            {
+                                                <li>@category.Name</li>
+                                            }
+                                        </ul>
                                     }
-                                </ul>
+                                    else
+                                    {
+                                        <span>Нет категорий</span>
+                                    }
+                                    @* <i class="las la-pen"></i> *@
+                                </a>
                             }
                             else
                             {
-                                <span>Нет категорий</span>
+                                @if (userProject.CategoryTypes != null && userProject.CategoryTypes.Any())
+                                {
+                                    <ul class="category-list">
+                                        @foreach (var category in userProject.CategoryTypes)
+                                        {
+                                            <li>@category.Name</li>
+                                        }
+                                    </ul>
+                                }
+                                else
+                                {
+                                    <span>Нет категорий</span>
+                                }
                             }
                         </td>
                         <td>@userProject.User.Email</td>
@@ -246,76 +268,145 @@
 </div>
 
 <script>
-        document.addEventListener('DOMContentLoaded', function () {
-        //редактированиу категории
-        const editButtons = document.querySelectorAll('.edit-category-link');
-        editButtons.forEach(button => {
-            button.addEventListener('click', function (event) {
-                event.preventDefault();
+    document.addEventListener('DOMContentLoaded', function () {
+    //редактированиу категории
+    const editButtons = document.querySelectorAll('.edit-category-link');
+    editButtons.forEach(button => {
+    button.addEventListener('click', function (event) {
+    event.preventDefault();
 
-                const categoryID = this.getAttribute('data-category-id');
-                document.querySelectorAll('.categoryform').forEach(element => {
-                    element.classList.add('hidden');
-                });
-                const selectedEditForm = document.getElementById('EDIT_CATEGORY' + categoryID);
-                if (selectedEditForm) {
-                    selectedEditForm.classList.remove('hidden');
-                }
-            });
-        });
+    const categoryID = this.getAttribute('data-category-id');
+    document.querySelectorAll('.categoryform').forEach(element => {
+    element.classList.add('hidden');
+    });
+    const selectedEditForm = document.getElementById('EDIT_CATEGORY' + categoryID);
+    if (selectedEditForm) {
+    selectedEditForm.classList.remove('hidden');
+    }
+    });
+    });
 
-        //удаление категории
-        const deleteCategoryButtons = document.querySelectorAll('.delete-category-button');
-        deleteCategoryButtons.forEach(button => {
-            button.addEventListener('click', function (event) {
-                event.preventDefault();
+    //удаление категории
+    const deleteCategoryButtons = document.querySelectorAll('.delete-category-button');
+    deleteCategoryButtons.forEach(button => {
+    button.addEventListener('click', function (event) {
+    event.preventDefault();
 
-                const categoryID = this.getAttribute('data-category-id');
-                document.querySelectorAll('.categoryform').forEach(element => {
-                    element.classList.add('hidden');
-                });
-                const selectedDeleteForm = document.getElementById('DELETE_CATEGORY' + categoryID);
-                if (selectedDeleteForm) {
-                    selectedDeleteForm.classList.remove('hidden');
-                }
-            });
-        });
+    const categoryID = this.getAttribute('data-category-id');
+    document.querySelectorAll('.categoryform').forEach(element => {
+    element.classList.add('hidden');
+    });
+    const selectedDeleteForm = document.getElementById('DELETE_CATEGORY' + categoryID);
+    if (selectedDeleteForm) {
+    selectedDeleteForm.classList.remove('hidden');
+    }
+    });
+    });
 
-        //удаление пользователя
-        const deleteUserButtons = document.querySelectorAll('.delete-user-button');
-        deleteUserButtons.forEach(button => {
-            button.addEventListener('click', function (event) {
-                event.preventDefault();
+    //удаление пользователя
+    const deleteUserButtons = document.querySelectorAll('.delete-user-button');
+    deleteUserButtons.forEach(button => {
+    button.addEventListener('click', function (event) {
+    event.preventDefault();
 
-                const userID = this.getAttribute('data-user-id');
-                document.querySelectorAll('.userform').forEach(element => {
-                    element.classList.add('hidden');
-                });
-                const selectedDeleteForm = document.getElementById('REMOVE_USER' + userID);
-                if (selectedDeleteForm) {
-                    selectedDeleteForm.classList.remove('hidden');
-                }
-            });
-        });
+    const userID = this.getAttribute('data-user-id');
+    document.querySelectorAll('.userform').forEach(element => {
+    element.classList.add('hidden');
+    });
+    const selectedDeleteForm = document.getElementById('REMOVE_USER' + userID);
+    if (selectedDeleteForm) {
+    selectedDeleteForm.classList.remove('hidden');
+    }
+    });
+    });
 
-        // редактироване роли пользователя
-        const editRoleButtons = document.querySelectorAll('.user-role-edit');
-        editRoleButtons.forEach(button => {
-            button.addEventListener('click', function (event) {
-                event.preventDefault();
+    // редактироване роли пользователя
+    const editRoleButtons = document.querySelectorAll('.user-role-edit');
+    editRoleButtons.forEach(button => {
+    button.addEventListener('click', function (event) {
+    event.preventDefault();
 
-                const userID = this.getAttribute('data-user-id');
-                document.querySelectorAll('.userform').forEach(element => {
-                    element.classList.add('hidden');
-                });
-                const selectedEditForm = document.getElementById('EDIT_ROLE' + userID);
-                if (selectedEditForm) {
-                    selectedEditForm.classList.remove('hidden');
-                }
-            });
-        });
+    const userID = this.getAttribute('data-user-id');
+    document.querySelectorAll('.userform').forEach(element => {
+    element.classList.add('hidden');
+    });
+    const selectedEditForm = document.getElementById('EDIT_ROLE' + userID);
+    if (selectedEditForm) {
+    selectedEditForm.classList.remove('hidden');
+    }
+    });
+    });
+
+    // Передача прав администратора
+    const giveRightsLinks = document.querySelectorAll('.giveRights_link');
+    giveRightsLinks.forEach(link => {
+    link.addEventListener('click', function (event) {
+    event.preventDefault();
+
+    const userID = this.getAttribute('data-user-id');
+    document.querySelectorAll('.userform').forEach(element => {
+    element.classList.add('hidden');
+    });
+    const selectedGiveRightsForm = document.getElementById('GIVE_RIGHTS' + userID);
+    if (selectedGiveRightsForm) {
+    selectedGiveRightsForm.classList.remove('hidden');
+    }
+    });
+    });
+
+    //Управление позьзовательских категорий
+    const categoryLinks = document.querySelectorAll('.category-link');
+    categoryLinks.forEach(link => {
+    link.addEventListener('click', function (event) {
+    event.preventDefault();
+
+    const userProjectID = this.getAttribute('data-userproj-id');
+    document.querySelectorAll('.categoryform').forEach(element => {
+    element.classList.add('hidden');
+    });
+    const selectedCategoryForm = document.getElementById('EDIT_USER_CATEGORY' + userProjectID);
+    if (selectedCategoryForm) {
+    selectedCategoryForm.classList.remove('hidden');
+    }
+    });
+    });
+
     });
 </script>
+
+<div id="user-category" class="modal">
+    @foreach (UserProject userProject in Model.UserProjects)
+    {
+        <div id="EDIT_USER_CATEGORY@(userProject.ID)" class="hidden categoryform">
+            <form asp-action="AssignCategoriesToUser" asp-controller="Projects">
+                <input type="hidden" value="@userProject.ID" name="userProjectID" />
+                <input type="hidden" value="@Model.ID" name="projectID" />
+                <div class="modal-container">
+                    <h1 class="modal-title">Категории пользователя</h1>
+                    @if (Model.CategoryTypes.Count != 0)
+                    {
+
+                        @foreach (var category in Model.CategoryTypes)
+                        {
+                            <div class="category-item">
+                                <input type="checkbox" name="selectedCategories" value="@category.ID"
+                                @(userProject.CategoryTypes != null && userProject.CategoryTypes.Any(c => c.ID == category.ID) ? "checked" : "") />
+                                @category.Name
+                            </div>
+                        }
+                        <button class="input__submit confirm">Сохранить <i class="las la-save"></i></button>
+                    }
+                    else{
+
+                    <p class="delete-text">В проекте пока нет ни одной категории.</p>
+                    }
+                    
+                </div>
+            </form>
+        </div>
+    }
+    <a href="#" rel="modal:close"></a>
+</div>
 
 <form asp-action="InviteUser" asp-controller="Projects" method="post" id="invite-user" class="modal">
     <input type="hidden" name="projectID" value="@ViewBag.ProjectID" />
@@ -360,12 +451,36 @@
                     <label class="input-form__label">
                         <span class="input-placeholder select-date">Роль</span>
                         <select class="form__input input-select" name="newRole" required>
-                            @* <!option value="@UserRoles.Admin" @(userProject.UserRole == UserRoles.Admin ? "selected" : "")>@userProject.ConvertRoles(UserRoles.Admin)</!option> *@
                             <!option value="@UserRoles.Manager" @(userProject.UserRole == UserRoles.Manager ? "selected" : "")>@userProject.ConvertRoles(UserRoles.Manager)</!option>
                             <!option value="@UserRoles.Employee" @(userProject.UserRole == UserRoles.Employee ? "selected" : "")>@userProject.ConvertRoles(UserRoles.Employee)</!option>
                         </select>
                     </label>
+                    <a class="giveRights_link" href="#give-rights" rel="modal:open" data-user-id="@userProject.ID">Передать права администратора</a>
+
                     <button class="input__submit confirm">Сохранить <i class="las la-save"></i></button>
+                </div>
+            </form>
+        </div>
+    }
+    <a href="#" rel="modal:close"></a>
+</div>
+
+<div id="give-rights" class="modal">
+    @foreach (var userProject in Model.UserProjects)
+    {
+        <div id="GIVE_RIGHTS@(userProject.ID)" class="hidden userform">
+            <form asp-action="EditUserRole" asp-controller="Projects">
+                <input type="hidden" value="@userProject.ID" name="userProjectID" />
+                <input type="hidden" value="@Model.ID" name="projectID" />
+                <input type="hidden" value="@UserRoles.Admin" name="newRole" />
+                <div class="modal-container">
+                    <h1 class="modal-title">Подтвердите передачу прав на проект</h1>
+                    <p class="delete-text">
+                        Вы уверены, что хотите передать права администратора на проект пользователю <br>
+                        <strong>@userProject.User.LName @userProject.User.FName</strong>?
+                    </p>
+                    <p class="delete-text">После передачи прав вам будет назначена роль "Сотрудник".</p>
+                    <button class="input__submit confirm">Подтвердить <i class="las la-check"></i></button>
                 </div>
             </form>
         </div>
@@ -385,12 +500,13 @@
             </div>
         </form>
     }
-    else{
-    <div class="modal-container">
-        <h1 class="modal-title">Вы не можете покинуть проект</h1>
-        <p class="delete-text">Вы являетесь администратором проекта.</p>
-        <p class="delete-text">Для выхода из проекта необходимо передать права администратора другому пользователю.</p>
-    </div>
+    else
+    {
+        <div class="modal-container">
+            <h1 class="modal-title">Вы не можете покинуть проект</h1>
+            <p class="delete-text">Вы являетесь администратором проекта.</p>
+            <p class="delete-text">Для выхода из проекта необходимо передать права администратора другому пользователю.</p>
+        </div>
     }
     <a href="#" rel="modal:close"></a>
 </div>

@@ -59,18 +59,22 @@ else
                         <p class="project-created">Завершен @project.EndDate.Value.ToString("dd.MM.yyyy")</p>
                     }
 
-                    @if (project.CreatorID == ViewBag.UserID)
+                    @foreach (var userProj in project.UserProjects)
                     {
-                        <a href="#edit-project" rel="modal:open" class="edit-project-button" data-project-id="@project.ID">
-                            <i class="las la-pen"></i>
-                        </a>
+                        @if (userProj.UserRole == UserRoles.Admin && userProj.UserID == ViewBag.UserID)
+                        {
+                            <a href="#edit-project" rel="modal:open" class="edit-project-button" data-project-id="@project.ID">
+                                <i class="las la-pen"></i>
+                            </a>
+                        }
+                        else
+                        {
+                            <a href="#edit-project" rel="modal:open" class="edit-project-button" data-project-id="@project.ID">
+                                <i class="las la-info-circle"></i>
+                            </a>
+                        }
                     }
-                    else
-                    {
-                        <a href="#edit-project" rel="modal:open" class="edit-project-button" data-project-id="@project.ID">
-                            <i class="las la-info-circle"></i>
-                        </a>
-                    }
+                    
                 </a>
             </div>
         }
@@ -142,29 +146,31 @@ else
     {
         <div ID="PROJECT@(@project.ID)" class="hidden projectform">
             <form asp-action="EditProject" asp-controller="Projects">
-                <input type="hidden" value="@project.ID" name="projectID" id="projectID"/>
-                <input type="hidden" name="returnUrl" value="/Projects/AllProjects"/>
+                <input type="hidden" value="@project.ID" name="projectID" id="projectID" />
+                <input type="hidden" name="returnUrl" value="/Projects/AllProjects" />
                 <div class="modal-container">
                     <h1 class="modal-title">
-                        @(project.CreatorID == ViewBag.UserID ? "Редактирование проекта" : "Просмотр проекта")
+                        @{
+                            bool isAdmin = project.UserProjects.Any(up => up.UserID == ViewBag.UserID && up.UserRole == UserRoles.Admin);
+                            @(isAdmin ? "Редактирование проекта" : "Просмотр проекта")
+                        }
                     </h1>
                     <label class="input-form__label add-project">
                         <span class="input-placeholder">название</span>
                         <input class="form__input input-name" name="Name" autocomplete="off" required value="@project.Name"
-                               @(project.CreatorID != ViewBag.UserID ? "disabled" : "")>
+                        @(isAdmin ? "" : "disabled")>
                     </label>
 
                     <label class="input-form__label add-project">
                         <span class="input-placeholder">описание</span>
                         <textarea class="form__input form__textarea" name="Description" autocomplete="off"
-                                  @(project.CreatorID != ViewBag.UserID ? "disabled" : "")>@project.Description</textarea>
+                        @(isAdmin ? "" : "disabled")>@project.Description</textarea>
                     </label>
-
 
                     <label class="input-form__label">
                         <span class="input-placeholder select-date">статус</span>
                         <select class="form__input input-select" name="Status" required
-                                @(project.CreatorID != ViewBag.UserID ? "disabled" : "")>
+                        @(isAdmin ? "" : "disabled")>
                             <!option value="@ProjectStatus.InProcess" @((project.Status == ProjectStatus.InProcess) ? "selected" : "")>@project.ConvertStatus(ProjectStatus.InProcess)</!option>
                             <!option value="@ProjectStatus.Frozen" @((project.Status == ProjectStatus.Frozen) ? "selected" : "")>@project.ConvertStatus(ProjectStatus.Frozen)</!option>
                             <!option value="@ProjectStatus.Completed" @((project.Status == ProjectStatus.Completed) ? "selected" : "")>@project.ConvertStatus(ProjectStatus.Completed)</!option>
@@ -175,10 +181,10 @@ else
                         <span class="input-placeholder select-date">срок</span>
                         <input class="form__input input-date" type="date" name="DeadlineDate" required
                                value="@project.DeadlineDate.Value.ToString("yyyy-MM-dd")"
-                               @(project.CreatorID != ViewBag.UserID ? "disabled" : "")>
+                        @(isAdmin ? "" : "disabled")>
                     </label>
 
-                    @if (project.CreatorID == ViewBag.UserID)
+                    @if (isAdmin)
                     {
                         <button class="input__submit confirm">Сохранить <i class="las la-save"></i></button>
                     }

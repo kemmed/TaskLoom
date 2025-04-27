@@ -2,44 +2,50 @@
     margin: 0% 20%;
     margin-bottom: 30px;
 }
+
 .settings-header {
     margin: 20px 0px;
     display: flex;
     justify-content: space-evenly;
 }
+
 .update-project-container {
     display: flex;
     flex-direction: column;
-    padding-bottom:20px;
-    margin-bottom:10px;
+    padding-bottom: 20px;
+    margin-bottom: 10px;
     border-bottom: 3px solid #ddd;
 }
+
     .update-project-container .input__submit {
         width: 250px;
     }
+
     .update-project-container .input-date {
         width: 250px;
     }
+
     .update-project-container .input-select {
         width: 300px;
     }
 
-.categories-list{
+.categories-list {
     margin: 20px 0px;
 }
-.categories-list ul {
-    list-style-type: none;
-    padding: 0;
-}
 
-.categories-list li {
-    background-color: #f9f9f9;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    padding: 15px;
-    font-size: 16px;
-    color: #333;
-}
+    .categories-list ul {
+        list-style-type: none;
+        padding: 0;
+    }
+
+    .categories-list li {
+        background-color: #f9f9f9;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        padding: 15px;
+        font-size: 16px;
+        color: #333;
+    }
 
 
 .project-table {
@@ -47,16 +53,18 @@
     margin: 20px 0px;
     border: 2px solid #ddd;
 }
+
 .button-exclude-user {
     margin: 10px 0px;
 }
+
     .button-exclude-user a {
         padding: 15px 20px;
         outline: none;
         text-decoration: none;
-    
     }
-.exclude-user{
+
+.exclude-user {
     width: 150px;
 }
 
@@ -71,32 +79,61 @@
     text-align: center;
     font-weight: bold;
 }
-.no-margin{
-    margin:0;
+
+.no-margin {
+    margin: 0;
 }
+
 .category-item-container {
     display: flex;
     justify-content: space-between;
     gap: 10px;
     align-items: center;
-    margin-bottom:10px;
-    
+    margin-bottom: 10px;
 }
+
     .category-item-container .category-name-container {
         text-decoration: none;
         color: #333;
     }
+
 .category-name-container:hover {
     color: #60a7e7;
 }
-    .category-name{
-    flex-grow:1;
+
+.category-name {
+    flex-grow: 1;
     text-decoration: none;
 }
+
 .user-role-edit {
     text-decoration: none;
     color: #333;
 }
+
     .user-role-edit:hover {
         color: #60a7e7;
     }
+
+.category-link {
+    text-decoration: none;
+    color: #333;
+}
+
+    .category-link:hover {
+        color: #60a7e7;
+    }
+
+.giveRights_link {
+    color: #007bff;
+    text-align: center;
+    margin-bottom:15px;
+    text-decoration:none;
+}
+.category-item{
+    margin-bottom: 10px;
+}
+.category-list {
+    text-align: left;
+    margin:0;
+}

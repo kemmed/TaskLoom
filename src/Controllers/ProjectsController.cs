@@ -46,9 +46,10 @@ namespace diplom.Controllers
                 return Redirect("/Users/Authorization");
 
             var allProjects = _context.Project.Where(x => x.CreatorID == userLoggedInID ||
-                _context.UserProject.Any(ub => ub.ProjectID == x.ID 
-                && ub.UserID == userLoggedInID 
+                _context.UserProject.Any(ub => ub.ProjectID == x.ID
+                && ub.UserID == userLoggedInID
                 && ub.IsActive))
+                .Include(p=>p.UserProjects)
                 .ToList();
 
             var statusCounts = new Dictionary<ProjectStatus, int>
@@ -88,12 +89,6 @@ namespace diplom.Controllers
                 .Include(x => x.Issues.Where(y => !y.IsDelete))
                 .ThenInclude(x => x.Performer).ToList();
 
-            //var project = _context.Project.Where(x => x.ID == projectID)
-            //    .Include(x => x.StatusTypes)
-            //    .Include(x => x.PriorityTypes)
-            //    .Include(x => x.Issues)
-            //    .ThenInclude(x => x.Performer)
-
             ViewBag.ProjectName = _context.Project.FirstOrDefault(x => x.ID == projectID).Name;
             ViewBag.ProjectID = _context.Project.FirstOrDefault(x => x.ID == projectID).ID;
 
@@ -101,26 +96,26 @@ namespace diplom.Controllers
                 .Select(c => new SelectListItem
                 {
                     Value = c.UserID.ToString(),
-                    Text = c.User.LName +" "+ c.User.FName  
+                    Text = c.User.LName + " " + c.User.FName
                 }).ToList();
             var categories = _context.CategoryType.Where(x => x.ProjectID == projectID)
                 .Select(c => new SelectListItem
-            {
-                Value = c.ID.ToString(),
-                Text = c.Name
-            }).ToList();
+                {
+                    Value = c.ID.ToString(),
+                    Text = c.Name
+                }).ToList();
             var priorities = _context.PriorityType.Where(x => x.ProjectID == projectID)
                 .Select(c => new SelectListItem
-            {
-                Value = c.ID.ToString(),
-                Text = c.Name
-            }).ToList();
+                {
+                    Value = c.ID.ToString(),
+                    Text = c.Name
+                }).ToList();
             var statuses = _context.StatusType.Where(x => x.ProjectID == projectID)
                 .Select(c => new SelectListItem
-            {
-                Value = c.ID.ToString(),
-                Text = c.Name
-            }).ToList();
+                {
+                    Value = c.ID.ToString(),
+                    Text = c.Name
+                }).ToList();
 
             ViewBag.Responsibilities = reponsibilities;
             ViewBag.Categories = categories;
@@ -131,9 +126,9 @@ namespace diplom.Controllers
             UserRoles userRole = _context.UserProject.FirstOrDefault(x => x.UserID == HttpContext.Session.GetInt32("UserID") && x.ProjectID == projectID).UserRole;
             if (userRole == UserRoles.Admin)
                 ViewBag.userRole = 1;
-            else if(userRole == UserRoles.Manager)
+            else if (userRole == UserRoles.Manager)
                 ViewBag.userRole = 2;
-            else 
+            else
                 ViewBag.userRole = 3;
 
             List<Issue> issues = new List<Issue>();
@@ -152,13 +147,13 @@ namespace diplom.Controllers
             {
                 return NotFound();
             }
-            var log = _context.Log.Where(x => x.ProjectID == projectID).OrderByDescending(x => x.DateTime) .ToList();
+            var log = _context.Log.Where(x => x.ProjectID == projectID).OrderByDescending(x => x.DateTime).ToList();
 
             ViewBag.ProjectID = projectID;
             return View(log);
         }
 
-            [HttpGet("/Projects/ProjectSettings/{projectID}")]
+        [HttpGet("/Projects/ProjectSettings/{projectID}")]
         public async Task<IActionResult> ProjectSettings(int projectID)
         {
             if (_context.Project.FirstOrDefault(x => x.ID == projectID) == null ||
@@ -168,9 +163,13 @@ namespace diplom.Controllers
                 return NotFound();
             }
 
+            UserProject currUserProj = _context.UserProject.FirstOrDefault(x => x.UserID == HttpContext.Session.GetInt32("UserID"));
+
             var project = await _context.Project
                 .Include(p => p.UserProjects.Where(up => up.IsActive))
                 .ThenInclude(up => up.User)
+                .Include(p => p.UserProjects.Where(up => up.IsActive))
+                .ThenInclude(up => up.CategoryTypes)
                 .Include(p => p.CategoryTypes)
                 .Include(p => p.PriorityTypes)
                 .Include(p => p.StatusTypes)
@@ -198,7 +197,7 @@ namespace diplom.Controllers
                 return NotFound();
             }
 
-            var issue =  _context.Issue.Where(x => x.ProjectID == projectID && x.IsDelete)
+            var issue = _context.Issue.Where(x => x.ProjectID == projectID && x.IsDelete)
                 .Include(x => x.CategoryType)
                 .Include(x => x.Performer)
                 .ToList();
@@ -359,7 +358,7 @@ namespace diplom.Controllers
             User inviter = _context.User.FirstOrDefault(x => x.ID == userSessionID);
 
             // Добавление записи в лог
-            _logService.LogAction(projectID,$"отправил приглашение пользователю {invitedUser.FName} {invitedUser.LName} на присоединение к проекту",userSessionID);
+            _logService.LogAction(projectID, $"отправил приглашение пользователю {invitedUser.FName} {invitedUser.LName} на присоединение к проекту", userSessionID);
 
             await _context.SaveChangesAsync();
 
@@ -392,7 +391,7 @@ namespace diplom.Controllers
                 var user = _context.User.FirstOrDefault(u => u.ID == userProject.UserID);
 
                 // Добавление записи в лог
-                _logService.LogAction(project.ID,$"присоединился к проекту \"{project.Name}\"",user.ID);
+                _logService.LogAction(project.ID, $"присоединился к проекту \"{project.Name}\"", user.ID);
 
             }
             else
@@ -415,11 +414,44 @@ namespace diplom.Controllers
             User remover = _context.User.FirstOrDefault(x => x.ID == userSessionID);
 
             // Добавление записи в лог
-            _logService.LogAction(projectID,$"исключил пользователя {userProject.User.FName} {userProject.User.LName} из проекта.",userSessionID);
+            _logService.LogAction(projectID, $"исключил пользователя {userProject.User.FName} {userProject.User.LName} из проекта.", userSessionID);
 
             _context.SaveChanges();
             return Redirect($"/Projects/ProjectSettings/{projectID}");
         }
+
+        //Назначение категорий пользователю
+        [HttpPost]
+        public async Task<IActionResult> AssignCategoriesToUser(int userProjectID, int projectID, List<int> selectedCategories)
+        {
+            UserProject userProject = _context.UserProject
+                .Include(x => x.User)
+                .Include(up => up.CategoryTypes)
+                .FirstOrDefault(x => x.ID == userProjectID);
+
+            var allCategories = _context.CategoryType.Where(c => c.ProjectID == projectID).ToList();
+
+            userProject.CategoryTypes.Clear();
+
+            if (selectedCategories != null && selectedCategories.Any())
+            {
+                foreach (var categoryId in selectedCategories)
+                {
+                    var category = allCategories.FirstOrDefault(c => c.ID == categoryId);
+                    if (category != null)
+                        userProject.CategoryTypes.Add(category);
+                }
+            }
+
+            int? userSessionID = HttpContext.Session.GetInt32("UserID");
+            User currentUser = _context.User.FirstOrDefault(x => x.ID == userSessionID);
+
+            _logService.LogAction(projectID, $"обновил категории пользователя {userProject.User.FName} {userProject.User.LName}", userSessionID);
+
+            await _context.SaveChangesAsync();
+            return Redirect($"/Projects/ProjectSettings/{projectID}");
+        }
+
         //Выход из проекта
         [HttpPost]
         public async Task<IActionResult> LeaveProject(int projectID)
@@ -430,7 +462,7 @@ namespace diplom.Controllers
             _context.UserProject.Remove(userProject);
 
             // Добавление записи в лог
-            _logService.LogAction(projectID,$"покинул проект",userSessionID);
+            _logService.LogAction(projectID, $"покинул проект", userSessionID);
 
             await _context.SaveChangesAsync();
             return Redirect("/Projects/AllProjects");
@@ -439,16 +471,28 @@ namespace diplom.Controllers
         [HttpPost]
         public async Task<IActionResult> EditUserRole(int userProjectID, UserRoles newRole)
         {
-            UserProject userProject = _context.UserProject.FirstOrDefault(x => x.ID == userProjectID);
-            string oldRole = userProject.UserRole.ToString();
-            userProject.UserRole = newRole;
+            UserProject userProject = _context.UserProject.Include(x => x.User).FirstOrDefault(x => x.ID == userProjectID);
 
             int? userSessionID = HttpContext.Session.GetInt32("UserID");
             User editor = _context.User.FirstOrDefault(x => x.ID == userSessionID);
+            if (newRole == UserRoles.Admin)
+            {
+                userProject.UserRole = newRole;
 
-            // Добавление записи в лог
-            _logService.LogAction(userProject.ProjectID,$"изменил роль пользователя {userProject.User.FName} {userProject.User.LName} с \"{oldRole}\" на \"{newRole}\"",userSessionID);
+                UserProject userProjectEditor = _context.UserProject.Include(x => x.User).FirstOrDefault(x => x.UserID == editor.ID && x.ProjectID == userProject.ProjectID);
+                userProjectEditor.UserRole = UserRoles.Employee;
 
+                // Добавление записи в лог
+                _logService.LogAction(userProject.ProjectID, $"передал права на проект пользователю {userProject.User.FName}", userSessionID);
+            }
+            else
+            {
+                string oldRole = userProject.ConvertRoles(userProject.UserRole);
+                userProject.UserRole = newRole;
+
+                // Добавление записи в лог
+                _logService.LogAction(userProject.ProjectID, $"изменил роль пользователя {userProject.User.FName} {userProject.User.LName} с \"{oldRole}\" на \"{userProject.ConvertRoles(newRole)}\"", userSessionID);
+            }
             _context.SaveChanges();
             return Redirect($"/Projects/ProjectSettings/{userProject.ProjectID}");
         }
@@ -467,7 +511,7 @@ namespace diplom.Controllers
             _context.Add(categoryType);
 
             // Добавление записи в лог
-            _logService.LogAction(currProject.ID,$"добавил категорию \"{categoryType.Name}\"",userSessionID);
+            _logService.LogAction(currProject.ID, $"добавил категорию \"{categoryType.Name}\"", userSessionID);
 
             _context.SaveChanges();
             var c = _context.CategoryType.ToList();
@@ -485,7 +529,7 @@ namespace diplom.Controllers
             User editor = _context.User.FirstOrDefault(x => x.ID == userSessionID);
 
             // Добавление записи в лог
-            _logService.LogAction(category.ProjectID,$"изменил название категории с \"{oldName}\" на \"{category.Name}\"", userSessionID);
+            _logService.LogAction(category.ProjectID, $"изменил название категории с \"{oldName}\" на \"{category.Name}\"", userSessionID);
 
             _context.SaveChangesAsync();
             return Redirect($"/Projects/ProjectSettings/{category.ProjectID}");
@@ -510,7 +554,7 @@ namespace diplom.Controllers
             User deleter = _context.User.FirstOrDefault(x => x.ID == userSessionID);
 
             // Добавление записи в лог
-            _logService.LogAction(projectID,$"удалил категорию \"{category.Name}\"",userSessionID);
+            _logService.LogAction(projectID, $"удалил категорию \"{category.Name}\"", userSessionID);
 
             _context.CategoryType.Remove(category);
             _context.SaveChanges();
@@ -543,7 +587,7 @@ namespace diplom.Controllers
             _context.Add(newIssue);
 
             // Добавление записи в лог
-            _logService.LogAction(projectID,$"создал задачу \"{newIssue.Name}\"",userSessionID);
+            _logService.LogAction(projectID, $"создал задачу \"{newIssue.Name}\"", userSessionID);
 
             _context.SaveChanges();
 
@@ -608,7 +652,7 @@ namespace diplom.Controllers
             }
             _context.SaveChanges();
 
-            
+
             int? userSessionID = HttpContext.Session.GetInt32("UserID");
             if (changes.Any())
             {
@@ -632,7 +676,7 @@ namespace diplom.Controllers
             User deleter = _context.User.FirstOrDefault(x => x.ID == userSessionID);
 
             // Добавление записи в лог
-            _logService.LogAction(currIssue.ProjectID,$"удалил задачу \"{currIssue.Name}\"",userSessionID);
+            _logService.LogAction(currIssue.ProjectID, $"удалил задачу \"{currIssue.Name}\"", userSessionID);
 
             await _context.SaveChangesAsync();
             return Redirect($"/Projects/Project/{currIssue.ProjectID}");
@@ -649,7 +693,7 @@ namespace diplom.Controllers
             User restorer = _context.User.FirstOrDefault(x => x.ID == userSessionID);
 
             // Добавление записи в лог
-            _logService.LogAction(currIssue.ProjectID,$"восстановил задачу \"{currIssue.Name}\"",userSessionID);
+            _logService.LogAction(currIssue.ProjectID, $"восстановил задачу \"{currIssue.Name}\"", userSessionID);
 
             await _context.SaveChangesAsync();
             return Redirect($"/Projects/DeletedIssueArchive/{currIssue.ProjectID}");
