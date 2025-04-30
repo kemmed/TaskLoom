@@ -1,7 +1,7 @@
 ﻿@using diplom.Models
 @using diplom.Controllers
 @addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
-@model List<StatusType>
+@model List<Issue>
 
 @{
     Layout = "_Layout";
@@ -25,25 +25,27 @@
     </div>
 
     <div class="task-filter-tabs">
-        @* <a href="/Projects/ProjectDetails?filter=all" class="filter-button all @(ViewBag.TaskFilter == "all" ? "active" : "")">Все</a>
-        <a href="/Projects/ProjectDetails?filter=myTasks" class="filter-button my-task @(ViewBag.TaskFilter == "myTasks" ? "active" : "")">Мои <i class="las la-user-alt"></i></a>
-        <a href="/Projects/ProjectDetails?filter=myCategory" class="filter-button my-category @(ViewBag.TaskFilter == "myTasks" ? "active" : "")">Моей категории <i class="las la-stream"></i></a> *@
+        <a href="/Projects/Project/@ViewBag.ProjectID?filter=all" class="filter-button all @(ViewBag.TaskFilter == "all" ? "active" : "")">Все</a>
+        <a href="/Projects/Project/@ViewBag.ProjectID?filter=myTasks" class="filter-button my-task @(ViewBag.TaskFilter == "myTasks" ? "active" : "")">Мои задачи <i class="las la-user-alt"></i></a>
+        <a href="/Projects/Project/@ViewBag.ProjectID?filter=myCategory" class="filter-button my-category @(ViewBag.TaskFilter == "myCategory" ? "active" : "")">Мои категории <i class="las la-stream"></i></a>
     </div>
 
     <div class="task-columns-container">
         <div class="task-columns">
-            @foreach (StatusType statusType in Model)
+            @foreach (StatusType statusType in ViewBag.StatusTypes)
             {
                 <div class="task-column" data-status="@statusType.Name" data-status-id="@statusType.ID">
                     <h2>@statusType.Name</h2>
                     <ul class="task-list">
-                        @foreach (Issue task in statusType.Issues.Where(t => t.StatusType.Name == statusType.Name))
+                        @foreach (Issue task in Model.Where(t => t.StatusType.Name == statusType.Name))
                         {
                             <li class="task-card draggable @GetPriorityClass(task.PriorityType)" data-task-id="@task.ID">
                                 <a href="#edit-task" rel="modal:open" class="edit-task-link" data-issue-id="@task.ID">
                                     <h3>@task.Name</h3>
                                     <p>Приоритет: <span class="priority-text">@(task.PriorityType.Name)</span></p>
-                                    <p>Завершить до: @(task.DeadlineDate?.ToString("dd.MM.yyyy") ?? "не указано")</p>
+                                    <p>Ответственный: @($"{task.Performer.LName} {task.Performer.FName}")</p>
+                                    <p>Категория: @(task.CategoryType.Name ?? "нет категории")</p>
+                                    <p>Завершить до: @(task.DeadlineDate?.ToString("dd.MM.yyyy") ?? "нет срока")</p>
                                 </a>
 
                                 
@@ -222,10 +224,8 @@
 
 
 <div id="delete-task" class="modal">
-    @foreach (var status in Model)
+    @foreach (var issue in Model)
     {
-        @foreach (var issue in status.Issues)
-        {
             <div id="DELETE_ISSUE@(issue.ID)" class="hidden issueform">
                 <form asp-action="DeleteIssue" asp-controller="Projects">
                     <input type="hidden" value="@issue.ID" name="issueID" id="issueID" />
@@ -236,17 +236,14 @@
                     </div>
                 </form>
             </div>
-        }
     }
     <a href="#" rel="modal:close"></a>
 </div>
 
 
 <div id="edit-task" class="modal">
-    @foreach (var status in Model)
+    @foreach (var issue in Model)
     {
-        @foreach (var issue in status.Issues)
-        {
             <div id="EDIT_ISSUE@(issue.ID)" class="hidden issueform">
                 <form asp-action="UpdateIssue" asp-controller="Projects">
                     <input type="hidden" value="@issue.ID" name="issueID" id="issueID" />
@@ -324,7 +321,6 @@
                     </div>
                 </form>
             </div>
-        }
     }
     <a href="#" rel="modal:close"></a>
 </div>

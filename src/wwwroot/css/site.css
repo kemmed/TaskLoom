@@ -172,5 +172,8 @@ h1 {
 .history-header {
     justify-content: flex-end;
 }
+#history-date-column{
+    text-align:center;
+}
 
 

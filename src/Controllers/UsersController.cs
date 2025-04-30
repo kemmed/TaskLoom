@@ -297,27 +297,6 @@ namespace diplom.Controllers
             await _context.SaveChangesAsync();
             return Redirect("UserProfile");
         }
-        // Изменение email пользователя
-        //[HttpPost]
-        //public async Task<IActionResult> UpdateProfileEmail([Bind("ID,Email")] User user)
-        //{
-        //    int? userSessionID = HttpContext.Session.GetInt32("UserID");
-        //    var currentUser = _context.User.FirstOrDefault(x => x.ID == userSessionID);
-        //    if ((_context.User.FirstOrDefault(x => x.Email == user.Email) == null))
-        //    {
-        //        currentUser.Email = user.Email;
-        //    }
-        //    else if (currentUser.Email == user.Email)
-        //    {
-        //        return Redirect("UserProfile");
-        //    }
-        //    else
-        //    {
-        //        return Redirect("/Users/RegError?view=UserProfile");
-        //    }
-        //    await _context.SaveChangesAsync();
-        //    return Redirect("UserProfile");
-        //}
 
         // Изменение пароля пользователя
         [HttpPost]

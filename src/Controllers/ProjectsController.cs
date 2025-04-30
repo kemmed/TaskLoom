@@ -49,7 +49,7 @@ namespace diplom.Controllers
                 _context.UserProject.Any(ub => ub.ProjectID == x.ID
                 && ub.UserID == userLoggedInID
                 && ub.IsActive))
-                .Include(p=>p.UserProjects)
+                .Include(p => p.UserProjects)
                 .ToList();
 
             var statusCounts = new Dictionary<ProjectStatus, int>
@@ -70,12 +70,14 @@ namespace diplom.Controllers
             }
 
             ViewBag.StatusFilter = statusFilter;
-            ViewBag.UserID = _context.User.FirstOrDefault(x => x.ID == HttpContext.Session.GetInt32("UserID")).ID;
+            ViewBag.UserID = userLoggedInID;
+            ViewBag.UserRole = _context.UserProject.FirstOrDefault(x=>x.UserID == userLoggedInID).UserRole;
+
             return View(filteredProjects.ToList());
         }
 
         [HttpGet("/Projects/Project/{projectID}")]
-        public async Task<IActionResult> Project(int projectID)
+        public async Task<IActionResult> Project(int projectID, string filter = "all")
         {
             if (_context.Project.FirstOrDefault(x => x.ID == projectID) == null ||
                 HttpContext.Session.GetInt32("UserID") == null ||
@@ -83,11 +85,45 @@ namespace diplom.Controllers
             {
                 return NotFound();
             }
-            var columns = _context.StatusType.Where(x => x.ProjectID == projectID)
-                .Include(x => x.Project)
-                .ThenInclude(x => x.PriorityTypes)
-                .Include(x => x.Issues.Where(y => !y.IsDelete))
-                .ThenInclude(x => x.Performer).ToList();
+            int? userSessionID = HttpContext.Session.GetInt32("UserID");
+
+            var allIssues = _context.Issue
+                 .Where(i => i.ProjectID == projectID && !i.IsDelete)
+                 .Include(i => i.Project)
+                     .ThenInclude(p => p.StatusTypes)
+                 .Include(i => i.Project)
+                     .ThenInclude(p => p.PriorityTypes)
+                 .Include(i => i.Project)
+                    .ThenInclude(i=>i.CategoryTypes)
+                 .Include(i => i.Performer)
+                 .ToList();
+
+            List<Issue> filteredIssues = new List<Issue>();
+
+            if (filter == "myTasks")
+            {
+                filteredIssues = allIssues.Where(i => i.PerformerID == userSessionID).ToList();
+            }
+            else if (filter == "myCategory")
+            {
+                var userCategoryIds = _context.CategoryType
+                    .Where(ct => ct.ProjectID == projectID &&
+                                 ct.UserProjects.Any(up => up.UserID == userSessionID))
+                    .Select(ct => ct.ID)
+                    .ToList();
+
+                filteredIssues = allIssues
+                    .Where(i => i.CategoryTypeID.HasValue && userCategoryIds.Contains(i.CategoryTypeID.Value))
+                    .ToList();
+            }
+            else
+            {
+                filteredIssues = allIssues;
+            }
+
+            var columns = _context.StatusType.Where(x => x.ProjectID == projectID);
+
+            ViewBag.StatusTypes = columns;
 
             ViewBag.ProjectName = _context.Project.FirstOrDefault(x => x.ID == projectID).Name;
             ViewBag.ProjectID = _context.Project.FirstOrDefault(x => x.ID == projectID).ID;
@@ -131,11 +167,9 @@ namespace diplom.Controllers
             else
                 ViewBag.userRole = 3;
 
-            List<Issue> issues = new List<Issue>();
-            issues = _context.Issue.Where(x => x.ProjectID == projectID && !x.IsDelete).ToList();
-            ViewBag.projectIssues = issues;
-            ViewBag.UserID = _context.User.FirstOrDefault(x => x.ID == HttpContext.Session.GetInt32("UserID")).ID;
-            return View(columns);
+
+            ViewBag.UserID = userSessionID;
+            return View(filteredIssues);
         }
 
         [HttpGet("/Projects/ProjectHistory/{projectID}")]
@@ -163,7 +197,7 @@ namespace diplom.Controllers
                 return NotFound();
             }
 
-            UserProject currUserProj = _context.UserProject.FirstOrDefault(x => x.UserID == HttpContext.Session.GetInt32("UserID"));
+            UserProject currUserProj = _context.UserProject.FirstOrDefault(x => x.UserID == HttpContext.Session.GetInt32("UserID") && x.ProjectID == projectID);
 
             var project = await _context.Project
                 .Include(p => p.UserProjects.Where(up => up.IsActive))
@@ -180,11 +214,11 @@ namespace diplom.Controllers
                 return NotFound();
             }
             project.UserProjects = project.UserProjects
-                .OrderByDescending(up => up.UserRole)
+                .OrderBy(up => up.UserRole)
                 .ToList();
 
             ViewBag.ProjectID = projectID;
-            ViewBag.UserRole = _context.UserProject.FirstOrDefault(x => x.UserID == HttpContext.Session.GetInt32("UserID")).UserRole;
+            ViewBag.UserRole = currUserProj.UserRole;
             return View(project);
         }
         [HttpGet("/Projects/DeletedIssueArchive/{projectID}")]

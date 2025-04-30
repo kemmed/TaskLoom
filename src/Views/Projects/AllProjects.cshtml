@@ -59,20 +59,17 @@ else
                         <p class="project-created">Завершен @project.EndDate.Value.ToString("dd.MM.yyyy")</p>
                     }
 
-                    @foreach (var userProj in project.UserProjects)
+                    @if (ViewBag.UserRole == UserRoles.Admin)
                     {
-                        @if (userProj.UserRole == UserRoles.Admin && userProj.UserID == ViewBag.UserID)
-                        {
-                            <a href="#edit-project" rel="modal:open" class="edit-project-button" data-project-id="@project.ID">
-                                <i class="las la-pen"></i>
-                            </a>
-                        }
-                        else
-                        {
-                            <a href="#edit-project" rel="modal:open" class="edit-project-button" data-project-id="@project.ID">
-                                <i class="las la-info-circle"></i>
-                            </a>
-                        }
+                        <a href="#edit-project" rel="modal:open" class="edit-project-button" data-project-id="@project.ID">
+                            <i class="las la-pen"></i>
+                        </a>
+                    }
+                    else
+                    {
+                        <a href="#edit-project" rel="modal:open" class="edit-project-button" data-project-id="@project.ID">
+                            <i class="las la-info-circle"></i>
+                        </a>
                     }
                     
                 </a>
