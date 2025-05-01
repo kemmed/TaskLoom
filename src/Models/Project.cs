@@ -14,13 +14,11 @@
         public ProjectStatus Status { get; set; }
         public bool IsDelete { get; set; }
 
-        public int CreatorID { get; set; }
-        public User CreatorUser { get; set; }
 
         public List<Issue> Issues { get; set; }
-        public List<PriorityType> PriorityTypes { get; set; }
-        public List<StatusType> StatusTypes { get; set; }
-        public List<CategoryType> CategoryTypes { get; set; }
+        public List<string> PriorityTypes { get; set; }
+        public List<string> StatusTypes { get; set; }
+        public List<string>? CategoryTypes { get; set; }
         public List<UserProject> UserProjects { get; set; }
         public List<Log> Logs { get; set; }
 

@@ -9,13 +9,14 @@
         public UserRoles UserRole { get; set; }
         public string? InviteToken { get; set; }
         public DateTime? InviteTokenDate { get; set; }
+        public bool IsCreator { get; set; }
 
         public bool IsActive { get; set; }
 
         public User User { get; set; }
         public Project Project { get; set; }
 
-        public List<CategoryType> CategoryTypes { get; set; }
+        public List<string> Categories { get; set; }
 
         public string ConvertRoles(UserRoles userRoles)
         {

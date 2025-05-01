@@ -14,7 +14,5 @@
         public DateTime? PassRecoveryTokenDate {  get; set; }
 
         public List <UserProject> UserProjects { get; set; }
-        public List <Project> Projects { get; set; }
-        public List <Issue> Issues { get; set; }
     }
 }

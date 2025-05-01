@@ -13,17 +13,13 @@
 
         public int? PerformerID { get; set; }
         public int ProjectID { get; set; }
-        public int PriorityTypeID { get; set; } 
+        public String Priority { get; set; } 
 
         public bool IsDelete { get; set; }
         public DateTime? DeleteDate { get; set; }
-        public int? CategoryTypeID { get; set; }
-        public int StatusTypeID { get; set; }
+        public String? Category { get; set; }
+        public String Status { get; set; }
 
-
-        public StatusType StatusType { get; set; }
-        public CategoryType? CategoryType { get; set; } = new();
-        public PriorityType PriorityType { get; set; }
         public Project Project { get; set; }
         public User Creator { get; set; }
         public User? Performer { get; set; }

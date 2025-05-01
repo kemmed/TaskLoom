@@ -1,20 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using diplom.Data;
+using diplom.Models;
+using diplom.Services;
+using DocumentFormat.OpenXml.Bibliography;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
-using diplom.Data;
-using diplom.Models;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Microsoft.CodeAnalysis;
-using Microsoft.Build.Evaluation;
-using diplom.Services;
-using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages.Manage;
-using System.Net;
-using Microsoft.AspNetCore.Components.Forms;
-using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.Blazor;
+using Microsoft.EntityFrameworkCore;
 
 namespace diplom.Controllers
 {
@@ -45,12 +36,17 @@ namespace diplom.Controllers
             if (userLoggedInID == null)
                 return Redirect("/Users/Authorization");
 
-            var allProjects = _context.Project.Where(x => x.CreatorID == userLoggedInID ||
-                _context.UserProject.Any(ub => ub.ProjectID == x.ID
+            var allProjects = _context.Project.Where(x => x.UserProjects.Any(ub => ub.ProjectID == x.ID
                 && ub.UserID == userLoggedInID
                 && ub.IsActive))
                 .Include(p => p.UserProjects)
                 .ToList();
+            //var allProjects = _context.Project.Where(x => x.CreatorID == userLoggedInID ||
+            //_context.UserProject.Any(ub => ub.ProjectID == x.ID
+            //&& ub.UserID == userLoggedInID
+            //&& ub.IsActive))
+            //.Include(p => p.UserProjects)
+            //.ToList();
 
             var statusCounts = new Dictionary<ProjectStatus, int>
             {
@@ -71,7 +67,6 @@ namespace diplom.Controllers
 
             ViewBag.StatusFilter = statusFilter;
             ViewBag.UserID = userLoggedInID;
-            ViewBag.UserRole = _context.UserProject.FirstOrDefault(x=>x.UserID == userLoggedInID).UserRole;
 
             return View(filteredProjects.ToList());
         }
@@ -81,77 +76,55 @@ namespace diplom.Controllers
         {
             if (_context.Project.FirstOrDefault(x => x.ID == projectID) == null ||
                 HttpContext.Session.GetInt32("UserID") == null ||
-                _context.UserProject.FirstOrDefault(x => x.UserID == HttpContext.Session.GetInt32("UserID")) == null)
-            {
-                return NotFound();
-            }
+                _context.UserProject.FirstOrDefault(x => x.UserID == HttpContext.Session.GetInt32("UserID") && x.ProjectID == projectID) == null)
+                     return NotFound();
+
             int? userSessionID = HttpContext.Session.GetInt32("UserID");
 
-            var allIssues = _context.Issue
-                 .Where(i => i.ProjectID == projectID && !i.IsDelete)
-                 .Include(i => i.Project)
-                     .ThenInclude(p => p.StatusTypes)
-                 .Include(i => i.Project)
-                     .ThenInclude(p => p.PriorityTypes)
-                 .Include(i => i.Project)
-                    .ThenInclude(i=>i.CategoryTypes)
-                 .Include(i => i.Performer)
-                 .ToList();
+            var project = await _context.Project
+                .Include(p => p.Issues)
+                    .ThenInclude(i => i.Performer)
+                .Include(p => p.UserProjects)
+                    .ThenInclude(up => up.User)
+                .FirstOrDefaultAsync(p => p.ID == projectID);
 
-            List<Issue> filteredIssues = new List<Issue>();
+            if (project == null)
+                return NotFound();
 
-            if (filter == "myTasks")
+            project.PriorityTypes ??= new List<string>();
+            project.StatusTypes ??= new List<string>();
+            project.CategoryTypes ??= new List<string>();
+
+            var allIssues = project.Issues.Where(i => !i.IsDelete).ToList();
+
+            List<Models.Issue> filteredIssues = filter switch
             {
-                filteredIssues = allIssues.Where(i => i.PerformerID == userSessionID).ToList();
-            }
-            else if (filter == "myCategory")
-            {
-                var userCategoryIds = _context.CategoryType
-                    .Where(ct => ct.ProjectID == projectID &&
-                                 ct.UserProjects.Any(up => up.UserID == userSessionID))
-                    .Select(ct => ct.ID)
-                    .ToList();
+                "myTasks" => allIssues.Where(i => i.PerformerID == userSessionID).ToList(),
+                "myCategory" => allIssues.Where(i => i.Category != null && project.CategoryTypes.Contains(i.Category)).ToList(),
+                _ => allIssues
+            };
 
-                filteredIssues = allIssues
-                    .Where(i => i.CategoryTypeID.HasValue && userCategoryIds.Contains(i.CategoryTypeID.Value))
-                    .ToList();
-            }
-            else
-            {
-                filteredIssues = allIssues;
-            }
+            ViewBag.ProjectName = project.Name;
+            ViewBag.ProjectID = project.ID;
 
-            var columns = _context.StatusType.Where(x => x.ProjectID == projectID);
-
-            ViewBag.StatusTypes = columns;
-
-            ViewBag.ProjectName = _context.Project.FirstOrDefault(x => x.ID == projectID).Name;
-            ViewBag.ProjectID = _context.Project.FirstOrDefault(x => x.ID == projectID).ID;
-
-            var reponsibilities = _context.UserProject.Where(x => x.ProjectID == projectID)
+            var reponsibilities = project.UserProjects?
                 .Select(c => new SelectListItem
                 {
                     Value = c.UserID.ToString(),
-                    Text = c.User.LName + " " + c.User.FName
-                }).ToList();
-            var categories = _context.CategoryType.Where(x => x.ProjectID == projectID)
-                .Select(c => new SelectListItem
-                {
-                    Value = c.ID.ToString(),
-                    Text = c.Name
-                }).ToList();
-            var priorities = _context.PriorityType.Where(x => x.ProjectID == projectID)
-                .Select(c => new SelectListItem
-                {
-                    Value = c.ID.ToString(),
-                    Text = c.Name
-                }).ToList();
-            var statuses = _context.StatusType.Where(x => x.ProjectID == projectID)
-                .Select(c => new SelectListItem
-                {
-                    Value = c.ID.ToString(),
-                    Text = c.Name
-                }).ToList();
+                    Text = $"{c.User.LName} {c.User.FName}"
+                }).ToList() ?? new List<SelectListItem>();
+
+            var categories = project.CategoryTypes?
+                .Select(c => new SelectListItem { Value = c, Text = c })
+                .ToList() ?? new List<SelectListItem>();
+
+            var priorities = project.PriorityTypes?
+                .Select(c => new SelectListItem { Value = c, Text = c })
+                .ToList() ?? new List<SelectListItem>();
+
+            var statuses = project.StatusTypes?
+                .Select(c => new SelectListItem { Value = c, Text = c })
+                .ToList() ?? new List<SelectListItem>();
 
             ViewBag.Responsibilities = reponsibilities;
             ViewBag.Categories = categories;
@@ -159,16 +132,17 @@ namespace diplom.Controllers
             ViewBag.Statuses = statuses;
 
 
-            UserRoles userRole = _context.UserProject.FirstOrDefault(x => x.UserID == HttpContext.Session.GetInt32("UserID") && x.ProjectID == projectID).UserRole;
-            if (userRole == UserRoles.Admin)
-                ViewBag.userRole = 1;
-            else if (userRole == UserRoles.Manager)
-                ViewBag.userRole = 2;
-            else
-                ViewBag.userRole = 3;
-
+            var userProject = project.UserProjects?.FirstOrDefault(x => x.UserID == userSessionID);
+            ViewBag.userRole = userProject?.UserRole switch
+            {
+                UserRoles.Admin => 1,
+                UserRoles.Manager => 2,
+                _ => 3
+            };
 
             ViewBag.UserID = userSessionID;
+            ViewBag.StatusTypes = project.StatusTypes;
+
             return View(filteredIssues);
         }
 
@@ -190,57 +164,62 @@ namespace diplom.Controllers
         [HttpGet("/Projects/ProjectSettings/{projectID}")]
         public async Task<IActionResult> ProjectSettings(int projectID)
         {
-            if (_context.Project.FirstOrDefault(x => x.ID == projectID) == null ||
-                HttpContext.Session.GetInt32("UserID") == null ||
-                _context.UserProject.FirstOrDefault(x => x.UserID == HttpContext.Session.GetInt32("UserID")) == null)
-            {
+            var userID = HttpContext.Session.GetInt32("UserID");
+            if (_context.Project.Any(x => x.ID == projectID) == false ||
+                userID == null ||
+                _context.UserProject.Any(x => x.UserID == userID && x.ProjectID == projectID) == false)
                 return NotFound();
-            }
-
-            UserProject currUserProj = _context.UserProject.FirstOrDefault(x => x.UserID == HttpContext.Session.GetInt32("UserID") && x.ProjectID == projectID);
 
             var project = await _context.Project
-                .Include(p => p.UserProjects.Where(up => up.IsActive))
-                .ThenInclude(up => up.User)
-                .Include(p => p.UserProjects.Where(up => up.IsActive))
-                .ThenInclude(up => up.CategoryTypes)
-                .Include(p => p.CategoryTypes)
-                .Include(p => p.PriorityTypes)
-                .Include(p => p.StatusTypes)
+                .Include(p => p.UserProjects)
+                    .ThenInclude(up => up.User)
                 .FirstOrDefaultAsync(x => x.ID == projectID);
 
             if (project == null)
-            {
                 return NotFound();
-            }
+
+            project.CategoryTypes ??= new List<string>();
+            project.PriorityTypes ??= new List<string>();
+            project.StatusTypes ??= new List<string>();
+
             project.UserProjects = project.UserProjects
+                .Where(up => up.IsActive)
                 .OrderBy(up => up.UserRole)
                 .ToList();
 
+            var currUserProj = project.UserProjects.FirstOrDefault(up => up.UserID == userID);
+            if (currUserProj == null)
+                return NotFound();
+
             ViewBag.ProjectID = projectID;
             ViewBag.UserRole = currUserProj.UserRole;
+
+            ViewBag.CategoryTypes = project.CategoryTypes;
+            ViewBag.PriorityTypes = project.PriorityTypes;
+            ViewBag.StatusTypes = project.StatusTypes;
+
             return View(project);
         }
+
         [HttpGet("/Projects/DeletedIssueArchive/{projectID}")]
         public async Task<IActionResult> DeletedIssueArchive(int projectID)
         {
-            if (_context.Project.FirstOrDefault(x => x.ID == projectID) == null ||
-                HttpContext.Session.GetInt32("UserID") == null ||
-                _context.UserProject.FirstOrDefault(x => x.UserID == HttpContext.Session.GetInt32("UserID")) == null)
-            {
-                return NotFound();
-            }
+            var userID = HttpContext.Session.GetInt32("UserID");
 
-            var issue = _context.Issue.Where(x => x.ProjectID == projectID && x.IsDelete)
-                .Include(x => x.CategoryType)
+            if (_context.Project.Any(x => x.ID == projectID) == false ||
+                userID == null ||
+                _context.UserProject.Any(x => x.UserID == userID && x.ProjectID == projectID) == false)
+                return NotFound();
+
+            var deletedIssues = await _context.Issue
+                .Where(x => x.ProjectID == projectID && x.IsDelete)
                 .Include(x => x.Performer)
-                .ToList();
+                .ToListAsync();
 
-            if (issue == null)
-            {
+            if (deletedIssues == null || !deletedIssues.Any())
                 return NotFound();
-            }
-            return View(issue);
+
+            return View(deletedIssues);
         }
 
 
@@ -252,48 +231,49 @@ namespace diplom.Controllers
             int? userSessionID = HttpContext.Session.GetInt32("UserID");
 
             User creator = _context.User.FirstOrDefault(x => x.ID == userSessionID);
-            project.CreatorUser = creator;
-            project.CreatorID = creator.ID;
-            project.DeadlineDate = project.DeadlineDate.Value.Date < DateTime.Now.Date ? DateTime.Now.Date : project.DeadlineDate;
-            project.DeadlineDate = project.DeadlineDate;
+            if (creator == null)
+                return NotFound();
+
+            project.DeadlineDate = project.DeadlineDate?.Date < DateTime.Now.Date ? DateTime.Now.Date : project.DeadlineDate;
             project.Status = ProjectStatus.InProcess;
             project.CreateDate = DateTime.Now.Date;
-            _context.Add(project);
+            project.StatusTypes = new List<string>
+            {
+                "В процессе",
+                "На проверке",
+                "Отложенные",
+                "Завершенные"
+            };
+            project.PriorityTypes = new List<string>
+            {
+                "Низкий",
+                "Средний",
+                "Высокий"
+            };
+            project.CategoryTypes = new List<string>();
 
+            _context.Add(project);
             await _context.SaveChangesAsync();
 
-            UserProject userProject = new UserProject();
-            userProject.ProjectID = project.ID;
-            userProject.Project = project;
-            userProject.UserID = creator.ID;
-            userProject.User = creator;
-            userProject.UserRole = UserRoles.Admin;
-            userProject.IsActive = true;
+            UserProject userProject = new UserProject
+            {
+                ProjectID = project.ID,
+                Project = project,
+                UserID = creator.ID,
+                User = creator,
+                UserRole = UserRoles.Admin,
+                IsActive = true,
+                IsCreator = true,
+                Categories = new List<string>()
+            };
+
             _context.Add(userProject);
 
-            await _context.SaveChangesAsync();
 
-            var statusTypes = new List<StatusType>
-            {
-                new StatusType { Name = "В процессе", ProjectID = project.ID },
-                new StatusType { Name = "На проверке", ProjectID = project.ID },
-                new StatusType { Name = "Отложенные", ProjectID = project.ID },
-                new StatusType { Name = "Завершенные", ProjectID = project.ID }
-            };
-            _context.AddRange(statusTypes);
-            var priorityTypes = new List<PriorityType>
-            {
-                new PriorityType { Name = "Низкий", ProjectID = project.ID },
-                new PriorityType { Name = "Средний", ProjectID = project.ID },
-                new PriorityType { Name = "Высокий", ProjectID = project.ID }
-            };
-            _context.AddRange(priorityTypes);
-
-            // Добавление записи в лог
+            // Логируем действие
             _logService.LogAction(project.ID, $"создал проект \"{project.Name}\"", creator.ID);
 
             await _context.SaveChangesAsync();
-
             return Redirect("AllProjects");
         }
 
@@ -456,33 +436,33 @@ namespace diplom.Controllers
 
         //Назначение категорий пользователю
         [HttpPost]
-        public async Task<IActionResult> AssignCategoriesToUser(int userProjectID, int projectID, List<int> selectedCategories)
+        public async Task<IActionResult> AssignCategoriesToUser(int userProjectID, int projectID, List<string> selectedCategories)
         {
-            UserProject userProject = _context.UserProject
-                .Include(x => x.User)
-                .Include(up => up.CategoryTypes)
+            var userProject = _context.UserProject
+                .Include(up => up.User)
                 .FirstOrDefault(x => x.ID == userProjectID);
 
-            var allCategories = _context.CategoryType.Where(c => c.ProjectID == projectID).ToList();
+            if (userProject == null)
+                return NotFound();
 
-            userProject.CategoryTypes.Clear();
+            userProject.Categories ??= new List<string>();
+
+            userProject.Categories.Clear();
 
             if (selectedCategories != null && selectedCategories.Any())
             {
-                foreach (var categoryId in selectedCategories)
-                {
-                    var category = allCategories.FirstOrDefault(c => c.ID == categoryId);
-                    if (category != null)
-                        userProject.CategoryTypes.Add(category);
-                }
+                userProject.Categories.AddRange(selectedCategories);
             }
 
+            // Добавление записи в лог
             int? userSessionID = HttpContext.Session.GetInt32("UserID");
-            User currentUser = _context.User.FirstOrDefault(x => x.ID == userSessionID);
+            var currentUser = _context.User.FirstOrDefault(u => u.ID == userSessionID);
 
-            _logService.LogAction(projectID, $"обновил категории пользователя {userProject.User.FName} {userProject.User.LName}", userSessionID);
+            _logService.LogAction(projectID,$"обновил категории пользователя {userProject.User.FName} {userProject.User.LName}", userSessionID);
 
+            _context.Update(userProject);
             await _context.SaveChangesAsync();
+
             return Redirect($"/Projects/ProjectSettings/{projectID}");
         }
 
@@ -533,90 +513,128 @@ namespace diplom.Controllers
 
         //Добавление категории
         [HttpPost]
-        public async Task<IActionResult> AddCategory([Bind("ID,Name")] CategoryType categoryType, IFormCollection formData, int projectID)
+        public async Task<IActionResult> AddCategory(string categoryName, int projectID)
         {
-            var currProject = await _context.Project.FindAsync(int.Parse(formData["projectID"]));
-            categoryType.Project = currProject;
-            categoryType.ProjectID = currProject.ID;
+            var currProject = await _context.Project.FindAsync(projectID);
+            if (currProject == null)
+                return NotFound();
+
+            //if (string.IsNullOrWhiteSpace(categoryName))
+            //    return BadRequest("Название категории не может быть пустым");
+
+            if (currProject.CategoryTypes == null)
+                currProject.CategoryTypes = new List<string>();
+
+            if (currProject.CategoryTypes.Contains(categoryName))
+                return Redirect($"/Projects/ProjectSettings/{currProject.ID}");
+
+            currProject.CategoryTypes.Add(categoryName);
 
             int? userSessionID = HttpContext.Session.GetInt32("UserID");
             User creator = _context.User.FirstOrDefault(x => x.ID == userSessionID);
 
-            _context.Add(categoryType);
-
             // Добавление записи в лог
-            _logService.LogAction(currProject.ID, $"добавил категорию \"{categoryType.Name}\"", userSessionID);
+            _logService.LogAction(currProject.ID, $"добавил категорию \"{categoryName}\"", userSessionID);
 
-            _context.SaveChanges();
-            var c = _context.CategoryType.ToList();
+            _context.Update(currProject);
+            await _context.SaveChangesAsync();
+
             return Redirect($"/Projects/ProjectSettings/{currProject.ID}");
         }
+
         //Редактирование категории
         [HttpPost]
-        public async Task<IActionResult> EditCategory([Bind("ID,Name")] CategoryType categoryType, int categoryID)
+        public async Task<IActionResult> EditCategory(int projectID, string oldName, string newName)
         {
-            CategoryType category = _context.CategoryType.FirstOrDefault(x => x.ID == categoryID);
-            string oldName = category.Name;
-            category.Name = categoryType.Name;
+            var project = await _context.Project.FirstOrDefaultAsync(p => p.ID == projectID);
+            if (project == null)
+                return NotFound();
 
-            int? userSessionID = HttpContext.Session.GetInt32("UserID");
-            User editor = _context.User.FirstOrDefault(x => x.ID == userSessionID);
+            project.CategoryTypes ??= new List<string>();
+
+            if (!project.CategoryTypes.Contains(oldName))
+                return BadRequest("Категория не найдена");
+
+            if (project.CategoryTypes.Contains(newName))
+                return Redirect($"/Projects/ProjectSettings/{projectID}");
+
+            int index = project.CategoryTypes.IndexOf(oldName);
+            project.CategoryTypes[index] = newName;
 
             // Добавление записи в лог
-            _logService.LogAction(category.ProjectID, $"изменил название категории с \"{oldName}\" на \"{category.Name}\"", userSessionID);
+            int? userSessionID = HttpContext.Session.GetInt32("UserID");
+            _logService.LogAction(projectID,$"изменил название категории с \"{oldName}\" на \"{newName}\"", userSessionID);
 
-            _context.SaveChangesAsync();
-            return Redirect($"/Projects/ProjectSettings/{category.ProjectID}");
+            _context.Update(project);
+            await _context.SaveChangesAsync();
+
+            return Redirect($"/Projects/ProjectSettings/{projectID}");
         }
         //Удаление категории
         [HttpPost]
-        public async Task<IActionResult> DeleteCategory(int categoryID)
+        public async Task<IActionResult> DeleteCategory(int projectID, string categoryName)
         {
-            CategoryType category = _context.CategoryType.FirstOrDefault(x => x.ID == categoryID);
-            int projectID = category.ProjectID;
-            if (category.Issues != null)
+            var project = await _context.Project.FirstOrDefaultAsync(p => p.ID == projectID);
+            if (project == null)
+                return NotFound();
+
+            project.CategoryTypes ??= new List<string>();
+
+            if (!project.CategoryTypes.Contains(categoryName))
+                return BadRequest("Категория не найдена");
+
+            project.CategoryTypes.Remove(categoryName);
+
+            if (project.Issues != null && project.Issues.Any())
             {
-                foreach (Issue issue in category.Issues)
+                foreach (var issue in project.Issues.Where(i => i.Category == categoryName))
                 {
-                    issue.CategoryType = null;
-                    issue.CategoryTypeID = null;
+                    issue.Category = null;
                 }
             }
-            _context.SaveChanges();
-
-            int? userSessionID = HttpContext.Session.GetInt32("UserID");
-            User deleter = _context.User.FirstOrDefault(x => x.ID == userSessionID);
 
             // Добавление записи в лог
-            _logService.LogAction(projectID, $"удалил категорию \"{category.Name}\"", userSessionID);
+            int? userSessionID = HttpContext.Session.GetInt32("UserID");
+            _logService.LogAction(projectID,$"удалил категорию \"{categoryName}\"", userSessionID);
 
-            _context.CategoryType.Remove(category);
-            _context.SaveChanges();
+            _context.Update(project);
+            await _context.SaveChangesAsync();
+
             return Redirect($"/Projects/ProjectSettings/{projectID}");
         }
 
 
         //Добавление задачи
         [HttpPost]
-        public IActionResult CreateIssue([Bind("Name, Description, DeadlineDate, PerformerID, PriorityTypeID, CategoryTypeID")] Issue issue, int projectID)
+        public IActionResult CreateIssue([Bind("Name,Description,DeadlineDate,PerformerID,Priority,Category")] Models.Issue issue,int projectID)
         {
             int? userSessionID = HttpContext.Session.GetInt32("UserID");
-            var project = _context.Project.Include(x => x.StatusTypes).FirstOrDefault(x => x.ID == projectID);
-            User creator = _context.User.FirstOrDefault(x => x.ID == userSessionID);
 
-            Issue newIssue = new Issue();
+            var project = _context.Project.FirstOrDefault(x => x.ID == projectID);
 
-            newIssue.Name = issue.Name;
-            newIssue.Description = issue.Description ?? "";
-            newIssue.CreateDate = DateTime.Now;
-            newIssue.DeadlineDate = issue.DeadlineDate?.Date < DateTime.Now.Date ? DateTime.Now.Date : issue.DeadlineDate?.Date;
-            newIssue.CreatorID = (int)userSessionID;
-            newIssue.PerformerID = issue.PerformerID;
-            newIssue.ProjectID = projectID;
-            newIssue.PriorityTypeID = issue.PriorityTypeID;
-            newIssue.StatusTypeID = project.StatusTypes.FirstOrDefault(x => x.Name == "В процессе").ID;
-            newIssue.CategoryTypeID = issue.CategoryTypeID;
-            newIssue.IsDelete = false;
+            if (project == null)
+                return NotFound();
+
+            project.PriorityTypes ??= new List<string>();
+            project.CategoryTypes ??= new List<string>();
+            project.StatusTypes ??= new List<string>();
+
+            Models.Issue newIssue = new Models.Issue
+            {
+                Name = issue.Name,
+                Description = issue.Description ?? "",
+                CreateDate = DateTime.Now,
+                DeadlineDate = issue.DeadlineDate?.Date < DateTime.Now.Date ? DateTime.Now.Date : issue.DeadlineDate?.Date,
+                CreatorID = (int)userSessionID,
+                PerformerID = issue.PerformerID,
+                ProjectID = projectID,
+
+                Priority = issue.Priority,
+                Category = issue.Category,
+                Status = project.StatusTypes.FirstOrDefault(st => st == "В процессе") ?? project.StatusTypes.FirstOrDefault(),
+
+                IsDelete = false
+            };
 
             _context.Add(newIssue);
 
@@ -628,98 +646,98 @@ namespace diplom.Controllers
             return Redirect($"/Projects/Project/{projectID}");
         }
         //Редактирование задачи
-        [HttpPost]
-        public IActionResult UpdateIssue([Bind("ID, Name, Description, DeadlineDate, PerformerID, PriorityTypeID, StatusTypeID, CategoryTypeID")] Issue issue, int issueID)
-        {
-            Issue currIssue = _context.Issue.FirstOrDefault(x => x.ID == issueID);
+        //[HttpPost]
+        //public IActionResult UpdateIssue([Bind("ID, Name, Description, DeadlineDate, PerformerID, PriorityTypeID, StatusTypeID, CategoryTypeID")] Models.Issue issue, int issueID)
+        //{
+        //    Models.Issue currIssue = _context.Issue.FirstOrDefault(x => x.ID == issueID);
 
-            string oldName = currIssue.Name;
-            string oldDescription = currIssue.Description;
-            DateTime? oldDeadlineDate = currIssue.DeadlineDate;
-            int? oldPerformerID = currIssue.PerformerID;
-            int? oldPriorityTypeID = currIssue.PriorityTypeID;
-            int? oldStatusTypeID = currIssue.StatusTypeID;
-            int? oldCategoryTypeID = currIssue.CategoryTypeID;
+        //    string oldName = currIssue.Name;
+        //    string oldDescription = currIssue.Description;
+        //    DateTime? oldDeadlineDate = currIssue.DeadlineDate;
+        //    int? oldPerformerID = currIssue.PerformerID;
+        //    int? oldPriorityTypeID = currIssue.PriorityTypeID;
+        //    int? oldStatusTypeID = currIssue.StatusTypeID;
+        //    int? oldCategoryTypeID = currIssue.CategoryTypeID;
 
-            currIssue.Name = issue.Name;
-            currIssue.Description = issue.Description ?? "";
+        //    currIssue.Name = issue.Name;
+        //    currIssue.Description = issue.Description ?? "";
 
-            if (currIssue.DeadlineDate.Value.Date >= DateTime.Now.Date || currIssue.DeadlineDate.Value.Date > currIssue.DeadlineDate.Value.Date)
-                currIssue.DeadlineDate = currIssue.DeadlineDate.Value.Date;
+        //    if (currIssue.DeadlineDate.Value.Date >= DateTime.Now.Date || currIssue.DeadlineDate.Value.Date > currIssue.DeadlineDate.Value.Date)
+        //        currIssue.DeadlineDate = currIssue.DeadlineDate.Value.Date;
 
-            currIssue.PerformerID = issue.PerformerID;
-            currIssue.PriorityTypeID = issue.PriorityTypeID;
-            currIssue.StatusTypeID = issue.StatusTypeID;
-            currIssue.CategoryTypeID = issue.CategoryTypeID;
-            currIssue.IsDelete = false;
+        //    currIssue.PerformerID = issue.PerformerID;
+        //    currIssue.PriorityTypeID = issue.PriorityTypeID;
+        //    currIssue.StatusTypeID = issue.StatusTypeID;
+        //    currIssue.CategoryTypeID = issue.CategoryTypeID;
+        //    currIssue.IsDelete = false;
 
-            List<string> changes = new List<string>();
-            if (oldName != currIssue.Name)
-                changes.Add($"Название изменено с \"{oldName}\" на \"{currIssue.Name}\";");
-            if (oldDescription != currIssue.Description)
-                changes.Add($"Описание изменено;");
-            if (oldDeadlineDate != currIssue.DeadlineDate)
-                changes.Add($"Срок изменен с \"{oldDeadlineDate?.ToString("dd.MM.yyyy")}\" на \"{currIssue.DeadlineDate?.ToString("dd.MM.yyyy")}\";");
-            if (oldPerformerID != currIssue.PerformerID)
-            {
-                var oldPerformer = _context.User.FirstOrDefault(u => u.ID == oldPerformerID);
-                var newPerformer = _context.User.FirstOrDefault(u => u.ID == currIssue.PerformerID);
-                changes.Add($"Ответственный изменен с \"{oldPerformer?.FName} {oldPerformer?.LName}\" на \"{newPerformer?.FName} {newPerformer?.LName}\";");
-            }
-            if (oldPriorityTypeID != currIssue.PriorityTypeID)
-            {
-                var oldPriority = _context.PriorityType.FirstOrDefault(p => p.ID == oldPriorityTypeID);
-                var newPriority = _context.PriorityType.FirstOrDefault(p => p.ID == currIssue.PriorityTypeID);
-                changes.Add($"Приоритет изменен с \"{oldPriority?.Name}\" на \"{newPriority?.Name}\";");
-            }
-            if (oldStatusTypeID != currIssue.StatusTypeID)
-            {
-                var oldStatus = _context.StatusType.FirstOrDefault(s => s.ID == oldStatusTypeID);
-                var newStatus = _context.StatusType.FirstOrDefault(s => s.ID == currIssue.StatusTypeID);
-                changes.Add($"Статус изменен с \"{oldStatus?.Name}\" на \"{newStatus?.Name}\";");
-            }
-            if (oldCategoryTypeID != currIssue.CategoryTypeID)
-            {
-                var oldCategory = _context.CategoryType.FirstOrDefault(c => c.ID == oldCategoryTypeID);
-                var newCategory = _context.CategoryType.FirstOrDefault(c => c.ID == currIssue.CategoryTypeID);
-                changes.Add($"Категория изменена с \"{oldCategory?.Name}\" на \"{newCategory?.Name}\"");
-            }
-            _context.SaveChanges();
+        //    List<string> changes = new List<string>();
+        //    if (oldName != currIssue.Name)
+        //        changes.Add($"Название изменено с \"{oldName}\" на \"{currIssue.Name}\";");
+        //    if (oldDescription != currIssue.Description)
+        //        changes.Add($"Описание изменено;");
+        //    if (oldDeadlineDate != currIssue.DeadlineDate)
+        //        changes.Add($"Срок изменен с \"{oldDeadlineDate?.ToString("dd.MM.yyyy")}\" на \"{currIssue.DeadlineDate?.ToString("dd.MM.yyyy")}\";");
+        //    if (oldPerformerID != currIssue.PerformerID)
+        //    {
+        //        var oldPerformer = _context.User.FirstOrDefault(u => u.ID == oldPerformerID);
+        //        var newPerformer = _context.User.FirstOrDefault(u => u.ID == currIssue.PerformerID);
+        //        changes.Add($"Ответственный изменен с \"{oldPerformer?.FName} {oldPerformer?.LName}\" на \"{newPerformer?.FName} {newPerformer?.LName}\";");
+        //    }
+        //    if (oldPriorityTypeID != currIssue.PriorityTypeID)
+        //    {
+        //        var oldPriority = _context.PriorityType.FirstOrDefault(p => p.ID == oldPriorityTypeID);
+        //        var newPriority = _context.PriorityType.FirstOrDefault(p => p.ID == currIssue.PriorityTypeID);
+        //        changes.Add($"Приоритет изменен с \"{oldPriority?.Name}\" на \"{newPriority?.Name}\";");
+        //    }
+        //    if (oldStatusTypeID != currIssue.StatusTypeID)
+        //    {
+        //        var oldStatus = _context.StatusType.FirstOrDefault(s => s.ID == oldStatusTypeID);
+        //        var newStatus = _context.StatusType.FirstOrDefault(s => s.ID == currIssue.StatusTypeID);
+        //        changes.Add($"Статус изменен с \"{oldStatus?.Name}\" на \"{newStatus?.Name}\";");
+        //    }
+        //    if (oldCategoryTypeID != currIssue.CategoryTypeID)
+        //    {
+        //        var oldCategory = _context.CategoryType.FirstOrDefault(c => c.ID == oldCategoryTypeID);
+        //        var newCategory = _context.CategoryType.FirstOrDefault(c => c.ID == currIssue.CategoryTypeID);
+        //        changes.Add($"Категория изменена с \"{oldCategory?.Name}\" на \"{newCategory?.Name}\"");
+        //    }
+        //    _context.SaveChanges();
 
 
-            int? userSessionID = HttpContext.Session.GetInt32("UserID");
-            if (changes.Any())
-            {
-                // Добавление записи в лог
-                string changeMessage = string.Join(" ", changes);
-                _logService.LogAction(currIssue.ProjectID, $"отредактировал задачу \"{oldName}\". Изменения: {changeMessage}", userSessionID);
-            }
+        //    int? userSessionID = HttpContext.Session.GetInt32("UserID");
+        //    if (changes.Any())
+        //    {
+        //        // Добавление записи в лог
+        //        string changeMessage = string.Join(" ", changes);
+        //        _logService.LogAction(currIssue.ProjectID, $"отредактировал задачу \"{oldName}\". Изменения: {changeMessage}", userSessionID);
+        //    }
 
-            return Redirect($"/Projects/Project/{currIssue.ProjectID}");
-        }
+        //    return Redirect($"/Projects/Project/{currIssue.ProjectID}");
+        //}
 
-        //Удаление задачи
-        [HttpPost]
-        public async Task<IActionResult> DeleteIssue(int issueID)
-        {
-            Issue currIssue = _context.Issue.FirstOrDefault(x => x.ID == issueID);
-            currIssue.IsDelete = true;
-            currIssue.DeleteDate = DateTime.Now;
+        ////Удаление задачи
+        //[HttpPost]
+        //public async Task<IActionResult> DeleteIssue(int issueID)
+        //{
+        //    Models.Issue currIssue = _context.Issue.FirstOrDefault(x => x.ID == issueID);
+        //    currIssue.IsDelete = true;
+        //    currIssue.DeleteDate = DateTime.Now;
 
-            int? userSessionID = HttpContext.Session.GetInt32("UserID");
-            User deleter = _context.User.FirstOrDefault(x => x.ID == userSessionID);
+        //    int? userSessionID = HttpContext.Session.GetInt32("UserID");
+        //    User deleter = _context.User.FirstOrDefault(x => x.ID == userSessionID);
 
-            // Добавление записи в лог
-            _logService.LogAction(currIssue.ProjectID, $"удалил задачу \"{currIssue.Name}\"", userSessionID);
+        //    // Добавление записи в лог
+        //    _logService.LogAction(currIssue.ProjectID, $"удалил задачу \"{currIssue.Name}\"", userSessionID);
 
-            await _context.SaveChangesAsync();
-            return Redirect($"/Projects/Project/{currIssue.ProjectID}");
-        }
+        //    await _context.SaveChangesAsync();
+        //    return Redirect($"/Projects/Project/{currIssue.ProjectID}");
+        //}
         //Восстановление задачи
         [HttpPost]
         public async Task<IActionResult> RestoreIssue(int issueID)
         {
-            Issue currIssue = _context.Issue.FirstOrDefault(x => x.ID == issueID);
+            Models.Issue currIssue = _context.Issue.FirstOrDefault(x => x.ID == issueID);
             currIssue.IsDelete = false;
             currIssue.DeleteDate = null;
 
@@ -735,26 +753,35 @@ namespace diplom.Controllers
 
         //Перетаскивание задачи
         [HttpGet]
-        public IActionResult UpdateIssueStatus(int currIssueID, int currStatusID)
+        public IActionResult UpdateIssueStatus(int currIssueID, string newStatus)
         {
-            Issue issue = _context.Issue.Include(i => i.StatusType).FirstOrDefault(x => x.ID == currIssueID);
+            var issue = _context.Issue
+                .Include(i => i.Project)
+                .FirstOrDefault(x => x.ID == currIssueID);
 
-            StatusType newStatus = _context.StatusType.FirstOrDefault(x => x.ID == currStatusID);
+            if (issue == null)
+                return NotFound();
 
-            if (issue.StatusTypeID == currStatusID)
-            {
+            if (string.IsNullOrWhiteSpace(newStatus))
+                return BadRequest("Новый статус не указан");
+
+            if (issue.Status == newStatus)
                 return Redirect($"/Projects/Project/{issue.ProjectID}");
-            }
-            string oldStatusName = issue.StatusType?.Name;
-            issue.StatusTypeID = currStatusID;
+
+            var oldStatusName = issue.Status;
+
+            //if (issue.Project?.StatusTypes == null || !issue.Project.StatusTypes.Contains(newStatus))
+            //    return BadRequest("Недопустимый статус");
+
+            issue.Status = newStatus;
 
             int? userSessionID = HttpContext.Session.GetInt32("UserID");
-            User editor = _context.User.FirstOrDefault(x => x.ID == userSessionID);
 
             // Добавление записи в лог
-            _logService.LogAction(issue.ProjectID, $"изменил статус задачи \"{issue.Name}\" с \"{oldStatusName}\" на \"{newStatus.Name}\"", userSessionID);
+            _logService.LogAction(issue.ProjectID, $"изменил статус задачи \"{issue.Name}\" с \"{oldStatusName}\" на \"{newStatus}\"", userSessionID);
 
             _context.SaveChanges();
+
             return Redirect($"/Projects/Project/{issue.ProjectID}");
         }
 
@@ -796,6 +823,76 @@ namespace diplom.Controllers
                     );
                 }
             }
+        }
+
+        //Возвращение проекта
+        [HttpGet("/Projects/GetProjectInfo/{projectID}")]
+        public async Task<IActionResult> GetProjectInfo(int projectID)
+        {
+            bool isAdmin;
+            int? userSessionID = HttpContext.Session.GetInt32("UserID");
+            var project = await _context.Project.Include(p => p.UserProjects).FirstOrDefaultAsync(x => x.ID == projectID);
+
+            if (project.UserProjects.FirstOrDefault(x => x.UserID == userSessionID).UserRole==UserRoles.Admin)
+                isAdmin = true;
+            else
+                isAdmin = false;
+            var currProject = new
+            {
+                project,
+                isAdmin
+            };
+            return Ok(currProject);
+        }
+        //Возвращение задачи
+        [HttpGet("/Projects/GetIssueInfo/{issueID}")]
+        public async Task<IActionResult> GetIssueInfo(int issueID)
+        {
+            bool isCreator;
+            int? userSessionID = HttpContext.Session.GetInt32("UserID");
+            Models.Issue issue = await _context.Issue
+                    .Include(i => i.Project)
+                    .Include(i => i.Creator)
+                    .FirstOrDefaultAsync(x => x.ID == issueID);
+            if (issue.Creator.ID == userSessionID)
+                isCreator = true;
+            else
+                isCreator = false;
+
+            var currIssue = new
+            {
+                issue,
+                isCreator
+            };
+            return Ok(currIssue);
+        }
+        //Возвращение пользователя в проекте
+        [HttpGet("/Projects/GetUserProjectInfo/{userProjID}")]
+        public async Task<IActionResult> GetUserProjectInfo(int userProjID)
+        {
+            var userProject = await _context.UserProject
+                .Include(up => up.User)
+                .Include(up => up.Project)
+                .FirstOrDefaultAsync(x => x.ID == userProjID);
+
+            if (userProject == null)
+                return NotFound();
+
+            var result = new
+            {
+                id = userProject.ID,
+                user = new
+                {
+                    fName = userProject.User.FName,
+                    lName = userProject.User.LName
+                },
+                project = new
+                {
+                    id = userProject.Project.ID
+                }
+            };
+
+            return Ok(result);
         }
     }
 }

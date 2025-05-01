@@ -32,23 +32,22 @@
 
     <div class="task-columns-container">
         <div class="task-columns">
-            @foreach (StatusType statusType in ViewBag.StatusTypes)
+            @foreach (string statusType in ViewBag.StatusTypes)
             {
-                <div class="task-column" data-status="@statusType.Name" data-status-id="@statusType.ID">
-                    <h2>@statusType.Name</h2>
+                <div class="task-column" data-status="@statusType">
+                    <h2>@statusType</h2>
                     <ul class="task-list">
-                        @foreach (Issue task in Model.Where(t => t.StatusType.Name == statusType.Name))
+                        @foreach (Issue task in Model.Where(t => t.Status == statusType))
                         {
-                            <li class="task-card draggable @GetPriorityClass(task.PriorityType)" data-task-id="@task.ID">
+                            <li class="task-card draggable @GetPriorityClass(task.Priority)" data-task-id="@task.ID">
                                 <a href="#edit-task" rel="modal:open" class="edit-task-link" data-issue-id="@task.ID">
                                     <h3>@task.Name</h3>
-                                    <p>Приоритет: <span class="priority-text">@(task.PriorityType.Name)</span></p>
+                                    <h4>@(task.Category ?? "нет категории")</h4>
+                                    <p>Приоритет: <span class="priority-text">@(task.Priority)</span></p>
                                     <p>Ответственный: @($"{task.Performer.LName} {task.Performer.FName}")</p>
-                                    <p>Категория: @(task.CategoryType.Name ?? "нет категории")</p>
                                     <p>Завершить до: @(task.DeadlineDate?.ToString("dd.MM.yyyy") ?? "нет срока")</p>
                                 </a>
 
-                                
                                 @if (task.CreatorID == ViewBag.UserID)
                                 {
                                     <a href="#delete-task" rel="modal:open" class="delete-task-button" data-task-id="@task.ID">
@@ -65,21 +64,21 @@
 </div>
 
 @functions {
-    private string GetPriorityClass(PriorityType priority)
+    private string GetPriorityClass(string priority)
     {
-        switch (priority.Name)
+        return priority switch
         {
-            case "Высокий": return "priority-high";
-            case "Средний": return "priority-medium";
-            case "Низкий": return "priority-low";
-            default: return "";
-        }
+            "Высокий" => "priority-high",
+            "Средний" => "priority-medium",
+            "Низкий" => "priority-low",
+            _ => ""
+        };
     }
 }
 
 
 <script>
-    document.addEventListener('DOMContentLoaded', function () {
+        document.addEventListener('DOMContentLoaded', function () {
         const taskColumns = document.querySelectorAll('.task-list');
 
         taskColumns.forEach(column => {
@@ -92,18 +91,18 @@
                 onEnd: function (evt) {
                     const draggedTask = evt.item;
                     const issueID = draggedTask.dataset.taskId;
-                    const targetColumn = evt.to;
-                    const statusID = targetColumn.closest('.task-column').dataset.statusId;
+                    const targetColumn = evt.to.closest('.task-column');
+                    const statusName = targetColumn.dataset.status;
 
-                    fetch(`/Projects/UpdateIssueStatus?currIssueID=${encodeURIComponent(issueID)}&currStatusID=${encodeURIComponent(statusID)}`)
+                    fetch(`/Projects/UpdateIssueStatus?currIssueID=${encodeURIComponent(issueID)}&newStatus=${encodeURIComponent(statusName)}`)
                         .then(response => {
                             if (!response.ok) {
                                 throw new Error('Network response was not ok');
                             }
-                            return response.json();
+                            return response.text();
                         })
-                        .then(data => {
-                            console.log('Status updated:', data);
+                        .then(() => {
+                            console.log('Status updated successfully');
                         })
                         .catch(error => {
                             console.error('Error updating status:', error);
@@ -115,7 +114,6 @@
 </script>
 
 
-
 <div id="add-task" class="modal">
     <form asp-action="CreateIssue" asp-controller="Projects" method="post">
         <input type="hidden" name="projectID" value="@ViewBag.ProjectID" />
@@ -125,7 +123,7 @@
 
             <label class="input-form__label add-project">
                 <span class="input-placeholder">название</span>
-                <input class="form__input input-name" name="Name" autocomplete="off" required>
+                <input class="form__input input-name" name="Name" autocomplete="off" required />
             </label>
 
             <label class="input-form__label add-project">
@@ -135,7 +133,7 @@
 
             <label class="input-form__label">
                 <span class="input-placeholder select-date">приоритет</span>
-                <select class="form__input input-select" name="PriorityTypeID" required>
+                <select class="form__input input-select" name="Priority" required>
                     @foreach (SelectListItem option in ViewBag.Priorities)
                     {
                         <option value="@option.Value">@option.Text</option>
@@ -145,7 +143,7 @@
 
             <label class="input-form__label">
                 <span class="input-placeholder select-date">категория</span>
-                <select class="form__input input-select" name="CategoryTypeID">
+                <select class="form__input input-select" name="Category">
                     <option value="">---без категории---</option>
                     @foreach (SelectListItem option in ViewBag.Categories)
                     {
@@ -166,7 +164,7 @@
 
             <label class="input-form__label add-project">
                 <span class="input-placeholder select-date">срок</span>
-                <input class="form__input input-date" type="date" name="DeadlineDate" value="@DateTime.Now.ToString("yyyy-MM-dd")" required>
+                <input class="form__input input-date" type="date" name="DeadlineDate" value="@DateTime.Now.ToString("yyyy-MM-dd")" required />
             </label>
 
             <button class="input__submit confirm">Добавить <i class="las la-clipboard-check"></i></button>
@@ -241,88 +239,79 @@
 </div>
 
 
-<div id="edit-task" class="modal">
-    @foreach (var issue in Model)
-    {
-            <div id="EDIT_ISSUE@(issue.ID)" class="hidden issueform">
-                <form asp-action="UpdateIssue" asp-controller="Projects">
-                    <input type="hidden" value="@issue.ID" name="issueID" id="issueID" />
-                    <div class="modal-container">
-                        <h1 class="modal-title">
-                            @(issue.CreatorID == ViewBag.UserID ? "Редактирование задачи" : "Просмотр задачи")
-                        </h1>
-                        <label class="input-form__label add-project">
-                            <span class="input-placeholder">название</span>
-                            <input class="form__input input-name" name="Name" autocomplete="off" value="@issue.Name"
-                                   required @(issue.CreatorID != ViewBag.UserID ? "disabled" : "")>
-                        </label>
+@* <div id="edit-task" class="modal">
+        <form asp-action="UpdateIssue" asp-controller="Projects">
+            <input type="hidden" name="issueID" id="issueID" />
+            <div class="modal-container">
+                <h1 class="modal-title">
+                     @(issue.CreatorID == ViewBag.UserID ? "Редактирование задачи" : "Просмотр задачи") 
+                </h1>
+                <label class="input-form__label add-project">
+                    <span class="input-placeholder">название</span>
+                    <input class="form__input input-name" name="Name" autocomplete="off"
+                            required @(issue.CreatorID != ViewBag.UserID ? "disabled" : "")>
+                </label>
 
-                        <label class="input-form__label add-project">
-                            <span class="input-placeholder">описание</span>
-                            <textarea class="form__input form__textarea" name="Description" autocomplete="off"
-                                      @(issue.CreatorID != ViewBag.UserID ? "disabled" : "")>@issue.Description</textarea>
-                        </label>
+                <label class="input-form__label add-project">
+                    <span class="input-placeholder">описание</span>
+                    <textarea class="form__input form__textarea" name="Description" autocomplete="off"
+                                @(issue.CreatorID != ViewBag.UserID ? "disabled" : "")> </textarea>
+                </label>
 
-                        <label class="input-form__label">
-                            <span class="input-placeholder select-date">приоритет</span>
-                            <select class="form__input input-select" name="PriorityTypeID" required
-                                    @(issue.CreatorID != ViewBag.UserID ? "disabled" : "")>
-                                @foreach (var option in ViewBag.Priorities)
-                                {
-                                    <!option value="@option.Value" @((issue.PriorityTypeID.ToString() == option.Value) ? "selected" : "")>@option.Text</!option>
-                                }
-                            </select>
-                        </label>
-
-                        <label class="input-form__label">
-                            <span class="input-placeholder select-date">статус</span>
-                            <select class="form__input input-select" name="StatusTypeID"
-                                    @(issue.CreatorID != ViewBag.UserID ? "disabled" : "")>
-                                @foreach (var option in ViewBag.Statuses)
-                                {
-                                    <!option value="@option.Value" @((issue.StatusTypeID.ToString() == option.Value) ? "selected" : "")>@option.Text</!option>
-                                }
-                            </select>
-                        </label>
-
-                        <label class="input-form__label">
-                            <span class="input-placeholder select-date">категория</span>
-                            <select class="form__input input-select" name="CategoryTypeID"
-                                    @(issue.CreatorID != ViewBag.UserID ? "disabled" : "")>
-                                <option value="">---без категории---</option>
-                                @foreach (var option in ViewBag.Categories)
-                                {
-                                    <!option value="@option.Value" @((issue.CategoryTypeID?.ToString() == option.Value) ? "selected" : "")>@option.Text</!option>
-                                }
-                            </select>
-                        </label>
-
-                        <label class="input-form__label">
-                            <span class="input-placeholder select-date">ответственный</span>
-                            <select class="form__input input-select" name="PerformerID"
-                                    @(issue.CreatorID != ViewBag.UserID ? "disabled" : "")>
-                                @foreach (var option in ViewBag.Responsibilities)
-                                {
-                                    <!option value="@option.Value" @((issue.Performer.ID.ToString() == option.Value) ? "selected" : "")>@option.Text</!option>
-                                }
-                            </select>
-                        </label>
-
-                        <label class="input-form__label add-project">
-                            <span class="input-placeholder select-date">срок</span>
-                            <input class="form__input input-date" type="date" name="DeadlineDate"
-                                   value="@(issue.DeadlineDate?.ToString("yyyy-MM-dd") ?? DateTime.Now.ToString("yyyy-MM-dd"))"
-                                   required @(issue.CreatorID != ViewBag.UserID ? "disabled" : "")>
-                        </label>
-                        @if (issue.CreatorID == ViewBag.UserID)
+                <label class="input-form__label">
+                    <span class="input-placeholder select-date">приоритет</span>
+                    <select class="form__input input-select" name="PriorityTypeID" required
+                            @(issue.CreatorID != ViewBag.UserID ? "disabled" : "")>
+                        @foreach (var option in ViewBag.Priorities)
                         {
-                            <button class="input__submit confirm">Сохранить <i class="las la-clipboard-check"></i></button>
                         }
-                    </div>
-                </form>
+                    </select>
+                </label>
+
+                <label class="input-form__label">
+                    <span class="input-placeholder select-date">статус</span>
+                    <select class="form__input input-select" name="StatusTypeID"
+                            @(issue.CreatorID != ViewBag.UserID ? "disabled" : "")>
+                        @foreach (var option in ViewBag.Statuses)
+                        {
+                        }
+                    </select>
+                </label>
+
+                <label class="input-form__label">
+                    <span class="input-placeholder select-date">категория</span>
+                    <select class="form__input input-select" name="CategoryTypeID"
+                            @(issue.CreatorID != ViewBag.UserID ? "disabled" : "")>
+                        <option value="">---без категории---</option>
+                        @foreach (var option in ViewBag.Categories)
+                        {
+                        }
+                    </select>
+                </label>
+
+                <label class="input-form__label">
+                    <span class="input-placeholder select-date">ответственный</span>
+                    <select class="form__input input-select" name="PerformerID"
+                            @(issue.CreatorID != ViewBag.UserID ? "disabled" : "")>
+                        @foreach (var option in ViewBag.Responsibilities)
+                        {
+                        }
+                    </select>
+                </label>
+
+                <label class="input-form__label add-project">
+                    <span class="input-placeholder select-date">срок</span>
+                    <input class="form__input input-date" type="date" name="DeadlineDate"
+                            value="@(issue.DeadlineDate?.ToString("yyyy-MM-dd") ?? DateTime.Now.ToString("yyyy-MM-dd"))"
+                            required @(issue.CreatorID != ViewBag.UserID ? "disabled" : "")>
+                </label>
+                @if (issue.CreatorID == ViewBag.UserID)
+                {
+                    <button class="input__submit confirm">Сохранить <i class="las la-clipboard-check"></i></button>
+                }
             </div>
-    }
+        </form>
     <a href="#" rel="modal:close"></a>
-</div>
+</div> *@
 
 

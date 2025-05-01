@@ -11,8 +11,8 @@ using diplom.Data;
 namespace diplom.Migrations
 {
     [DbContext(typeof(diplomContext))]
-    [Migration("20250319100447_passTokenDateAdd")]
-    partial class passTokenDateAdd
+    [Migration("20250501194050_CategoryTypeNullable")]
+    partial class CategoryTypeNullable
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -20,49 +20,14 @@ namespace diplom.Migrations
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "8.0.11");
 
-            modelBuilder.Entity("CategoryTypeUserProject", b =>
-                {
-                    b.Property<int>("CategoryTypesID")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("UserProjectsID")
-                        .HasColumnType("INTEGER");
-
-                    b.HasKey("CategoryTypesID", "UserProjectsID");
-
-                    b.HasIndex("UserProjectsID");
-
-                    b.ToTable("CategoryTypeUserProject");
-                });
-
-            modelBuilder.Entity("diplom.Models.CategoryType", b =>
-                {
-                    b.Property<int>("ID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<int>("ProjectID")
-                        .HasColumnType("INTEGER");
-
-                    b.HasKey("ID");
-
-                    b.HasIndex("ProjectID");
-
-                    b.ToTable("CategoryType");
-                });
-
             modelBuilder.Entity("diplom.Models.Issue", b =>
                 {
                     b.Property<int>("ID")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<int?>("CategoryTypeID")
-                        .HasColumnType("INTEGER");
+                    b.Property<string>("Category")
+                        .HasColumnType("TEXT");
 
                     b.Property<DateTime>("CreateDate")
                         .HasColumnType("TEXT");
@@ -71,6 +36,9 @@ namespace diplom.Migrations
                         .HasColumnType("INTEGER");
 
                     b.Property<DateTime?>("DeadlineDate")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("DeleteDate")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Description")
@@ -89,28 +57,24 @@ namespace diplom.Migrations
                     b.Property<int?>("PerformerID")
                         .HasColumnType("INTEGER");
 
-                    b.Property<int>("PriorityTypeID")
-                        .HasColumnType("INTEGER");
+                    b.Property<string>("Priority")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
 
                     b.Property<int>("ProjectID")
                         .HasColumnType("INTEGER");
 
-                    b.Property<int>("StatusTypeID")
-                        .HasColumnType("INTEGER");
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
 
                     b.HasKey("ID");
-
-                    b.HasIndex("CategoryTypeID");
 
                     b.HasIndex("CreatorID");
 
                     b.HasIndex("PerformerID");
 
-                    b.HasIndex("PriorityTypeID");
-
                     b.HasIndex("ProjectID");
-
-                    b.HasIndex("StatusTypeID");
 
                     b.ToTable("Issue");
                 });
@@ -138,40 +102,17 @@ namespace diplom.Migrations
                     b.ToTable("Log");
                 });
 
-            modelBuilder.Entity("diplom.Models.PriorityType", b =>
-                {
-                    b.Property<int>("ID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<int>("ProjectID")
-                        .HasColumnType("INTEGER");
-
-                    b.HasKey("ID");
-
-                    b.HasIndex("ProjectID");
-
-                    b.ToTable("PriorityType");
-                });
-
             modelBuilder.Entity("diplom.Models.Project", b =>
                 {
                     b.Property<int>("ID")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<DateTime>("CreateDate")
+                    b.Property<string>("CategoryTypes")
                         .HasColumnType("TEXT");
 
-                    b.Property<int>("CreatorID")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("CreatorUserID")
-                        .HasColumnType("INTEGER");
+                    b.Property<DateTime>("CreateDate")
+                        .HasColumnType("TEXT");
 
                     b.Property<DateTime?>("DeadlineDate")
                         .HasColumnType("TEXT");
@@ -189,34 +130,20 @@ namespace diplom.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<int>("ProjectStatus")
-                        .HasColumnType("INTEGER");
-
-                    b.HasKey("ID");
-
-                    b.HasIndex("CreatorUserID");
-
-                    b.ToTable("Project");
-                });
-
-            modelBuilder.Entity("diplom.Models.StatusType", b =>
-                {
-                    b.Property<int>("ID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("Name")
+                    b.Property<string>("PriorityTypes")
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<int>("ProjectID")
+                    b.Property<int>("Status")
                         .HasColumnType("INTEGER");
+
+                    b.Property<string>("StatusTypes")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
 
                     b.HasKey("ID");
 
-                    b.HasIndex("ProjectID");
-
-                    b.ToTable("StatusType");
+                    b.ToTable("Project");
                 });
 
             modelBuilder.Entity("diplom.Models.User", b =>
@@ -265,6 +192,22 @@ namespace diplom.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
+                    b.Property<string>("Categories")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("InviteToken")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("InviteTokenDate")
+                        .HasColumnType("TEXT");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("IsCreator")
+                        .HasColumnType("INTEGER");
+
                     b.Property<int>("ProjectID")
                         .HasColumnType("INTEGER");
 
@@ -283,42 +226,12 @@ namespace diplom.Migrations
                     b.ToTable("UserProject");
                 });
 
-            modelBuilder.Entity("CategoryTypeUserProject", b =>
-                {
-                    b.HasOne("diplom.Models.CategoryType", null)
-                        .WithMany()
-                        .HasForeignKey("CategoryTypesID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("diplom.Models.UserProject", null)
-                        .WithMany()
-                        .HasForeignKey("UserProjectsID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("diplom.Models.CategoryType", b =>
-                {
-                    b.HasOne("diplom.Models.Project", "Project")
-                        .WithMany()
-                        .HasForeignKey("ProjectID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Project");
-                });
-
             modelBuilder.Entity("diplom.Models.Issue", b =>
                 {
-                    b.HasOne("diplom.Models.CategoryType", "CategoryType")
-                        .WithMany("Issues")
-                        .HasForeignKey("CategoryTypeID");
-
                     b.HasOne("diplom.Models.User", "Creator")
-                        .WithMany("Issues")
+                        .WithMany()
                         .HasForeignKey("CreatorID")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("diplom.Models.User", "Performer")
@@ -326,74 +239,23 @@ namespace diplom.Migrations
                         .HasForeignKey("PerformerID")
                         .OnDelete(DeleteBehavior.SetNull);
 
-                    b.HasOne("diplom.Models.PriorityType", "PriorityType")
-                        .WithMany("Issues")
-                        .HasForeignKey("PriorityTypeID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("diplom.Models.Project", "Project")
                         .WithMany("Issues")
                         .HasForeignKey("ProjectID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("diplom.Models.StatusType", "StatusType")
-                        .WithMany("Issues")
-                        .HasForeignKey("StatusTypeID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("CategoryType");
-
                     b.Navigation("Creator");
 
                     b.Navigation("Performer");
 
-                    b.Navigation("PriorityType");
-
                     b.Navigation("Project");
-
-                    b.Navigation("StatusType");
                 });
 
             modelBuilder.Entity("diplom.Models.Log", b =>
                 {
                     b.HasOne("diplom.Models.Project", "Project")
                         .WithMany("Logs")
-                        .HasForeignKey("ProjectID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Project");
-                });
-
-            modelBuilder.Entity("diplom.Models.PriorityType", b =>
-                {
-                    b.HasOne("diplom.Models.Project", "Project")
-                        .WithMany("PriorityTypes")
-                        .HasForeignKey("ProjectID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Project");
-                });
-
-            modelBuilder.Entity("diplom.Models.Project", b =>
-                {
-                    b.HasOne("diplom.Models.User", "CreatorUser")
-                        .WithMany("Projects")
-                        .HasForeignKey("CreatorUserID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("CreatorUser");
-                });
-
-            modelBuilder.Entity("diplom.Models.StatusType", b =>
-                {
-                    b.HasOne("diplom.Models.Project", "Project")
-                        .WithMany("StatusTypes")
                         .HasForeignKey("ProjectID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -420,40 +282,17 @@ namespace diplom.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("diplom.Models.CategoryType", b =>
-                {
-                    b.Navigation("Issues");
-                });
-
-            modelBuilder.Entity("diplom.Models.PriorityType", b =>
-                {
-                    b.Navigation("Issues");
-                });
-
             modelBuilder.Entity("diplom.Models.Project", b =>
                 {
                     b.Navigation("Issues");
 
                     b.Navigation("Logs");
 
-                    b.Navigation("PriorityTypes");
-
-                    b.Navigation("StatusTypes");
-
                     b.Navigation("UserProjects");
-                });
-
-            modelBuilder.Entity("diplom.Models.StatusType", b =>
-                {
-                    b.Navigation("Issues");
                 });
 
             modelBuilder.Entity("diplom.Models.User", b =>
                 {
-                    b.Navigation("Issues");
-
-                    b.Navigation("Projects");
-
                     b.Navigation("UserProjects");
                 });
 #pragma warning restore 612, 618

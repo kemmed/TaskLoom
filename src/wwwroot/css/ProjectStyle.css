@@ -59,7 +59,6 @@
     font-size: 18px;
     font-weight: 300;
 }
-
 .task-list {
     list-style-type: none;
     padding: 0;
@@ -110,6 +109,11 @@
         word-wrap: break-word;
         overflow-wrap: break-word;
         font-weight: 600;
+    }
+    .task-card h4 {
+        font-size: 14px;
+        margin: 0 0 10px;
+        font-weight: 500;
     }
 
     .task-card p {

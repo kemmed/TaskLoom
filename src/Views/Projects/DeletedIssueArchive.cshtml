@@ -27,7 +27,7 @@
                     <tr>
                         <td>@task.Name</td>
                         <td>@task.Description</td>
-                        <td>@task.CategoryType?.Name</td>
+                        <td>@task.Category?</td>
                         <td>@task.Performer?.LName @task.Performer?.FName</td>
                         <td>@task.DeadlineDate?.ToString("dd.MM.yyyy")</td>
                         <td>@task.DeleteDate.Value.ToString("dd.MM.yyyy HH:mm")</td>

@@ -59,7 +59,7 @@ else
                         <p class="project-created">Завершен @project.EndDate.Value.ToString("dd.MM.yyyy")</p>
                     }
 
-                    @if (ViewBag.UserRole == UserRoles.Admin)
+                    @if (project.UserProjects.FirstOrDefault(x => x.UserRole == UserRoles.Admin).UserID == ViewBag.UserID)
                     {
                         <a href="#edit-project" rel="modal:open" class="edit-project-button" data-project-id="@project.ID">
                             <i class="las la-pen"></i>
@@ -120,74 +120,120 @@ else
 </form>
 
 <script>
-        document.addEventListener('DOMContentLoaded', function () {
+            document.addEventListener('DOMContentLoaded', function () {
         const buttons = document.querySelectorAll('.edit-project-button');
+
         buttons.forEach(button => {
-            button.addEventListener('click', function () {
+            button.addEventListener('click', async function () {
                 const projectID = this.getAttribute('data-project-id');
-                document.querySelectorAll('.projectform').forEach(element => {
-                    element.classList.add('hidden');
-                });
-                const selectedProjectForm = document.getElementById('PROJECT' + projectID);
-                if (selectedProjectForm) {
-                    selectedProjectForm.classList.remove('hidden');
+                const modalTitle = document.getElementById('edit-project-title');
+                const form = document.getElementById('edit-project-form');
+                resetForm();
+
+                openModal();
+                try {
+                    const response = await fetch(`/Projects/GetProjectInfo/${projectID}`);
+                    const data = await response.json();
+
+                    if (!data) {
+                        modalTitle.textContent = 'Ошибка загрузки';
+                        return;
+                    }
+
+                    const project = data.project;
+                    const isAdmin = data.isAdmin;
+
+                    document.getElementById('edit-project-id').value = project.ID;
+                    document.getElementById('edit-project-name').value = project.Name;
+                    document.getElementById('edit-project-description').value = project.Description || '';
+
+                    const statusSelect = document.getElementById('edit-project-status');
+                    statusSelect.innerHTML = '';
+
+                    const statusMap = {
+                        "@ProjectStatus.InProcess": "В процессе",
+                        "@ProjectStatus.Frozen": "Отложен",
+                        "@ProjectStatus.Completed": "Завершен"
+                    };
+
+                    Object.entries(statusMap).forEach(([value, label]) => {
+                        const option = document.createElement('option');
+                        option.value = value;
+                        option.text = label;
+                        if (value === project.Status.toString()) {
+                            option.selected = true;
+                        }
+                        statusSelect.appendChild(option);
+                    });
+
+                    if (project.DeadlineDate) {
+                        const date = new Date(project.DeadlineDate);
+                        const formattedDate = date.toISOString().split('T')[0];
+                        document.getElementById('edit-project-deadline').value = formattedDate;
+                    }
+                    modalTitle.textContent = isAdmin ? "Редактирование проекта" : "Просмотр проекта";
+                    const inputs = form.querySelectorAll('input, textarea, select');
+                    inputs.forEach(input => {
+                        input.disabled = !isAdmin;
+                    });
+
+                    const saveBtn = document.getElementById('edit-project-save-btn');
+                    saveBtn.classList.toggle('hidden', !isAdmin);
+
+                } catch (error) {
+                    console.error('Ошибка при загрузке данных проекта:', error);
+                    modalTitle.textContent = 'Ошибка загрузки данных';
                 }
-                document.getElementById('projectID').value = projectID;
             });
         });
+
+        function resetForm() {
+            const form = document.getElementById('edit-project-form');
+            form.reset();
+            form.querySelector('#edit-project-id').value = '';
+            form.querySelector('#edit-project-status').innerHTML = '';
+            form.querySelector('#edit-project-save-btn').classList.add('hidden');
+        }
+
+        function openModal() {
+            const modal = document.getElementById('edit-project');
+            modal.style.display = 'block';
+        }
     });
 </script>
 
 <div id="edit-project" class="modal">
-    @foreach (Project project in Model)
-    {
-        <div ID="PROJECT@(@project.ID)" class="hidden projectform">
-            <form asp-action="EditProject" asp-controller="Projects">
-                <input type="hidden" value="@project.ID" name="projectID" id="projectID" />
-                <input type="hidden" name="returnUrl" value="/Projects/AllProjects" />
-                <div class="modal-container">
-                    <h1 class="modal-title">
-                        @{
-                            bool isAdmin = project.UserProjects.Any(up => up.UserID == ViewBag.UserID && up.UserRole == UserRoles.Admin);
-                            @(isAdmin ? "Редактирование проекта" : "Просмотр проекта")
-                        }
-                    </h1>
-                    <label class="input-form__label add-project">
-                        <span class="input-placeholder">название</span>
-                        <input class="form__input input-name" name="Name" autocomplete="off" required value="@project.Name"
-                        @(isAdmin ? "" : "disabled")>
-                    </label>
+    <form id="edit-project-form" asp-action="EditProject" asp-controller="Projects">
+        <input type="hidden" name="projectID" id="edit-project-id" />
+        <input type="hidden" name="returnUrl" value="/Projects/AllProjects" />
 
-                    <label class="input-form__label add-project">
-                        <span class="input-placeholder">описание</span>
-                        <textarea class="form__input form__textarea" name="Description" autocomplete="off"
-                        @(isAdmin ? "" : "disabled")>@project.Description</textarea>
-                    </label>
+        <div class="modal-container">
+            <h1 class="modal-title" id="edit-project-title">Загрузка...</h1>
 
-                    <label class="input-form__label">
-                        <span class="input-placeholder select-date">статус</span>
-                        <select class="form__input input-select" name="Status" required
-                        @(isAdmin ? "" : "disabled")>
-                            <!option value="@ProjectStatus.InProcess" @((project.Status == ProjectStatus.InProcess) ? "selected" : "")>@project.ConvertStatus(ProjectStatus.InProcess)</!option>
-                            <!option value="@ProjectStatus.Frozen" @((project.Status == ProjectStatus.Frozen) ? "selected" : "")>@project.ConvertStatus(ProjectStatus.Frozen)</!option>
-                            <!option value="@ProjectStatus.Completed" @((project.Status == ProjectStatus.Completed) ? "selected" : "")>@project.ConvertStatus(ProjectStatus.Completed)</!option>
-                        </select>
-                    </label>
+            <label class="input-form__label add-project">
+                <span class="input-placeholder">название</span>
+                <input class="form__input input-name" id="edit-project-name" name="Name" autocomplete="off" disabled />
+            </label>
 
-                    <label class="input-form__label add-project">
-                        <span class="input-placeholder select-date">срок</span>
-                        <input class="form__input input-date" type="date" name="DeadlineDate" required
-                               value="@project.DeadlineDate.Value.ToString("yyyy-MM-dd")"
-                        @(isAdmin ? "" : "disabled")>
-                    </label>
+            <label class="input-form__label add-project">
+                <span class="input-placeholder">описание</span>
+                <textarea class="form__input form__textarea" id="edit-project-description" name="Description" autocomplete="off" disabled></textarea>
+            </label>
 
-                    @if (isAdmin)
-                    {
-                        <button class="input__submit confirm">Сохранить <i class="las la-save"></i></button>
-                    }
-                </div>
-            </form>
+            <label class="input-form__label">
+                <span class="input-placeholder select-date">статус</span>
+                <select class="form__input input-select" id="edit-project-status" name="Status" disabled>
+
+                </select>
+            </label>
+
+            <label class="input-form__label add-project">
+                <span class="input-placeholder select-date">срок</span>
+                <input class="form__input input-date" type="date" id="edit-project-deadline" name="DeadlineDate" disabled />
+            </label>
+
+            <button type="submit" id="edit-project-save-btn" class="input__submit confirm hidden">Сохранить <i class="las la-save"></i></button>
         </div>
-    }
+    </form>
     <a href="#" rel="modal:close"></a>
 </div>
