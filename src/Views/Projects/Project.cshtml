@@ -44,7 +44,7 @@
                                     <h3>@task.Name</h3>
                                     <h4>@(task.CategoryType?.Name ?? "нет категории")</h4>
                                     <p>Приоритет: <span class="priority-text">@(task.PriorityType.Name)</span></p>
-                                    <p>Ответственный: @($"{task.Performer.LName} {task.Performer.FName}")</p>
+                                    <p>Ответственный: @($"{task.Performer?.LName} {task.Performer?.FName}" ?? "нет ответственного")</p>
                                     <p>Завершить до: @(task.DeadlineDate?.ToString("dd.MM.yyyy") ?? "нет срока")</p>
                                 </a>
 
@@ -114,6 +114,51 @@
     });
 </script>
 
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const categorySelects = document.querySelectorAll('select[name="CategoryTypeID"]');
+        const performerSelects = document.querySelectorAll('select[name="PerformerID"]');
+
+        categorySelects.forEach((categorySelect, index) => {
+            const performerSelect = performerSelects[index];
+
+            if (categorySelect && performerSelect) {
+                const projectId = '@ViewBag.ProjectID';
+
+                categorySelect.addEventListener('change', async function () {
+                    const selectedCategoryId = this.value;
+
+                    performerSelect.innerHTML = '<option value="">Загрузка...</option>';
+
+                    try {
+                        const response = await fetch(`/Projects/GetPerformersByCategory?projectID=${projectId}&categoryTypeID=${selectedCategoryId}`);
+                        const data = await response.json();
+
+                        const performers = data.$values || data;
+
+                        performerSelect.innerHTML = '';
+                        if (performers.length === 0) {
+                            const option = document.createElement('option');
+                            option.value = '';
+                            option.textContent = 'Нет подходящих исполнителей';
+                            performerSelect.appendChild(option);
+                        } else {
+                            performers.forEach(user => {
+                                const option = document.createElement('option');
+                                option.value = user.id;
+                                option.textContent = user.name;
+                                performerSelect.appendChild(option);
+                            });
+                        }
+                    } catch (error) {
+                        console.error('Ошибка загрузки данных:', error);
+                        performerSelect.innerHTML = '<option value="">Ошибка загрузки</option>';
+                    }
+                });
+            }
+        });
+    });
+</script>
 
 
 <div id="add-task" class="modal">
@@ -178,37 +223,54 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', function () {
-    const editButtons = document.querySelectorAll('.edit-task-link');
-    editButtons.forEach(button => {
-        button.addEventListener('click', function () {
+            // Редактирование задачи
+    const editTaskLinks = document.querySelectorAll('.edit-task-link');
+    editTaskLinks.forEach(link => {
+        link.addEventListener('click', function (event) {
+            event.preventDefault();
             const issueID = this.getAttribute('data-issue-id');
-            resetAndPopulateForm(issueID, 'EDIT_ISSUE');
+            document.querySelectorAll('.issueform').forEach(form => {
+                form.classList.add('hidden');
+            });
+            const selectedEditForm = document.getElementById('EDIT_ISSUE' + issueID);
+            if (selectedEditForm) {
+                selectedEditForm.classList.remove('hidden');
+            }
         });
     });
 
-        const deleteButtons = document.querySelectorAll('.delete-task-button');
-        deleteButtons.forEach(button => {
-            button.addEventListener('click', function () {
-                const issueID = this.getAttribute('data-task-id');
-                resetAndPopulateForm(issueID, 'DELETE_ISSUE');
+    // Удаление задачи
+    const deleteTaskButtons = document.querySelectorAll('.delete-task-button');
+    deleteTaskButtons.forEach(button => {
+        button.addEventListener('click', function (event) {
+            event.preventDefault();
+            const taskID = this.getAttribute('data-task-id');
+            document.querySelectorAll('.issueform').forEach(form => {
+                form.classList.add('hidden');
             });
+            const selectedDeleteForm = document.getElementById('DELETE_ISSUE' + taskID);
+            if (selectedDeleteForm) {
+                selectedDeleteForm.classList.remove('hidden');
+            }
         });
+    });
+    });
 </script>
 
 
 <div id="delete-task" class="modal">
     @foreach (var issue in Model)
     {
-            <div id="DELETE_ISSUE@(issue.ID)" class="hidden issueform">
-                <form asp-action="DeleteIssue" asp-controller="Projects">
-                    <input type="hidden" value="@issue.ID" name="issueID" id="issueID" />
-                    <div class="modal-container">
-                        <h1 class="modal-title">Подтвердите удаление задачи</h1>
-                        <p class="delete-text">После удаления задача будет перемещена в архив.</p>
-                        <button class="input__submit cancel">Удалить <i class="las la-trash-alt"></i></button>
-                    </div>
-                </form>
-            </div>
+        <div id="DELETE_ISSUE@(issue.ID)" class="hidden issueform">
+            <form asp-action="DeleteIssue" asp-controller="Projects">
+                <input type="hidden" value="@issue.ID" name="issueID" id="issueID" />
+                <div class="modal-container">
+                    <h1 class="modal-title">Подтвердите удаление задачи</h1>
+                    <p class="delete-text">После удаления задача будет перемещена в архив.</p>
+                    <button class="input__submit cancel">Удалить <i class="las la-trash-alt"></i></button>
+                </div>
+            </form>
+        </div>
     }
     <a href="#" rel="modal:close"></a>
 </div>
@@ -217,83 +279,83 @@
 <div id="edit-task" class="modal">
     @foreach (var issue in Model)
     {
-            <div id="EDIT_ISSUE@(issue.ID)" class="hidden issueform">
-                <form asp-action="UpdateIssue" asp-controller="Projects">
-                    <input type="hidden" value="@issue.ID" name="issueID" id="issueID" />
-                    <div class="modal-container">
-                        <h1 class="modal-title">
-                            @(issue.CreatorID == ViewBag.UserID ? "Редактирование задачи" : "Просмотр задачи")
-                        </h1>
-                        <label class="input-form__label add-project">
-                            <span class="input-placeholder">название</span>
-                            <input class="form__input input-name" name="Name" autocomplete="off" value="@issue.Name"
-                                   required @(issue.CreatorID != ViewBag.UserID ? "disabled" : "")>
-                        </label>
+        <div id="EDIT_ISSUE@(issue.ID)" class="hidden issueform" data-issue-id="@issue.ID">
+            <form asp-action="UpdateIssue" asp-controller="Projects">
+                <input type="hidden" value="@issue.ID" name="issueID" id="issueID" />
+                <div class="modal-container">
+                    <h1 class="modal-title">
+                        @(issue.CreatorID == ViewBag.UserID ? "Редактирование задачи" : "Просмотр задачи")
+                    </h1>
+                    <label class="input-form__label add-project">
+                        <span class="input-placeholder">название</span>
+                        <input class="form__input input-name" name="Name" autocomplete="off" value="@issue.Name"
+                                required @(issue.CreatorID != ViewBag.UserID ? "disabled" : "")>
+                    </label>
 
-                        <label class="input-form__label add-project">
-                            <span class="input-placeholder">описание</span>
-                            <textarea class="form__input form__textarea" name="Description" autocomplete="off"
-                                      @(issue.CreatorID != ViewBag.UserID ? "disabled" : "")>@issue.Description</textarea>
-                        </label>
+                    <label class="input-form__label add-project">
+                        <span class="input-placeholder">описание</span>
+                        <textarea class="form__input form__textarea" name="Description" autocomplete="off"
+                                    @(issue.CreatorID != ViewBag.UserID ? "disabled" : "")>@issue.Description</textarea>
+                    </label>
 
-                        <label class="input-form__label">
-                            <span class="input-placeholder select-date">приоритет</span>
-                            <select class="form__input input-select" name="PriorityTypeID" required
-                                    @(issue.CreatorID != ViewBag.UserID ? "disabled" : "")>
-                                @foreach (var option in ViewBag.Priorities)
-                                {
-                                    <!option value="@option.Value" @((issue.PriorityTypeID.ToString() == option.Value) ? "selected" : "")>@option.Text</!option>
-                                }
-                            </select>
-                        </label>
+                    <label class="input-form__label">
+                        <span class="input-placeholder select-date">приоритет</span>
+                        <select class="form__input input-select" name="PriorityTypeID" required
+                                @(issue.CreatorID != ViewBag.UserID ? "disabled" : "")>
+                            @foreach (var option in ViewBag.Priorities)
+                            {
+                                <!option value="@option.Value" @((issue.PriorityTypeID.ToString() == option.Value) ? "selected" : "")>@option.Text</!option>
+                            }
+                        </select>
+                    </label>
 
-                        <label class="input-form__label">
-                            <span class="input-placeholder select-date">статус</span>
-                            <select class="form__input input-select" name="StatusTypeID"
-                                    @(issue.CreatorID != ViewBag.UserID ? "disabled" : "")>
-                                @foreach (var option in ViewBag.Statuses)
-                                {
-                                    <!option value="@option.Value" @((issue.StatusTypeID.ToString() == option.Value) ? "selected" : "")>@option.Text</!option>
-                                }
-                            </select>
-                        </label>
+                    <label class="input-form__label">
+                        <span class="input-placeholder select-date">статус</span>
+                        <select class="form__input input-select" name="StatusTypeID"
+                                @(issue.CreatorID != ViewBag.UserID ? "disabled" : "")>
+                            @foreach (var option in ViewBag.Statuses)
+                            {
+                                <!option value="@option.Value" @((issue.StatusTypeID.ToString() == option.Value) ? "selected" : "")>@option.Text</!option>
+                            }
+                        </select>
+                    </label>
 
-                        <label class="input-form__label">
-                            <span class="input-placeholder select-date">категория</span>
-                            <select class="form__input input-select" name="CategoryTypeID"
-                                    @(issue.CreatorID != ViewBag.UserID ? "disabled" : "")>
-                                <option value="">---без категории---</option>
-                                @foreach (var option in ViewBag.Categories)
-                                {
-                                    <!option value="@option.Value" @((issue.CategoryTypeID?.ToString() == option.Value) ? "selected" : "")>@option.Text</!option>
-                                }
-                            </select>
-                        </label>
+                    <label class="input-form__label">
+                        <span class="input-placeholder select-date">категория</span>
+                        <select class="form__input input-select" name="CategoryTypeID"
+                                @(issue.CreatorID != ViewBag.UserID ? "disabled" : "")>
+                            <option value="">---без категории---</option>
+                            @foreach (var option in ViewBag.Categories)
+                            {
+                                <!option value="@option.Value" @((issue.CategoryTypeID?.ToString() == option.Value) ? "selected" : "")>@option.Text</!option>
+                            }
+                        </select>
+                    </label>
 
-                        <label class="input-form__label">
-                            <span class="input-placeholder select-date">ответственный</span>
-                            <select class="form__input input-select" name="PerformerID"
-                                    @(issue.CreatorID != ViewBag.UserID ? "disabled" : "")>
-                                @foreach (var option in ViewBag.Responsibilities)
-                                {
-                                    <!option value="@option.Value" @((issue.Performer.ID.ToString() == option.Value) ? "selected" : "")>@option.Text</!option>
-                                }
-                            </select>
-                        </label>
+                    <label class="input-form__label">
+                        <span class="input-placeholder select-date">ответственный</span>
+                        <select class="form__input input-select" name="PerformerID"
+                                @(issue.CreatorID != ViewBag.UserID ? "disabled" : "")>
+                            @foreach (var option in ViewBag.Responsibilities)
+                            {
+                                <!option value="@option.Value" @((issue.Performer.ID.ToString() == option.Value) ? "selected" : "")>@option.Text</!option>
+                            }
+                        </select>
+                    </label>
 
-                        <label class="input-form__label add-project">
-                            <span class="input-placeholder select-date">срок</span>
-                            <input class="form__input input-date" type="date" name="DeadlineDate"
-                                   value="@(issue.DeadlineDate?.ToString("yyyy-MM-dd") ?? DateTime.Now.ToString("yyyy-MM-dd"))"
-                                   required @(issue.CreatorID != ViewBag.UserID ? "disabled" : "")>
-                        </label>
-                        @if (issue.CreatorID == ViewBag.UserID)
-                        {
-                            <button class="input__submit confirm">Сохранить <i class="las la-clipboard-check"></i></button>
-                        }
-                    </div>
-                </form>
-            </div>
+                    <label class="input-form__label add-project">
+                        <span class="input-placeholder select-date">срок</span>
+                        <input class="form__input input-date" type="date" name="DeadlineDate"
+                                value="@(issue.DeadlineDate?.ToString("yyyy-MM-dd") ?? DateTime.Now.ToString("yyyy-MM-dd"))"
+                                required @(issue.CreatorID != ViewBag.UserID ? "disabled" : "")>
+                    </label>
+                    @if (issue.CreatorID == ViewBag.UserID)
+                    {
+                        <button class="input__submit confirm">Сохранить <i class="las la-clipboard-check"></i></button>
+                    }
+                </div>
+            </form>
+        </div>
     }
     <a href="#" rel="modal:close"></a>
 </div>

@@ -77,6 +77,108 @@ namespace diplom.Controllers
             return View(filteredProjects.ToList());
         }
 
+        //Сортировка списка ответсвенных с количеством их задач
+        public List<SelectListItem> GetSortedResponsibilities(int projectID)
+        {
+            return _context.UserProject
+                .Where(up => up.ProjectID == projectID)
+                .Select(up => new
+                {
+                    UserID = up.UserID,
+                    UserName = up.User.LName + " " + up.User.FName,
+                    TaskCount = _context.Issue
+                        .Count(t => t.ProjectID == projectID
+                                 && !t.IsDelete
+                                 && t.PerformerID == up.UserID),
+                    NearestDeadline = _context.Issue
+                        .Where(t => t.ProjectID == projectID
+                                 && !t.IsDelete
+                                 && t.PerformerID == up.UserID
+                                 && t.DeadlineDate.HasValue)
+                        .Min(t => t.DeadlineDate)
+                })
+                .AsEnumerable()
+                .OrderBy(u => u.TaskCount)
+                .ThenBy(u => u.NearestDeadline)
+                .Select(u => new SelectListItem
+                {
+                    Value = u.UserID.ToString(),
+                    Text = $"{u.UserName} ({u.TaskCount} {GetTaskWord(u.TaskCount)})"
+                })
+                .ToList();
+        }
+
+        //Метод корректного отображения слова задача
+        public static string GetTaskWord(int count)
+        {
+            count = Math.Abs(count) % 100;
+            var lastDigit = count % 10;
+
+            if (count >= 11 && count <= 14)
+                return "задач";
+
+            switch (lastDigit)
+            {
+                case 1:
+                    return "задача";
+                case 2:
+                case 3:
+                case 4:
+                    return "задачи";
+                default:
+                    return "задач";
+            }
+        }
+
+        //Изменение списка ответственных в зависимости от выбранной категории
+        [HttpGet("/Projects/GetPerformersByCategory")]
+        public async Task<IActionResult> GetPerformersByCategory(int projectID, int? categoryTypeID)
+        {
+            var users = await _context.UserProject
+                .Where(up => up.ProjectID == projectID)
+                .Include(up => up.User)
+                .Include(up => up.CategoryTypes)
+                .ToListAsync();
+
+            if (categoryTypeID.HasValue)
+            {
+                users = users
+                    .Where(u => u.CategoryTypes != null &&
+                                u.CategoryTypes.Any(ct => ct.ID == categoryTypeID.Value))
+                    .ToList();
+            }
+
+            var performers = users.Select(u => new
+            {
+                UserID = u.UserID,
+                UserName = u.User.LName + " " + u.User.FName,
+
+                TaskCount = _context.Issue
+                    .Count(t => t.ProjectID == projectID &&
+                                !t.IsDelete &&
+                                t.PerformerID == u.UserID),
+
+                NearestDeadline = _context.Issue
+                    .Where(t => t.ProjectID == projectID &&
+                                !t.IsDelete &&
+                                t.PerformerID == u.UserID &&
+                                t.DeadlineDate.HasValue)
+                    .Min(t => t.DeadlineDate)
+            })
+            .AsEnumerable()
+            .OrderBy(u => u.TaskCount)
+            .ThenBy(u => u.NearestDeadline)
+            .Select(u => new
+            {
+                ID = u.UserID,
+                Name = $"{u.UserName} ({u.TaskCount} {GetTaskWord(u.TaskCount)})",
+            })
+            .ToList();
+
+            return Json(performers);
+        }
+
+
         [HttpGet("/Projects/Project/{projectID}")]
         public async Task<IActionResult> Project(int projectID, string filter = "all")
         {
@@ -129,24 +231,22 @@ namespace diplom.Controllers
             ViewBag.ProjectName = _context.Project.FirstOrDefault(x => x.ID == projectID).Name;
             ViewBag.ProjectID = _context.Project.FirstOrDefault(x => x.ID == projectID).ID;
 
-            var reponsibilities = _context.UserProject.Where(x => x.ProjectID == projectID)
-                .Select(c => new SelectListItem
-                {
-                    Value = c.UserID.ToString(),
-                    Text = c.User.LName + " " + c.User.FName
-                }).ToList();
+            var reponsibilities = GetSortedResponsibilities(projectID);
+
             var categories = _context.CategoryType.Where(x => x.ProjectID == projectID)
                 .Select(c => new SelectListItem
                 {
                     Value = c.ID.ToString(),
                     Text = c.Name
                 }).ToList();
+
             var priorities = _context.PriorityType.Where(x => x.ProjectID == projectID)
                 .Select(c => new SelectListItem
                 {
                     Value = c.ID.ToString(),
                     Text = c.Name
                 }).ToList();
+
             var statuses = _context.StatusType.Where(x => x.ProjectID == projectID)
                 .Select(c => new SelectListItem
                 {
@@ -463,7 +563,7 @@ namespace diplom.Controllers
 
             _context.UserProject.Remove(userProject);
             _context.SaveChanges();
-            return Redirect($"/Projects/ProjectSettings/{projectID}");
+            return Redirect($"/Projects/ProjectSettings/{projectID}#users-section");
         }
 
         //Назначение категорий пользователю
@@ -495,7 +595,7 @@ namespace diplom.Controllers
             _logService.LogAction(projectID, $"обновил категории пользователя {userProject.User.FName} {userProject.User.LName}", userSessionID);
 
             await _context.SaveChangesAsync();
-            return Redirect($"/Projects/ProjectSettings/{projectID}");
+            return Redirect($"/Projects/ProjectSettings/{projectID}#users-section");
         }
 
         //Выход из проекта
@@ -540,7 +640,7 @@ namespace diplom.Controllers
                 _logService.LogAction(userProject.ProjectID, $"изменил роль пользователя {userProject.User.FName} {userProject.User.LName} с \"{oldRole}\" на \"{userProject.ConvertRoles(newRole)}\"", userSessionID);
             }
             _context.SaveChanges();
-            return Redirect($"/Projects/ProjectSettings/{userProject.ProjectID}");
+            return Redirect($"/Projects/ProjectSettings/{userProject.ProjectID}#users-section");
         }
 
         //Добавление категории
@@ -561,7 +661,7 @@ namespace diplom.Controllers
 
             _context.SaveChanges();
             var c = _context.CategoryType.ToList();
-            return Redirect($"/Projects/ProjectSettings/{currProject.ID}");
+            return Redirect($"/Projects/ProjectSettings/{currProject.ID}#categories-section");
         }
         //Редактирование категории
         [HttpPost]
@@ -578,7 +678,7 @@ namespace diplom.Controllers
             _logService.LogAction(category.ProjectID, $"изменил название категории с \"{oldName}\" на \"{category.Name}\"", userSessionID);
 
             _context.SaveChangesAsync();
-            return Redirect($"/Projects/ProjectSettings/{category.ProjectID}");
+            return Redirect($"/Projects/ProjectSettings/{category.ProjectID}#categories-section");
         }
         //Удаление категории
         [HttpPost]
@@ -604,7 +704,7 @@ namespace diplom.Controllers
 
             _context.CategoryType.Remove(category);
             _context.SaveChanges();
-            return Redirect($"/Projects/ProjectSettings/{projectID}");
+            return Redirect($"/Projects/ProjectSettings/{projectID}#categories-section");
         }
 
 
@@ -830,12 +930,8 @@ namespace diplom.Controllers
                 {
                     issue.ID,
                     issue.Name,
-                    issue.Description,
-                    issue.PriorityTypeID,
-                    issue.StatusTypeID,
-                    issue.CategoryTypeID,
-                    Performer = issue.Performer != null ? new { ID = issue.Performer.ID } : null,
-                    DeadlineDate = issue.DeadlineDate?.ToString("yyyy-MM-dd")
+                    issue.Description
+
                 },
                 isCreator = issue.Creator?.ID == userSessionID
             };

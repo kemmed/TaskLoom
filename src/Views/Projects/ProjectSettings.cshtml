@@ -78,7 +78,7 @@
         </form>
     </div>
 
-    <div class="users-section">
+    <div class="users-section" id="users-section">
         <div class="config-title-container">
             <h2 class="config-title">Сотрудники</h2>
             @if (ViewBag.UserRole == UserRoles.Admin)
@@ -197,7 +197,7 @@
         }
     </div>
 
-    <div class="categories-section">
+    <div class="categories-section" id="categories-section">
         <div class="config-title-container">
             <h2 class="config-title">Категории задач</h2>
             @if (ViewBag.UserRole == UserRoles.Admin || ViewBag.UserRole == UserRoles.Manager)
