@@ -167,12 +167,6 @@ namespace diplom.Migrations
                     b.Property<DateTime>("CreateDate")
                         .HasColumnType("TEXT");
 
-                    b.Property<int>("CreatorID")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("CreatorUserID")
-                        .HasColumnType("INTEGER");
-
                     b.Property<DateTime?>("DeadlineDate")
                         .HasColumnType("TEXT");
 
@@ -192,9 +186,12 @@ namespace diplom.Migrations
                     b.Property<int>("Status")
                         .HasColumnType("INTEGER");
 
+                    b.Property<int?>("UserID")
+                        .HasColumnType("INTEGER");
+
                     b.HasKey("ID");
 
-                    b.HasIndex("CreatorUserID");
+                    b.HasIndex("UserID");
 
                     b.ToTable("Project");
                 });
@@ -272,6 +269,9 @@ namespace diplom.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<bool>("IsActive")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("IsCreator")
                         .HasColumnType("INTEGER");
 
                     b.Property<int>("ProjectID")
@@ -390,13 +390,9 @@ namespace diplom.Migrations
 
             modelBuilder.Entity("diplom.Models.Project", b =>
                 {
-                    b.HasOne("diplom.Models.User", "CreatorUser")
+                    b.HasOne("diplom.Models.User", null)
                         .WithMany("Projects")
-                        .HasForeignKey("CreatorUserID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("CreatorUser");
+                        .HasForeignKey("UserID");
                 });
 
             modelBuilder.Entity("diplom.Models.StatusType", b =>

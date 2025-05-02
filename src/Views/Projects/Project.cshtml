@@ -42,9 +42,9 @@
                             <li class="task-card draggable @GetPriorityClass(task.PriorityType)" data-task-id="@task.ID">
                                 <a href="#edit-task" rel="modal:open" class="edit-task-link" data-issue-id="@task.ID">
                                     <h3>@task.Name</h3>
+                                    <h4>@(task.CategoryType?.Name ?? "нет категории")</h4>
                                     <p>Приоритет: <span class="priority-text">@(task.PriorityType.Name)</span></p>
                                     <p>Ответственный: @($"{task.Performer.LName} {task.Performer.FName}")</p>
-                                    <p>Категория: @(task.CategoryType.Name ?? "нет категории")</p>
                                     <p>Завершить до: @(task.DeadlineDate?.ToString("dd.MM.yyyy") ?? "нет срока")</p>
                                 </a>
 
@@ -178,13 +178,13 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', function () {
-        const editButtons = document.querySelectorAll('.edit-task-link');
-        editButtons.forEach(button => {
-            button.addEventListener('click', function () {
-                const issueID = this.getAttribute('data-issue-id');
-                resetAndPopulateForm(issueID, 'EDIT_ISSUE');
-            });
+    const editButtons = document.querySelectorAll('.edit-task-link');
+    editButtons.forEach(button => {
+        button.addEventListener('click', function () {
+            const issueID = this.getAttribute('data-issue-id');
+            resetAndPopulateForm(issueID, 'EDIT_ISSUE');
         });
+    });
 
         const deleteButtons = document.querySelectorAll('.delete-task-button');
         deleteButtons.forEach(button => {
@@ -193,33 +193,6 @@
                 resetAndPopulateForm(issueID, 'DELETE_ISSUE');
             });
         });
-        function resetAndPopulateForm(issueID, formPrefix) {
-            document.querySelectorAll('.issueform').forEach(element => {
-                element.classList.add('hidden');
-            });
-            const selectedForm = document.getElementById(formPrefix + issueID);
-            if (selectedForm) {
-                const form = selectedForm.querySelector('form');
-                form.reset();
-                populateFormWithData(form, issueID);
-                selectedForm.classList.remove('hidden');
-            }
-        }
-            function populateFormWithData(form, issueID) {
-        fetch(`/api/issues/${issueID}`)
-            .then(response => response.json())
-            .then(data => {
-                form.querySelector('[name="Name"]').value = data.Name;
-                form.querySelector('[name="Description"]').value = data.Description;
-                form.querySelector('[name="PriorityTypeID"]').value = data.PriorityTypeID;
-                form.querySelector('[name="StatusTypeID"]').value = data.StatusTypeID;
-                form.querySelector('[name="CategoryTypeID"]').value = data.CategoryTypeID || '';
-                form.querySelector('[name="PerformerID"]').value = data.PerformerID;
-                form.querySelector('[name="DeadlineDate"]').value = data.DeadlineDate.split('T')[0];
-            })
-            .catch(error => console.error('Ошибка при получении данных:', error));
-    }
-    });
 </script>
 
 

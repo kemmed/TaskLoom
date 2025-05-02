@@ -45,8 +45,7 @@ namespace diplom.Controllers
             if (userLoggedInID == null)
                 return Redirect("/Users/Authorization");
 
-            var allProjects = _context.Project.Where(x => x.CreatorID == userLoggedInID ||
-                _context.UserProject.Any(ub => ub.ProjectID == x.ID
+            var allProjects = _context.Project.Where(x => x.UserProjects.Any(ub => ub.ProjectID == x.ID
                 && ub.UserID == userLoggedInID
                 && ub.IsActive))
                 .Include(p => p.UserProjects)
@@ -71,7 +70,9 @@ namespace diplom.Controllers
 
             ViewBag.StatusFilter = statusFilter;
             ViewBag.UserID = userLoggedInID;
-            ViewBag.UserRole = _context.UserProject.FirstOrDefault(x=>x.UserID == userLoggedInID).UserRole;
+            var userProject = _context.UserProject.FirstOrDefault(x => x.UserID == userLoggedInID);
+
+            ViewBag.UserRole = userProject?.UserRole;
 
             return View(filteredProjects.ToList());
         }
@@ -217,8 +218,20 @@ namespace diplom.Controllers
                 .OrderBy(up => up.UserRole)
                 .ToList();
 
+            var userIdsInProject = project.UserProjects.ToList();
+
+            var expirationTime = DateTime.Now.AddHours(-24);
+
+            var pendingUsers = await _context.UserProject
+                .Where(up => up.ProjectID == projectID && !up.IsActive && up.InviteTokenDate > expirationTime)
+                .Include(up => up.User)
+                .Select(up => up.User)
+                .ToListAsync();
+
+            ViewBag.PendingUsers = pendingUsers;
             ViewBag.ProjectID = projectID;
             ViewBag.UserRole = currUserProj.UserRole;
+
             return View(project);
         }
         [HttpGet("/Projects/DeletedIssueArchive/{projectID}")]
@@ -252,8 +265,6 @@ namespace diplom.Controllers
             int? userSessionID = HttpContext.Session.GetInt32("UserID");
 
             User creator = _context.User.FirstOrDefault(x => x.ID == userSessionID);
-            project.CreatorUser = creator;
-            project.CreatorID = creator.ID;
             project.DeadlineDate = project.DeadlineDate.Value.Date < DateTime.Now.Date ? DateTime.Now.Date : project.DeadlineDate;
             project.DeadlineDate = project.DeadlineDate;
             project.Status = ProjectStatus.InProcess;
@@ -269,6 +280,7 @@ namespace diplom.Controllers
             userProject.User = creator;
             userProject.UserRole = UserRoles.Admin;
             userProject.IsActive = true;
+            userProject.IsCreator = true;
             _context.Add(userProject);
 
             await _context.SaveChangesAsync();
@@ -440,9 +452,8 @@ namespace diplom.Controllers
         [HttpPost]
         public async Task<IActionResult> RemoveUserFromProject(int userProjectID)
         {
-            UserProject userProject = _context.UserProject.FirstOrDefault(x => x.ID == userProjectID);
+            UserProject userProject = _context.UserProject.Include(up=>up.User).FirstOrDefault(x => x.ID == userProjectID);
             int projectID = userProject.ProjectID;
-            _context.UserProject.Remove(userProject);
 
             int? userSessionID = HttpContext.Session.GetInt32("UserID");
             User remover = _context.User.FirstOrDefault(x => x.ID == userSessionID);
@@ -450,6 +461,7 @@ namespace diplom.Controllers
             // Добавление записи в лог
             _logService.LogAction(projectID, $"исключил пользователя {userProject.User.FName} {userProject.User.LName} из проекта.", userSessionID);
 
+            _context.UserProject.Remove(userProject);
             _context.SaveChanges();
             return Redirect($"/Projects/ProjectSettings/{projectID}");
         }
@@ -797,5 +809,39 @@ namespace diplom.Controllers
                 }
             }
         }
+
+        [HttpGet("/Projects/GetIssueInfo/{issueID}")]
+        public async Task<IActionResult> GetIssueInfo(int issueID)
+        {
+            int? userSessionID = HttpContext.Session.GetInt32("UserID");
+
+            var issue = await _context.Issue
+                .Include(i => i.Project)
+                .Include(i => i.Creator)
+                .Include(i => i.Performer)
+                .FirstOrDefaultAsync(x => x.ID == issueID);
+
+            if (issue == null)
+                return NotFound();
+
+            var result = new
+            {
+                issue = new
+                {
+                    issue.ID,
+                    issue.Name,
+                    issue.Description,
+                    issue.PriorityTypeID,
+                    issue.StatusTypeID,
+                    issue.CategoryTypeID,
+                    Performer = issue.Performer != null ? new { ID = issue.Performer.ID } : null,
+                    DeadlineDate = issue.DeadlineDate?.ToString("yyyy-MM-dd")
+                },
+                isCreator = issue.Creator?.ID == userSessionID
+            };
+
+            return Ok(result);
+        }
+
     }
 }

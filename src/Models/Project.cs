@@ -14,9 +14,6 @@
         public ProjectStatus Status { get; set; }
         public bool IsDelete { get; set; }
 
-        public int CreatorID { get; set; }
-        public User CreatorUser { get; set; }
-
         public List<Issue> Issues { get; set; }
         public List<PriorityType> PriorityTypes { get; set; }
         public List<StatusType> StatusTypes { get; set; }

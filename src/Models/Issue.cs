@@ -22,7 +22,7 @@
 
 
         public StatusType StatusType { get; set; }
-        public CategoryType? CategoryType { get; set; } = new();
+        public CategoryType? CategoryType { get; set; } /*= new();*/
         public PriorityType PriorityType { get; set; }
         public Project Project { get; set; }
         public User Creator { get; set; }

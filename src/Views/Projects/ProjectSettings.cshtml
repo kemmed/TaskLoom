@@ -169,6 +169,32 @@
                 }
             </tbody>
         </table>
+
+        @if (ViewBag.PendingUsers != null && ViewBag.PendingUsers.Count > 0)
+        {
+        <div class="config-title-container">
+            <h2>Ожидают принятия приглашения</h2>
+        </div>
+            <table class="project-table">
+                <thead>
+                    <tr>
+                        <th>Имя</th>
+                        <th>Почта</th>
+                        <th>Статус</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var user in ViewBag.PendingUsers)
+                    {
+                        <tr>
+                            <td>@user.LName @user.FName</td>
+                            <td>@user.Email</td>
+                            <td>Приглашение отправлено, ожидание ответа</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
     </div>
 
     <div class="categories-section">

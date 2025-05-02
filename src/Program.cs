@@ -2,6 +2,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using diplom.Data;
 using diplom.Services;
+using System.Text.Json.Serialization;
 
 namespace diplom
 {
@@ -12,14 +13,19 @@ namespace diplom
             var builder = WebApplication.CreateBuilder(args);
             builder.Services.AddDbContext<diplomContext>(options =>
                 options.UseSqlite(builder.Configuration.GetConnectionString("diplomContext") ?? throw new InvalidOperationException("Connection string 'diplomContext' not found.")));
-           
 
+            builder.Services.AddControllersWithViews()
+                .AddJsonOptions(options =>
+                {
+                    options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve;
+                });
             // Add services to the container.
             builder.Services.AddRazorPages();
 
             builder.Services.AddSingleton<MailService>();
             builder.Services.AddSingleton<TokenService>();
             builder.Services.AddScoped<LogService>();
+            builder.Services.AddScoped<PasswordService>();
 
             builder.Services.AddSession(options =>
             {

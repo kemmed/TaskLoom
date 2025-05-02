@@ -11,8 +11,8 @@ using diplom.Data;
 namespace diplom.Migrations
 {
     [DbContext(typeof(diplomContext))]
-    [Migration("20250319100447_passTokenDateAdd")]
-    partial class passTokenDateAdd
+    [Migration("20250501202832_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -71,6 +71,9 @@ namespace diplom.Migrations
                         .HasColumnType("INTEGER");
 
                     b.Property<DateTime?>("DeadlineDate")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("DeleteDate")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Description")
@@ -167,12 +170,6 @@ namespace diplom.Migrations
                     b.Property<DateTime>("CreateDate")
                         .HasColumnType("TEXT");
 
-                    b.Property<int>("CreatorID")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("CreatorUserID")
-                        .HasColumnType("INTEGER");
-
                     b.Property<DateTime?>("DeadlineDate")
                         .HasColumnType("TEXT");
 
@@ -189,12 +186,15 @@ namespace diplom.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<int>("ProjectStatus")
+                    b.Property<int>("Status")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int?>("UserID")
                         .HasColumnType("INTEGER");
 
                     b.HasKey("ID");
 
-                    b.HasIndex("CreatorUserID");
+                    b.HasIndex("UserID");
 
                     b.ToTable("Project");
                 });
@@ -265,6 +265,18 @@ namespace diplom.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
+                    b.Property<string>("InviteToken")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("InviteTokenDate")
+                        .HasColumnType("TEXT");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("IsCreator")
+                        .HasColumnType("INTEGER");
+
                     b.Property<int>("ProjectID")
                         .HasColumnType("INTEGER");
 
@@ -301,7 +313,7 @@ namespace diplom.Migrations
             modelBuilder.Entity("diplom.Models.CategoryType", b =>
                 {
                     b.HasOne("diplom.Models.Project", "Project")
-                        .WithMany()
+                        .WithMany("CategoryTypes")
                         .HasForeignKey("ProjectID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -381,13 +393,9 @@ namespace diplom.Migrations
 
             modelBuilder.Entity("diplom.Models.Project", b =>
                 {
-                    b.HasOne("diplom.Models.User", "CreatorUser")
+                    b.HasOne("diplom.Models.User", null)
                         .WithMany("Projects")
-                        .HasForeignKey("CreatorUserID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("CreatorUser");
+                        .HasForeignKey("UserID");
                 });
 
             modelBuilder.Entity("diplom.Models.StatusType", b =>
@@ -432,6 +440,8 @@ namespace diplom.Migrations
 
             modelBuilder.Entity("diplom.Models.Project", b =>
                 {
+                    b.Navigation("CategoryTypes");
+
                     b.Navigation("Issues");
 
                     b.Navigation("Logs");

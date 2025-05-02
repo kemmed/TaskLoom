@@ -12,6 +12,27 @@ namespace diplom.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
+                name: "User",
+                columns: table => new
+                {
+                    ID = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    FName = table.Column<string>(type: "TEXT", nullable: true),
+                    LName = table.Column<string>(type: "TEXT", nullable: true),
+                    Email = table.Column<string>(type: "TEXT", nullable: false),
+                    HashPass = table.Column<string>(type: "TEXT", nullable: false),
+                    IsActive = table.Column<bool>(type: "INTEGER", nullable: false),
+                    RegToken = table.Column<string>(type: "TEXT", nullable: true),
+                    RegTokenDate = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    PassRecoveryToken = table.Column<string>(type: "TEXT", nullable: true),
+                    PassRecoveryTokenDate = table.Column<DateTime>(type: "TEXT", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_User", x => x.ID);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Project",
                 columns: table => new
                 {
@@ -22,30 +43,18 @@ namespace diplom.Migrations
                     EndDate = table.Column<DateTime>(type: "TEXT", nullable: true),
                     DeadlineDate = table.Column<DateTime>(type: "TEXT", nullable: true),
                     CreateDate = table.Column<DateTime>(type: "TEXT", nullable: false),
-                    ProjectStatus = table.Column<int>(type: "INTEGER", nullable: false),
-                    IsDelete = table.Column<bool>(type: "INTEGER", nullable: false)
+                    Status = table.Column<int>(type: "INTEGER", nullable: false),
+                    IsDelete = table.Column<bool>(type: "INTEGER", nullable: false),
+                    UserID = table.Column<int>(type: "INTEGER", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Project", x => x.ID);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "User",
-                columns: table => new
-                {
-                    ID = table.Column<int>(type: "INTEGER", nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
-                    FName = table.Column<string>(type: "TEXT", nullable: false),
-                    LName = table.Column<string>(type: "TEXT", nullable: false),
-                    Email = table.Column<string>(type: "TEXT", nullable: false),
-                    HashPass = table.Column<string>(type: "TEXT", nullable: false),
-                    IsActive = table.Column<bool>(type: "INTEGER", nullable: false),
-                    RegToken = table.Column<string>(type: "TEXT", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_User", x => x.ID);
+                    table.ForeignKey(
+                        name: "FK_Project_User_UserID",
+                        column: x => x.UserID,
+                        principalTable: "User",
+                        principalColumn: "ID");
                 });
 
             migrationBuilder.CreateTable(
@@ -137,7 +146,11 @@ namespace diplom.Migrations
                         .Annotation("Sqlite:Autoincrement", true),
                     UserID = table.Column<int>(type: "INTEGER", nullable: false),
                     ProjectID = table.Column<int>(type: "INTEGER", nullable: false),
-                    UserRole = table.Column<int>(type: "INTEGER", nullable: false)
+                    UserRole = table.Column<int>(type: "INTEGER", nullable: false),
+                    InviteToken = table.Column<string>(type: "TEXT", nullable: true),
+                    InviteTokenDate = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    IsCreator = table.Column<bool>(type: "INTEGER", nullable: false),
+                    IsActive = table.Column<bool>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -172,6 +185,7 @@ namespace diplom.Migrations
                     ProjectID = table.Column<int>(type: "INTEGER", nullable: false),
                     PriorityTypeID = table.Column<int>(type: "INTEGER", nullable: false),
                     IsDelete = table.Column<bool>(type: "INTEGER", nullable: false),
+                    DeleteDate = table.Column<DateTime>(type: "TEXT", nullable: true),
                     CategoryTypeID = table.Column<int>(type: "INTEGER", nullable: true),
                     StatusTypeID = table.Column<int>(type: "INTEGER", nullable: false)
                 },
@@ -206,7 +220,13 @@ namespace diplom.Migrations
                         column: x => x.CreatorID,
                         principalTable: "User",
                         principalColumn: "ID",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Issue_User_PerformerID",
+                        column: x => x.PerformerID,
+                        principalTable: "User",
+                        principalColumn: "ID",
+                        onDelete: ReferentialAction.SetNull);
                 });
 
             migrationBuilder.CreateTable(
@@ -254,6 +274,11 @@ namespace diplom.Migrations
                 column: "CreatorID");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Issue_PerformerID",
+                table: "Issue",
+                column: "PerformerID");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Issue_PriorityTypeID",
                 table: "Issue",
                 column: "PriorityTypeID");
@@ -277,6 +302,11 @@ namespace diplom.Migrations
                 name: "IX_PriorityType_ProjectID",
                 table: "PriorityType",
                 column: "ProjectID");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Project_UserID",
+                table: "Project",
+                column: "UserID");
 
             migrationBuilder.CreateIndex(
                 name: "IX_StatusType_ProjectID",
@@ -319,10 +349,10 @@ namespace diplom.Migrations
                 name: "StatusType");
 
             migrationBuilder.DropTable(
-                name: "User");
+                name: "Project");
 
             migrationBuilder.DropTable(
-                name: "Project");
+                name: "User");
         }
     }
 }

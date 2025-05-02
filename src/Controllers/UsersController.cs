@@ -22,12 +22,14 @@ namespace diplom.Controllers
         private readonly diplomContext _context;
         private readonly MailService _mailService;
         private readonly TokenService _tokenService;
+        private readonly PasswordService _passwordService;
 
-        public UsersController(diplomContext context, MailService mailService, TokenService tokenService)
+        public UsersController(diplomContext context, MailService mailService, TokenService tokenService, PasswordService passwordService)
         {
             _context = context;
             _mailService = mailService;
             _tokenService = tokenService;
+            _passwordService = passwordService;
         }
 
         public IActionResult Login()
@@ -106,7 +108,7 @@ namespace diplom.Controllers
         {
             List<User> users = await _context.User.ToListAsync();
             var logUser = await _context.User
-                .FirstOrDefaultAsync(m => m.Email == user.Email && m.HashPass == HashPassword(user.HashPass));
+                .FirstOrDefaultAsync(m => m.Email == user.Email && m.HashPass == _passwordService.HashPassword(user.HashPass));
             if (logUser == null)
             {
                 return Redirect("/Users/AuthError?error=wrongemail");
@@ -170,8 +172,8 @@ namespace diplom.Controllers
             }
 
 
-            recoveryUser.HashPass = HashPassword(user.HashPass);
-            HashPassRepeat = HashPassword(HashPassRepeat);
+            recoveryUser.HashPass = _passwordService.HashPassword(user.HashPass);
+            HashPassRepeat = _passwordService.HashPassword(HashPassRepeat);
 
             if (recoveryUser.HashPass != HashPassRepeat)
             {
@@ -191,39 +193,23 @@ namespace diplom.Controllers
             return Redirect($"PasswordRecoveryMessage?message={successMessage}&success={success}");
         }
 
-        //Хеширование пароля
-        static string HashPassword(string password)
-        {
-            byte[] passwordBytes = Encoding.UTF8.GetBytes(password);
-            using (SHA256 sha256 = SHA256.Create())
-            {
-                byte[] hashBytes = sha256.ComputeHash(passwordBytes);
-
-                StringBuilder hashString = new StringBuilder();
-                foreach (byte b in hashBytes)
-                {
-                    hashString.Append(b.ToString("x2"));
-                }
-
-                return hashString.ToString();
-            }
-        }
         // Регистрация пользователя
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("ID,FName,LName,Email,HashPass")] User user)
         {
-            ////_context.User.RemoveRange(_context.User);
-            ////await _context.SaveChangesAsync();
-
             var existingUser = await _context.User.FirstOrDefaultAsync(u => u.Email == user.Email);
 
             if (existingUser != null)
             {
                 return Redirect("/Users/RegError?view=Registration");
             }
+            if (!_passwordService.IsPasswordValid(user.HashPass))
+            {
+                return Redirect("/Users/RegError?view=Registration&errorType=password");
+            }
 
-            user.HashPass = HashPassword(user.HashPass);
+            user.HashPass = _passwordService.HashPassword(user.HashPass);
             user.IsActive = false;
             _context.Add(user);
 
@@ -305,15 +291,19 @@ namespace diplom.Controllers
             int? userSessionID = HttpContext.Session.GetInt32("UserID");
             var currentUser = _context.User.FirstOrDefault(x => x.ID == userSessionID);
 
-            currentUser.HashPass = HashPassword(user.HashPass);
+            currentUser.HashPass = _passwordService.HashPassword(user.HashPass);
             await _context.SaveChangesAsync();
             return Redirect("UserProfile");
         }
-        
-        // Ошибка при регистрации на существующий в системе email
-        public IActionResult RegError(string view)
+
+        // Ошибка при регистрации
+        public IActionResult RegError(string view, string errorType)
         {
-            ViewBag.error = "На этот email уже зарегистрирован аккаунт.";
+            if (errorType == "password")
+                ViewBag.error = "Пароль должен содержать не менее 8 символов, включая заглавные, строчные буквы, цифры и специальные символы.";
+            else
+                ViewBag.error = "На этот email уже зарегистрирован аккаунт.";
+
             return View($"{view}");
         }
 

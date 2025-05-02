@@ -111,6 +111,11 @@
         overflow-wrap: break-word;
         font-weight: 600;
     }
+    .task-card h4 {
+        font-size: 14px;
+        margin: 0 0 10px;
+        font-weight: 500;
+    }
 
     .task-card p {
         font-size: 14px;
