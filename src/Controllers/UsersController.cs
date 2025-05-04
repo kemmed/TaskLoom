@@ -23,13 +23,15 @@ namespace diplom.Controllers
         private readonly MailService _mailService;
         private readonly TokenService _tokenService;
         private readonly PasswordService _passwordService;
+        private readonly UserService _userService;
 
-        public UsersController(diplomContext context, MailService mailService, TokenService tokenService, PasswordService passwordService)
+        public UsersController(diplomContext context, MailService mailService, TokenService tokenService, PasswordService passwordService, UserService userService)
         {
             _context = context;
             _mailService = mailService;
             _tokenService = tokenService;
             _passwordService = passwordService;
+            _userService = userService;
         }
 
         public IActionResult Login()
@@ -57,12 +59,11 @@ namespace diplom.Controllers
         }
         public async Task<IActionResult> UserProfile()
         {
-            int? userSessionID = HttpContext.Session.GetInt32("UserID");
-            User currentUser = await _context.User.FindAsync(userSessionID);
-            if (currentUser != null)
-                return View(currentUser);
-            else
+            User? currentUser = await _userService.GetCurrentUser(HttpContext);
+            if (currentUser == null)
                 return NotFound();
+
+            return View(currentUser);
         }
 
         //Восстановление пароля
@@ -71,20 +72,22 @@ namespace diplom.Controllers
             ViewBag.token = token;
             bool success = true;
             string message;
-            User recoveryUser = _context.User.FirstOrDefault(u => u.PassRecoveryToken == token);
+
+            User? recoveryUser = _context.User.FirstOrDefault(u => u.PassRecoveryToken == token);
+
             if (recoveryUser == null)
             {
                 message = "Ошибка восстановления пароля.";
                 success = false;
                 return Redirect($"PasswordRecoveryMessage?message={message}&success={success}");
             }
-            else if ((DateTime.Now - recoveryUser.PassRecoveryTokenDate).Value.Minutes >= 30)
+            else if (!recoveryUser.PassRecoveryTokenDate.HasValue || (DateTime.Now - recoveryUser.PassRecoveryTokenDate.Value).TotalMinutes >= 30)
             {
                 message = "Время восстановления пароля истекло.<br/>Попробуйте снова.";
                 success = false;
                 return Redirect($"PasswordRecoveryMessage?message={message}&success={success}");
             }
-            
+
             return View();
         }
         //Результат восстановления пароля
@@ -108,15 +111,15 @@ namespace diplom.Controllers
         {
             List<User> users = await _context.User.ToListAsync();
             var logUser = await _context.User
-                .FirstOrDefaultAsync(m => m.Email == user.Email && m.HashPass == _passwordService.HashPassword(user.HashPass));
+                .FirstOrDefaultAsync(m => m.Email == user.Email && 
+                m.HashPass == _passwordService.HashPassword(user.HashPass));
+
             if (logUser == null)
-            {
                 return Redirect("/Users/AuthError?error=wrongemail");
-            }
             else
             {
                 HttpContext.Session.SetInt32("UserID", logUser.ID);
-                HttpContext.Session.SetString("UserName", logUser.FName);
+                HttpContext.Session.SetString("UserName", logUser.FName ?? "Не найдено");
                 return Redirect("/Projects/AllProjects");
             }
         }
@@ -134,6 +137,7 @@ namespace diplom.Controllers
         {
             var recoveryUser = await _context.User
                 .FirstOrDefaultAsync(m => m.Email == user.Email);
+
             if (recoveryUser == null || !recoveryUser.IsActive)
             {
                 return Redirect("/Users/PasswordRecoveryError?error=wrongemail");
@@ -145,6 +149,7 @@ namespace diplom.Controllers
 
                     string templatePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "emailMessages", "passRecovery.html");
                     string emailTemplate = System.IO.File.ReadAllText(templatePath);
+
                     string recoveryLink = $"https://localhost:7297/Users/PasswordRecovery?token={recoveryUser.PassRecoveryToken}";
                     string emailBody = emailTemplate.Replace("{recoveryLink}", recoveryLink);
                     emailBody = emailBody.Replace("{FName}", recoveryUser.FName);
@@ -162,24 +167,22 @@ namespace diplom.Controllers
         {
             bool success;
             string message;
-            User recoveryUser = _context.User.FirstOrDefault(u => u.PassRecoveryToken == token);
+            User? recoveryUser = _context.User.FirstOrDefault(u => u.PassRecoveryToken == token);
 
-            if (recoveryUser == null || (DateTime.Now - recoveryUser.PassRecoveryTokenDate).Value.Minutes >= 30)
+            if (recoveryUser == null ||
+            !recoveryUser.PassRecoveryTokenDate.HasValue ||
+            (DateTime.Now - recoveryUser.PassRecoveryTokenDate.Value).TotalMinutes >= 30)
             {
                 message = "Ошибка восстановления пароля.";
                 success = false;
                 return Redirect($"PasswordRecoveryMessage?message={message}&success={success}");
             }
 
-
             recoveryUser.HashPass = _passwordService.HashPassword(user.HashPass);
             HashPassRepeat = _passwordService.HashPassword(HashPassRepeat);
 
             if (recoveryUser.HashPass != HashPassRepeat)
-            {
-
                 return Redirect($"/Users/PasswordRecoveryError?error=wrongpass&token={token}");
-            }
 
             recoveryUser.PassRecoveryToken = null;
             recoveryUser.PassRecoveryTokenDate = null;
@@ -201,13 +204,9 @@ namespace diplom.Controllers
             var existingUser = await _context.User.FirstOrDefaultAsync(u => u.Email == user.Email);
 
             if (existingUser != null)
-            {
                 return Redirect("/Users/RegError?view=Registration");
-            }
             if (!_passwordService.IsPasswordValid(user.HashPass))
-            {
                 return Redirect("/Users/RegError?view=Registration&errorType=password");
-            }
 
             user.HashPass = _passwordService.HashPassword(user.HashPass);
             user.IsActive = false;
@@ -229,14 +228,13 @@ namespace diplom.Controllers
 
                 _mailService.SendEmail(emailBody, "Активация аккаунта", user.Email);
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 return Redirect($"WrongEmailReg?email={user.Email}");
             }
 
             
             await _context.SaveChangesAsync();
-
             return Redirect($"AwaitingConfirmation?email={user.Email}");
         }
 
@@ -244,13 +242,13 @@ namespace diplom.Controllers
         [HttpGet]
         public  IActionResult ActivationUser(string token)
         {
-            User existingUser = _context.User.FirstOrDefault(u => u.RegToken == token);
+            User? existingUser = _context.User.FirstOrDefault(u => u.RegToken == token);
             if (existingUser == null)
             {
                 ViewBag.message = "Ошибка активации аккаунта.";
                 ViewBag.success = false;
             }
-            else if ((DateTime.Now - existingUser.RegTokenDate).Value.Minutes >= 30)
+            else if (!existingUser.RegTokenDate.HasValue || (DateTime.Now - existingUser.RegTokenDate.Value).TotalMinutes >= 30)
             {
                 ViewBag.message = "Время активации аккаунта истекло.<br/>Попробуйте снова.";
                 ViewBag.success = false;
@@ -274,22 +272,26 @@ namespace diplom.Controllers
         [HttpPost]
         public async Task<IActionResult> UpdateProfileName([Bind("ID,FName,LName")] User user)
         {
-            int? userSessionID = HttpContext.Session.GetInt32("UserID");
-            var currentUser = _context.User.FirstOrDefault(x => x.ID == userSessionID);
+            User? currentUser = await _userService.GetCurrentUser(HttpContext);
+            if (currentUser == null)
+                return NotFound();
+
             currentUser.LName = user.LName;
             currentUser.FName = user.FName;
-            HttpContext.Session.SetString("UserName", user.FName);
+            HttpContext.Session.SetString("UserName", user.FName ?? "Не найдено");
 
             await _context.SaveChangesAsync();
             return Redirect("UserProfile");
+
         }
 
         // Изменение пароля пользователя
         [HttpPost]
         public async Task<IActionResult> UpdateProfilePassword([Bind("ID,HashPass")] User user)
         {
-            int? userSessionID = HttpContext.Session.GetInt32("UserID");
-            var currentUser = _context.User.FirstOrDefault(x => x.ID == userSessionID);
+            User? currentUser = await _userService.GetCurrentUser(HttpContext);
+            if (currentUser == null)
+                return NotFound();
 
             currentUser.HashPass = _passwordService.HashPassword(user.HashPass);
             await _context.SaveChangesAsync();

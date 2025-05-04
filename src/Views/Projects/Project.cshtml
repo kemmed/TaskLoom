@@ -48,7 +48,7 @@
                                     <p>Завершить до: @(task.DeadlineDate?.ToString("dd.MM.yyyy") ?? "нет срока")</p>
                                 </a>
 
-                                
+
                                 @if (task.CreatorID == ViewBag.UserID)
                                 {
                                     <a href="#delete-task" rel="modal:open" class="delete-task-button" data-task-id="@task.ID">
@@ -76,7 +76,6 @@
         }
     }
 }
-
 
 <script>
     document.addEventListener('DOMContentLoaded', function () {
@@ -113,6 +112,7 @@
         });
     });
 </script>
+
 
 <script>
     document.addEventListener('DOMContentLoaded', function () {

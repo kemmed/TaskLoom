@@ -1,28 +1,4 @@
 ﻿window.onload = function () {
-
-    //document.addEventListener('DOMContentLoaded', function () {
-    //    const inputDate = document.querySelector('.input-date');
-    //    const selectInputs = document.querySelectorAll('.input-select');
-
-    //    //const today = new Date();
-    //    //const formattedDate = today.toISOString().split('T')[0];
-    //    //inputDate.value = formattedDate;
-    //    inputDate.value = Date.now;
-
-    //    // Установка первого пункта в выпадающих списках
-    //    selectInputs.forEach(select => {
-    //        if (select.options.length > 1) {
-    //            select.selectedIndex = 1;
-    //        }
-    //    });
-    //});
-
-    //function Copy() {
-    //    var Url = document.createElement("textarea");
-    //    Url.innerHTML = window.location.href;
-    //    Copied = Url.createTextRange();
-    //    Copied.execCommand("Copy");
-    //}
     (function () {
         const inputText = document.querySelectorAll('.form__input');
 

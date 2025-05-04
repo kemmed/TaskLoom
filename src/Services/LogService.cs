@@ -18,12 +18,13 @@ namespace diplom.Services
 
         public void LogAction(int projectID, string action, int? userID = null)
         {
-            var user = userID.HasValue ? _context.User.FirstOrDefault(u => u.ID == userID) : null;
+            User? user = userID.HasValue ? _context.User.FirstOrDefault(u => u.ID == userID.Value) : null;
+            string userName = user != null ? $"{user.FName} {user.LName}" : " ";
 
             Log log = new Log
             {
                 DateTime = DateTime.Now,
-                Event = $"Пользователь {user.FName} {user.LName} {action}.",
+                Event = $"Пользователь {userName} {action}.",
                 ProjectID = projectID
             };
 
