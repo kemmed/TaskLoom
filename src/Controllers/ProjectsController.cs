@@ -998,7 +998,7 @@ namespace diplom.Controllers
         public async Task<IActionResult> UpdateIssueStatusAsync(int currIssueID, int currStatusID)
         {
             User? currentUser = await _userService.GetCurrentUser(HttpContext);
-            Issue? currIssue = _context.Issue.FirstOrDefault(x => x.ID == currIssueID);
+            Issue? currIssue = _context.Issue.Include(x=>x.StatusType).FirstOrDefault(x => x.ID == currIssueID);
             StatusType? newStatus = _context.StatusType.FirstOrDefault(x => x.ID == currStatusID);
             if (currIssue == null ||
                 currentUser == null ||

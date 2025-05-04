@@ -338,7 +338,7 @@
                                 @(issue.CreatorID != ViewBag.UserID ? "disabled" : "")>
                             @foreach (var option in ViewBag.Responsibilities)
                             {
-                                <!option value="@option.Value" @((issue.Performer.ID.ToString() == option.Value) ? "selected" : "")>@option.Text</!option>
+                                <!option value="@option.Value" @((issue.Performer != null && issue.Performer.ID.ToString() == option.Value) ? "selected" : "")>@option.Text</!option>
                             }
                         </select>
                     </label>

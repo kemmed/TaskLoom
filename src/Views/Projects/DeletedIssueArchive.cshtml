@@ -7,21 +7,21 @@
 }
 <div class="container">
     <h2 class="modal-title">Архив задач</h2>
-    <table class="project-table">
-        <thead>
-            <tr>
-                <th>Название</th>
-                <th>Описание</th>
-                <th>Категория</th>
-                <th>Ответственный</th>
-                <th>Срок</th>
-                <th>Удалена</th>
-                <th></th>
-            </tr>
-        </thead>
-        <tbody>
-            @if (Model.Count != 0 )
-            {
+    @if (Model.Count != 0)
+    {
+        <table class="project-table">
+            <thead>
+                <tr>
+                    <th>Название</th>
+                    <th>Описание</th>
+                    <th>Категория</th>
+                    <th>Ответственный</th>
+                    <th>Срок</th>
+                    <th>Удалена</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
                 @foreach (var task in Model)
                 {
                     <tr>
@@ -30,7 +30,7 @@
                         <td>@task.CategoryType?.Name</td>
                         <td>@task.Performer?.LName @task.Performer?.FName</td>
                         <td>@task.DeadlineDate?.ToString("dd.MM.yyyy")</td>
-                        <td>@task.DeleteDate.Value.ToString("dd.MM.yyyy HH:mm")</td>
+                        <td>@(task.DeleteDate.HasValue ? task.DeleteDate.Value.ToString("dd.MM.yyyy HH:mm") : "")</td>
                         <td class="exclude-user">
                             <div class="button-a">
                                 <a href="#restore-task" rel="modal:open" class="input__submit confirm restore-task-button" data-task-id="@task.ID">
@@ -40,18 +40,18 @@
                         </td>
                     </tr>
                 }
-            }
-            else
-            {
-                <div class="centered-container project-massage">
-                    <div class="message-container">
-                        <h2>Здесь пока задач</h2>
-                        <p>Из прокекта пока не удалено ни одной задачи.</p>
-                    </div>
-                </div>
-            }
-        </tbody>
-    </table>
+            </tbody>
+        </table>
+    }
+    else
+    {
+        <div class="centered-container project-massage">
+            <div class="message-container">
+                <h2>Здесь пока задач</h2>
+                <p>Из прокекта пока не удалено ни одной задачи.</p>
+            </div>
+        </div>
+    }
 </div>
 
 

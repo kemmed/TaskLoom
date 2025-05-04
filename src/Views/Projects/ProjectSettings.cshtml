@@ -48,7 +48,8 @@
                 </label>
                 <label class="input-form__label add-project">
                     <span class="input-placeholder select-date">срок</span>
-                    <input class="form__input input-date" type="date" name="DeadlineDate" required value="@Model.DeadlineDate.Value.ToString("yyyy-MM-dd")">
+                    <input class="form__input input-date" type="date" name="DeadlineDate" required
+                    value="@(Model.DeadlineDate.HasValue ? Model.DeadlineDate.Value.ToString("yyyy-MM-dd") : "")">
                 </label>
                 <button class="input__submit confirm no-margin">Сохранить <i class="las la-save"></i></button>
             }
@@ -72,7 +73,8 @@
                 </label>
                 <label class="input-form__label add-project">
                     <span class="input-placeholder select-date">срок</span>
-                    <input class="form__input input-date" type="date" value="@Model.DeadlineDate.Value.ToString("yyyy-MM-dd")" disabled>
+                    <input class="form__input input-date" type="date"
+                    value="@(Model.DeadlineDate.HasValue ? Model.DeadlineDate.Value.ToString("yyyy-MM-dd") : "")" disabled>
                 </label>
             }
         </form>
@@ -172,9 +174,9 @@
 
         @if (ViewBag.PendingUsers != null && ViewBag.PendingUsers.Count > 0)
         {
-        <div class="config-title-container">
-            <h2>Ожидают принятия приглашения</h2>
-        </div>
+            <div class="config-title-container">
+                <h2>Ожидают принятия приглашения</h2>
+            </div>
             <table class="project-table">
                 <thead>
                     <tr>
@@ -258,37 +260,44 @@
 </form>
 
 <div id="edit-category" class="modal">
-    @foreach (var category in Model.CategoryTypes)
+    @if (Model.CategoryTypes != null)
     {
-        <div id="EDIT_CATEGORY@(category.ID)" class="hidden categoryform">
-            <form asp-action="EditCategory" asp-controller="Projects">
-                <input type="hidden" value="@category.ID" name="categoryID" />
-                <div class="modal-container">
-                    <h1 class="modal-title">Редактировать категорию</h1>
-                    <label class="input-form__label add-project">
-                        <span class="input-placeholder">название категории</span>
-                        <input class="form__input input-name" name="Name" autocomplete="off" value="@category.Name" required>
-                    </label>
-                    <button class="input__submit confirm">Сохранить<i class="las la-save"></i></button>
-                </div>
-            </form>
-        </div>
+        @foreach (var category in Model.CategoryTypes)
+        {
+            <div id="EDIT_CATEGORY@(category.ID)" class="hidden categoryform">
+                <form asp-action="EditCategory" asp-controller="Projects">
+                    <input type="hidden" value="@category.ID" name="categoryID" />
+                    <div class="modal-container">
+                        <h1 class="modal-title">Редактировать категорию</h1>
+                        <label class="input-form__label add-project">
+                            <span class="input-placeholder">название категории</span>
+                            <input class="form__input input-name" name="Name" autocomplete="off" value="@category.Name" required>
+                        </label>
+                        <button class="input__submit confirm">Сохранить<i class="las la-save"></i></button>
+                    </div>
+                </form>
+            </div>
+        }
+
     }
     <a href="#" rel="modal:close"></a>
 </div>
 <div id="delete-category" class="modal">
-    @foreach (var category in Model.CategoryTypes)
+    @if (Model.CategoryTypes != null)
     {
-        <div id="DELETE_CATEGORY@(category.ID)" class="hidden categoryform">
-            <form asp-action="DeleteCategory" asp-controller="Projects">
-                <input type="hidden" value="@category.ID" name="categoryID" />
-                <div class="modal-container">
-                    <h1 class="modal-title">Подтвердите удаление категории</h1>
-                    <p class="delete-text">После удаления категорию невозможно будет восстановить.</p>
-                    <button class="input__submit cancel">Удалить <i class="las la-trash-alt"></i></button>
-                </div>
-            </form>
-        </div>
+        @foreach (var category in Model.CategoryTypes)
+        {
+            <div id="DELETE_CATEGORY@(category.ID)" class="hidden categoryform">
+                <form asp-action="DeleteCategory" asp-controller="Projects">
+                    <input type="hidden" value="@category.ID" name="categoryID" />
+                    <div class="modal-container">
+                        <h1 class="modal-title">Подтвердите удаление категории</h1>
+                        <p class="delete-text">После удаления категорию невозможно будет восстановить.</p>
+                        <button class="input__submit cancel">Удалить <i class="las la-trash-alt"></i></button>
+                    </div>
+                </form>
+            </div>
+        }   
     }
     <a href="#" rel="modal:close"></a>
 </div>
@@ -409,7 +418,7 @@
                 <input type="hidden" value="@Model.ID" name="projectID" />
                 <div class="modal-container">
                     <h1 class="modal-title">Категории пользователя</h1>
-                    @if (Model.CategoryTypes.Count != 0)
+                    @if (Model.CategoryTypes != null && Model.CategoryTypes.Count != 0)
                     {
 
                         @foreach (var category in Model.CategoryTypes)

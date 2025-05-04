@@ -3,7 +3,7 @@
     using System;
     public class TokenService
     {
-        private readonly Random _rnd = new Random();
+        private readonly Random _rnd = new();
 
         public string GenerateToken()
         {

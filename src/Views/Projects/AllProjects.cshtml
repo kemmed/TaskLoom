@@ -177,7 +177,7 @@ else
                     <label class="input-form__label add-project">
                         <span class="input-placeholder select-date">срок</span>
                         <input class="form__input input-date" type="date" name="DeadlineDate" required
-                               value="@project.DeadlineDate.Value.ToString("yyyy-MM-dd")"
+                               value="@(project.DeadlineDate.HasValue ? project.DeadlineDate.Value.ToString("yyyy-MM-dd") : "")"
                         @(isAdmin ? "" : "disabled")>
                     </label>
 
