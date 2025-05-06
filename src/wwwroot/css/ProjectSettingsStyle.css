@@ -74,6 +74,9 @@
     justify-content: center;
     gap: 15px;
 }
+.config-title-container .modal-title {
+    margin:0 ;
+}
 
 .config-tabel-title {
     text-align: center;

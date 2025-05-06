@@ -42,7 +42,14 @@ namespace diplom.Services
             if (projectID == null)
                 return null;
 
-            Project? project = await _context.Project.FindAsync(projectID);
+            Project? project = await _context.Project
+                .Include(x => x.Issues)
+                .Include(x=>x.StatusTypes)
+                .Include(x=>x.PriorityTypes)
+                .Include(x=>x.CategoryTypes)
+                .Include(x=>x.UserProjects)
+                .ThenInclude(u => u.User)
+                .FirstOrDefaultAsync(x=>x.ID==projectID);
             return project;
         }
         public async Task<UserProject?> GetUserProjectByID(int? projectID, int? userID)

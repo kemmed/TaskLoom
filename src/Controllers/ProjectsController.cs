@@ -16,6 +16,10 @@ using System.Net;
 using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.Blazor;
 using DocumentFormat.OpenXml.Spreadsheet;
+using DocumentFormat.OpenXml.Bibliography;
+using Issue = diplom.Models.Issue;
+using static System.Runtime.InteropServices.JavaScript.JSType;
+using System.Xml.Linq;
 
 namespace diplom.Controllers
 {
@@ -40,6 +44,129 @@ namespace diplom.Controllers
         {
             ViewBag.message = message;
             ViewBag.projectID = projectID;
+            return View();
+        }
+        [HttpGet("/Projects/ProjectStatistics/{projectID}")]
+        public async Task<IActionResult> ProjectStatistics(int projectID, string startDate = null, string endDate = null, int[] selectedCategories = null)
+        {
+            User? currentUser = await _userService.GetCurrentUser(HttpContext);
+            Models.Project? currentProject = await _userService.GetProjectByID(projectID);
+            if (currentProject == null || currentUser == null)
+                return NotFound();
+
+            var issues = currentProject.Issues.Where(issue => !issue.IsDelete).ToList();
+
+            var completedIssues = issues.Count(i => i.StatusType.Name == "Завершенные");
+            decimal completionPercentage = issues.Count() > 0 ? (decimal)completedIssues / issues.Count() * 100 : 0;
+
+            var allStatuses = await _context.StatusType
+                .Where(st => st.ProjectID == currentProject.ID)
+                .ToListAsync();
+
+            var statusCounts = new Dictionary<string, int>();
+            foreach (var status in allStatuses)
+            {
+                if (status.Name != "Завершенные")
+                    statusCounts[status.Name] = 0;
+            }
+
+            foreach (var issue in issues)
+            {
+                if (issue.StatusType.Name != "Завершенные")
+                {
+                    if (statusCounts.ContainsKey(issue.StatusType.Name))
+                        statusCounts[issue.StatusType.Name]++;
+                }
+            }
+
+            var priorityCounts = new Dictionary<string, int>
+                {
+                    { "Низкий", issues.Count(i => i.PriorityType.Name == "Низкий") },
+                    { "Средний", issues.Count(i => i.PriorityType.Name == "Средний") },
+                    { "Высокий", issues.Count(i => i.PriorityType.Name == "Высокий") }
+                };
+
+            var userStatistics = currentProject.UserProjects
+                .Select(up => up.User)
+                .Where(user => user != null)
+                .Select(user => new
+                {
+                    UserName = $"{user.LName} {user.FName}",
+                    CompletedOnTime = issues
+                        .Count(i => i.PerformerID == user.ID && 
+                        i.EndDate != null && 
+                        i.EndDate.Value.Date <= i.DeadlineDate.Value.Date),
+                    CompletedLater = issues
+                        .Count(i => i.PerformerID == user.ID  && 
+                        (i.EndDate == null && DateTime.Now.Date >= i.DeadlineDate.Value.Date || 
+                        (i.EndDate != null && i.EndDate.Value.Date > i.DeadlineDate.Value.Date)))
+                })
+                .ToList();
+
+            if (string.IsNullOrEmpty(startDate) || string.IsNullOrEmpty(endDate))
+            {
+                var today = DateTime.Today;
+                var startOfWeek = today.AddDays(-(int)today.DayOfWeek + (int)DayOfWeek.Monday);
+                var endOfWeek = startOfWeek.AddDays(6);
+                startDate = startOfWeek.ToString("yyyy-MM-dd");
+                endDate = endOfWeek.ToString("yyyy-MM-dd");
+            }
+            DateTime start = DateTime.Parse(startDate);
+            DateTime end = DateTime.Parse(endDate);
+
+            issues = issues.Where(i => i.CreateDate.Date >= start && i.CreateDate.Date <= end).ToList();
+
+            if (selectedCategories != null && selectedCategories.Length > 0)
+                issues = issues
+                    .Where(i => i.CategoryTypeID.HasValue && selectedCategories
+                    .Contains(i.CategoryTypeID.Value))
+                    .ToList();
+
+            var groupedIssuesCreate = issues
+                .GroupBy(i => i.CreateDate.Date)
+                .OrderBy(g => g.Key)
+                .ToDictionary(g => g.Key, g => g.Count());
+
+            var groupedIssuesDone = issues
+                .Where(i => i.EndDate!=null)
+                .GroupBy(i => i.EndDate.Value.Date)
+                .OrderBy(g => g.Key)
+                .ToDictionary(g => g.Key, g => g.Count());
+
+            string chartDataCreate = "";
+            string chartDataDone= "";
+
+            Dictionary<DateTime, int> dateIssue = new Dictionary<DateTime, int>();
+
+            for (DateTime date = start; date <= end; date = date.AddDays(1))
+            {
+                chartDataDone += "{";
+                chartDataDone += $"x: '{date.Date.ToString("dd.MM.yy")}', y: {(groupedIssuesDone.ContainsKey(date) ? groupedIssuesDone[date] : 0)}";
+                chartDataDone += "}, ";
+
+                chartDataCreate += "{";
+                chartDataCreate += $"x: '{date.Date.ToString("dd.MM.yy")}', y: {(groupedIssuesCreate.ContainsKey(date) ? groupedIssuesCreate[date] : 0)}";
+                chartDataCreate += "}, ";
+            }
+
+            ViewBag.StartDate = startDate;
+            ViewBag.EndDate = endDate;
+
+            ViewBag.CompletedIssues = completedIssues;
+            ViewBag.StatusCounts = statusCounts;
+
+            ViewBag.CompletionPercentage = completionPercentage;
+
+            ViewBag.PriorityCounts = priorityCounts;
+
+            ViewBag.UserStatistics = userStatistics;
+            ViewBag.ProjectID = projectID;
+            ViewBag.ChartDataCreate = chartDataCreate;
+            ViewBag.ChartDataDone = chartDataDone;
+
+            ViewBag.CategoryTypes = _context.CategoryType.Where(x => x.ProjectID == currentProject.ID).ToList();
+            ViewBag.SelectedCategories = selectedCategories?.ToList() ?? new List<int>();
+
             return View();
         }
         public async Task<IActionResult> AllProjects(string? statusFilter = null)
@@ -669,7 +796,7 @@ namespace diplom.Controllers
                 currentUser.ID);
 
             await _context.SaveChangesAsync();
-            return Redirect($"/Projects/ProjectSettings/{userProject.ID}#users-section");
+            return Redirect($"/Projects/ProjectSettings/{userProject.ProjectID}#users-section");
         }
 
         //Выход из проекта
@@ -897,11 +1024,17 @@ namespace diplom.Controllers
             else
                 currIssue.DeadlineDate = null;
 
+            if (issue.StatusTypeID == _context.StatusType.FirstOrDefault(x => x.Name == "Завершенные" && x.ProjectID == currIssue.ProjectID).ID)
+                currIssue.EndDate = DateTime.Now.Date;
+            else if (currIssue.StatusType == _context.StatusType.FirstOrDefault(x => x.Name == "Завершенные" && x.ProjectID == currIssue.ProjectID))
+                currIssue.EndDate = null;
+
             currIssue.PerformerID = issue.PerformerID;
             currIssue.PriorityTypeID = issue.PriorityTypeID;
             currIssue.StatusTypeID = issue.StatusTypeID;
             currIssue.CategoryTypeID = issue.CategoryTypeID;
             currIssue.IsDelete = false;
+            _context.SaveChanges();
 
             List<string> changes = [];
             if (oldName != currIssue.Name)
@@ -1008,6 +1141,11 @@ namespace diplom.Controllers
 
             if (currIssue.StatusTypeID == currStatusID)
                 return Redirect($"/Projects/Project/{currIssue.ProjectID}");
+
+            else if (currStatusID == _context.StatusType.FirstOrDefault(x => x.Name == "Завершенные" && x.ProjectID == currIssue.ProjectID).ID)
+                    currIssue.EndDate = DateTime.Now.Date;
+            else if (currIssue.StatusType == _context.StatusType.FirstOrDefault(x => x.Name == "Завершенные" && x.ProjectID == currIssue.ProjectID))
+                currIssue.EndDate = null;
 
             string? oldStatusName = currIssue.StatusType.Name;
             currIssue.StatusTypeID = currStatusID;

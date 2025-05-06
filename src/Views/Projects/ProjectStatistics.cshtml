@@ -1,0 +1,149 @@
+﻿@using diplom.Models
+@using diplom.Controllers
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+@{
+    Layout = "_Layout";
+    ViewData["Username"] = Context.Session.GetString("UserName");
+}
+
+<h2 class="modal-title">Статистика проекта</h2>
+<div class="tab-content">
+    <div class="issue-container">
+
+        <div class="status-container ">
+            <div class="container-item completed">
+                <span>@ViewBag.CompletionPercentage.ToString("F0")%</span><br>
+                <p>Завершено</p>
+            </div>
+
+            <div class="priority-container">
+                @foreach (var item in ViewBag.StatusCounts as Dictionary<string, int>)
+                {
+                    <div class="container-item">
+                        <span>@item.Value</span><br>
+                        <p>@item.Key</p>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <div class="priority-container">
+            @foreach (var item in ViewBag.PriorityCounts as Dictionary<string, int>)
+            {
+                <div class="container-item @GetPriorityClass(item.Key)">
+                    <span>@item.Value</span><br>
+                    <p>@item.Key</p>
+                </div>
+            }
+        </div>
+    </div>
+    @functions {
+        private string GetPriorityClass(string priority)
+        {
+            switch (priority)
+            {
+                case "Высокий": return "priority-high-text";
+                case "Средний": return "priority-medium-text";
+                case "Низкий": return "priority-low-text";
+                default: return "";
+            }
+        }
+    }
+
+    <div class="statistics-container">
+
+        <div class="statistics">
+            <div class="chart-container">
+                <form class="chart-settings" asp-action="ProjectStatistics" asp-controller="Projects" method="get">
+                    <h4>Период</h4>
+                    <span class="date-container">
+                        <input type="date" class="form__input input-date" name="startDate" value="@ViewBag.StartDate" required>
+                        <label> - </label>
+                        <input type="date" class="form__input input-date" name="endDate" value="@ViewBag.EndDate" required>
+                    </span>
+                    <h4>Категории</h4>
+                    <div class="category-chart-container">
+
+                        @foreach (CategoryType category in ViewBag.CategoryTypes)
+                        {
+                            <div class="category-item">
+                                <input type="checkbox" name="selectedCategories" value="@category.ID" @(ViewBag.SelectedCategories.Contains(category.ID) ? "checked" : "") />
+                                @category.Name
+                            </div>
+                        }
+                    </div>
+                    <div class="button-a">
+                        <button class="input__submit confirm">Применить</button>
+                        <a href="/Projects/ProjectStatistics/@ViewBag.ProjectID" class="input__submit cancel">Сбросить все </a>
+                    </div>
+                </form>
+                <div class="issues-chart">
+                    <h3>Выполенные задачи</h3>  
+                    <canvas id="issuesChart" width="400" height="200"></canvas>
+
+                </div>
+            </div>
+        </div>
+        <div class="user-rating">
+            <h3>Рейтинг пользователей</h3>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Имя пользователя</th>
+                        <th>Выполнено</th>
+                        <th>Просрочено</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var user in ViewBag.UserStatistics)
+                    {
+                        <tr>
+                            <td>@user.UserName</td>
+                            <td>@user.CompletedOnTime</td>
+                            <td>@user.CompletedLater</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    var ctx = document.getElementById('issuesChart');
+
+    var myChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            datasets: [{
+                label: 'Создано',
+                data: [@Html.Raw(@ViewBag.ChartDataCreate)],
+                backgroundColor: 'rgba(118, 175, 204, 0.4)',
+                borderColor: 'rgba(83, 146, 178, 1)',
+                borderWidth: 2
+            },
+            {
+                label: 'Выполнено',
+                data: [@Html.Raw(@ViewBag.chartDataDone)],
+                backgroundColor: 'rgba(119, 173, 132, 0.4)',
+                borderColor: 'rgba(93, 142, 105 , 1)',
+                borderWidth: 2
+            }
+            ]
+        },
+
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            stepSize: 1
+                        }
+                    }
+                }
+            }
+
+    });
+</script> 

@@ -16,7 +16,7 @@
                 @if (ViewBag.UserRole == UserRoles.Admin)
                 {
                     <a href="/Projects/ProjectHistory/@ViewBag.ProjectID" class="input__submit">История действий <i class="las la-history"></i></a>
-                    <a href="/Projects/Statistics/@ViewBag.ProjectID" class="input__submit">Статистика проекта <i class="las la-chart-bar"></i></a>
+                    <a href="/Projects/ProjectStatistics/@ViewBag.ProjectID" class="input__submit">Статистика проекта <i class="las la-chart-bar"></i></a>
                 }
             }
             <a href="#leave-project" class="input__submit cancel" rel="modal:open">Покинуть проект <i class="las la-sign-out-alt"></i></a>
@@ -82,7 +82,7 @@
 
     <div class="users-section" id="users-section">
         <div class="config-title-container">
-            <h2 class="config-title">Сотрудники</h2>
+            <h2 class="modal-title">Сотрудники</h2>
             @if (ViewBag.UserRole == UserRoles.Admin)
             {
                 <div class="button-a">
@@ -201,7 +201,7 @@
 
     <div class="categories-section" id="categories-section">
         <div class="config-title-container">
-            <h2 class="config-title">Категории задач</h2>
+            <h2 class="modal-title">Категории задач</h2>
             @if (ViewBag.UserRole == UserRoles.Admin || ViewBag.UserRole == UserRoles.Manager)
             {
                 <div class="button-a">
