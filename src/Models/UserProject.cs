@@ -15,7 +15,7 @@
         public User User { get; set; }
         public Project Project { get; set; }
 
-        public List<CategoryType> CategoryTypes { get; set; }
+        public List<CategoryType>? CategoryTypes { get; set; }
 
         public string ConvertRoles(UserRoles userRoles)
         {

@@ -931,9 +931,9 @@ namespace diplom.Controllers
                 !await _userService.UserIsInProject(currentProject.ID, currentUser.ID))
                 return NotFound();
 
-            if (category.Issues != null)
+            if (category.Project.Issues != null)
             {
-                foreach (Issue issue in category.Issues)
+                foreach (Issue issue in category.Project.Issues)
                 {
                     issue.CategoryType = null;
                     issue.CategoryTypeID = null;
@@ -1202,35 +1202,6 @@ namespace diplom.Controllers
                 "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
                 $"ProjectHistory_{currentProject.Name}.xlsx"
             );
-        }
-
-        [HttpGet("/Projects/GetIssueInfo/{issueID}")]
-        public async Task<IActionResult> GetIssueInfo(int issueID)
-        {
-            User? currentUser = await _userService.GetCurrentUser(HttpContext);
-            Issue? currIssue = await _context.Issue
-                .Include(i => i.Project)
-                .Include(i => i.Creator)
-                .Include(i => i.Performer)
-                .FirstOrDefaultAsync(x => x.ID == issueID);
-            if (currIssue == null ||
-                currentUser == null ||
-                !await _userService.UserIsInProject(currIssue.ProjectID, currentUser.ID))
-                return NotFound();
-
-            var result = new
-            {
-                currIssue = new
-                {
-                    currIssue.ID,
-                    currIssue.Name,
-                    currIssue.Description
-
-                },
-                isCreator = currIssue.Creator?.ID == currentUser.ID
-            };
-
-            return Ok(result);
         }
 
     }

@@ -78,37 +78,37 @@
 }
 
 <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const taskColumns = document.querySelectorAll('.task-list');
+    document.addEventListener('DOMContentLoaded', () => {
+        document.querySelectorAll('.task-list').forEach(list => {
+            if (list.children.length === 0) list.classList.add('is-empty');
 
-        taskColumns.forEach(column => {
-            Sortable.create(column, {
-                group: 'tasks',
+            Sortable.create(list, {
+                group: { name: 'tasks', pull: true, put: true },
                 animation: 150,
                 ghostClass: 'sortable-ghost',
-                emptyInsertThreshold: 250,
 
-                onEnd: function (evt) {
-                    const draggedTask = evt.item;
-                    const issueID = draggedTask.dataset.taskId;
-                    const targetColumn = evt.to;
-                    const statusID = targetColumn.closest('.task-column').dataset.statusId;
-
-                    fetch(`/Projects/UpdateIssueStatus?currIssueID=${encodeURIComponent(issueID)}&currStatusID=${encodeURIComponent(statusID)}`)
-                        .then(response => {
-                            if (!response.ok) {
-                                throw new Error('Network response was not ok');
-                            }
-                            return response.json();
-                        })
-                        .then(data => {
-                            console.log('Status updated:', data);
-                        })
-                        .catch(error => {
-                            console.error('Error updating status:', error);
-                        });
-                }
+                onAdd(evt) {
+                    evt.to.classList.remove('is-empty');
+                    updateIssue(evt);
+                },
+                onRemove(evt) {
+                    if (evt.from.children.length === 0)
+                        evt.from.classList.add('is-empty');
+                },
+                onEnd: updateIssue
             });
+            function updateIssue(evt){
+                const issueID  = evt.item.dataset.taskId;
+                const statusID = evt.to.closest('.task-column').dataset.statusId;
+                const url = `/Projects/UpdateIssueStatus?currIssueID=${
+                    encodeURIComponent(issueID)}&currStatusID=${
+                    encodeURIComponent(statusID)}`;
+
+                fetch(url)
+                    .then(r => r.ok ? r.json() : Promise.reject(r.statusText))
+                    .then(data => console.log('Status updated:', data))
+                    .catch(err  => console.error('Error updating status:', err));
+            }
         });
     });
 </script>
