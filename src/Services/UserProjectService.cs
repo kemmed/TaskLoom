@@ -11,11 +11,11 @@ using Microsoft.EntityFrameworkCore;
 
 namespace diplom.Services
 {
-    public class UserService
+    public class UserProjectService
     {
         private readonly diplomContext _context;
 
-        public UserService(diplomContext context)
+        public UserProjectService(diplomContext context)
         {
             this._context = context;
         }

@@ -4,7 +4,7 @@
     
     public class Project
     {
-
+#pragma warning disable CS8618
         public int ID { get; set; }
         public required string Name { get; set; }
         public string? Description { get; set; }
@@ -15,10 +15,10 @@
         public bool IsDelete { get; set; }
 
         public List<Issue>? Issues { get; set; }
-        public List<PriorityType>? PriorityTypes { get; set; }
-        public List<StatusType>? StatusTypes { get; set; }
+        public List<PriorityType> PriorityTypes { get; set; }
+        public List<StatusType> StatusTypes { get; set; }
         public List<CategoryType>? CategoryTypes { get; set; }
-        public List<UserProject>? UserProjects { get; set; }
+        public List<UserProject> UserProjects { get; set; }
         public List<Log>? Logs { get; set; }
 
         public string ConvertStatus(ProjectStatus projectStatus)

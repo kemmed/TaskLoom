@@ -17,24 +17,36 @@
                 <p>Завершено</p>
             </div>
 
-            <div class="priority-container">
-                @foreach (var item in ViewBag.StatusCounts as Dictionary<string, int>)
-                {
-                    <div class="container-item">
-                        <span>@item.Value</span><br>
-                        <p>@item.Key</p>
-                    </div>
+            <div class="priority-status-container">
+                @{
+                    var statusCounts = ViewBag.StatusCounts as Dictionary<string, int>;
+                    if (statusCounts != null)
+                    {
+                        foreach (var item in statusCounts)
+                        {
+                            <div class="container-item">
+                                <span>@item.Value</span><br>
+                                <p>@item.Key</p>
+                            </div>
+                        }
+                    }
                 }
             </div>
         </div>
 
-        <div class="priority-container">
-            @foreach (var item in ViewBag.PriorityCounts as Dictionary<string, int>)
-            {
-                <div class="container-item @GetPriorityClass(item.Key)">
-                    <span>@item.Value</span><br>
-                    <p>@item.Key</p>
-                </div>
+        <div class="priority-status-container">
+            @{
+                var priorityCounts = ViewBag.PriorityCounts as Dictionary<string, int>;
+                if (priorityCounts != null)
+                {
+                    foreach (var item in priorityCounts)
+                    {
+                        <div class="container-item @GetPriorityClass(item.Key)">
+                            <span>@item.Value</span><br>
+                            <p>@item.Key</p>
+                        </div>
+                    }
+                }
             }
         </div>
     </div>

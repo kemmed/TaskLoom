@@ -2,6 +2,7 @@
 {
     public class MailSettings
     {
+#pragma warning disable CS8618
         public string FromEmail { get; set; }
         public string Password { get; set; }
     }

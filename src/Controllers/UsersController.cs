@@ -23,9 +23,9 @@ namespace diplom.Controllers
         private readonly MailService _mailService;
         private readonly TokenService _tokenService;
         private readonly PasswordService _passwordService;
-        private readonly UserService _userService;
+        private readonly UserProjectService _userService;
 
-        public UsersController(diplomContext context, MailService mailService, TokenService tokenService, PasswordService passwordService, UserService userService)
+        public UsersController(diplomContext context, MailService mailService, TokenService tokenService, PasswordService passwordService, UserProjectService userService)
         {
             _context = context;
             _mailService = mailService;

@@ -3,6 +3,7 @@
     public enum UserRoles { Admin, Manager, Employee}
     public class UserProject
     {
+#pragma warning disable CS8618
         public int ID { get; set; }
         public int UserID { get; set; }
         public int ProjectID { get; set; }
@@ -11,7 +12,6 @@
         public DateTime? InviteTokenDate { get; set; }
         public bool IsCreator { get; set; }
         public bool IsActive { get; set; }
-
         public User User { get; set; }
         public Project Project { get; set; }
 

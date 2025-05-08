@@ -26,7 +26,10 @@ namespace diplom
             builder.Services.AddSingleton<TokenService>();
             builder.Services.AddScoped<LogService>();
             builder.Services.AddScoped<PasswordService>();
-            builder.Services.AddScoped<UserService>();
+            builder.Services.AddScoped<UserProjectService>();
+            builder.Services.AddScoped<ChartService>();
+            builder.Services.AddScoped<SortUsersService>();
+            builder.Services.AddScoped<ExcelReportService>();
 
             builder.Services.AddSession(options =>
             {

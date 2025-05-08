@@ -29,16 +29,29 @@ namespace diplom.Controllers
         private readonly MailService _mailService;
         private readonly TokenService _tokenService;
         private readonly LogService _logService;
-        private readonly UserService _userService;
+        private readonly UserProjectService _userService;
+        private readonly ChartService _chartService;
+        private readonly SortUsersService _sortUsersService;
+        private readonly ExcelReportService _excelReportService;
 
 
-        public ProjectsController(diplomContext context, MailService mailService, TokenService tokenService, LogService logService, UserService userService)
+        public ProjectsController(diplomContext context, 
+            MailService mailService, 
+            TokenService tokenService, 
+            LogService logService, 
+            UserProjectService userService, 
+            ChartService chartService,
+            SortUsersService sortUsersService,
+            ExcelReportService excelReportService)
         {
             _context = context;
             _mailService = mailService;
             _tokenService = tokenService;
             _logService = logService;
             _userService = userService;
+            _chartService = chartService;
+            _sortUsersService = sortUsersService;
+            _excelReportService = excelReportService;
         }
         public IActionResult InviteUserMessage(string message, int projectID)
         {
@@ -47,14 +60,14 @@ namespace diplom.Controllers
             return View();
         }
         [HttpGet("/Projects/ProjectStatistics/{projectID}")]
-        public async Task<IActionResult> ProjectStatistics(int projectID, string startDate = null, string endDate = null, int[] selectedCategories = null)
+        public async Task<IActionResult> ProjectStatistics(int projectID, string? startDate = null, string? endDate = null, int[]? selectedCategories = null)
         {
             User? currentUser = await _userService.GetCurrentUser(HttpContext);
             Models.Project? currentProject = await _userService.GetProjectByID(projectID);
             if (currentProject == null || currentUser == null)
                 return NotFound();
 
-            var issues = currentProject.Issues.Where(issue => !issue.IsDelete).ToList();
+            var issues = currentProject.Issues?.Where(issue => !issue.IsDelete).ToList() ?? new List<Issue>();
 
             var completedIssues = issues.Count(i => i.StatusType.Name == "Завершенные");
             decimal completionPercentage = issues.Count() > 0 ? (decimal)completedIssues / issues.Count() * 100 : 0;
@@ -86,73 +99,29 @@ namespace diplom.Controllers
                     { "Высокий", issues.Count(i => i.PriorityType.Name == "Высокий") }
                 };
 
-            var userStatistics = currentProject.UserProjects
+            var userStatistics = currentProject.UserProjects?
                 .Select(up => up.User)
                 .Where(user => user != null)
                 .Select(user => new
                 {
                     UserName = $"{user.LName} {user.FName}",
                     CompletedOnTime = issues
-                        .Count(i => i.PerformerID == user.ID && 
-                        i.EndDate != null && 
-                        i.EndDate.Value.Date <= i.DeadlineDate.Value.Date),
-                    CompletedLater = issues
-                        .Count(i => i.PerformerID == user.ID  && 
-                        (i.EndDate == null && DateTime.Now.Date >= i.DeadlineDate.Value.Date || 
-                        (i.EndDate != null && i.EndDate.Value.Date > i.DeadlineDate.Value.Date)))
+                        .Count(i => i.PerformerID == user.ID &&
+                            i.EndDate.HasValue &&
+                            i.DeadlineDate.HasValue &&
+                            i.EndDate.Value.Date <= i.DeadlineDate.Value.Date),
+                            CompletedLater = issues
+                        .Count(i => i.PerformerID == user.ID &&
+                        ((i.EndDate == null && i.DeadlineDate.HasValue && DateTime.Now.Date >= i.DeadlineDate.Value.Date) ||
+                        (i.EndDate.HasValue && i.DeadlineDate.HasValue && i.EndDate.Value.Date > i.DeadlineDate.Value.Date)))
                 })
                 .ToList();
 
-            if (string.IsNullOrEmpty(startDate) || string.IsNullOrEmpty(endDate))
-            {
-                var today = DateTime.Today;
-                var startOfWeek = today.AddDays(-(int)today.DayOfWeek + (int)DayOfWeek.Monday);
-                var endOfWeek = startOfWeek.AddDays(6);
-                startDate = startOfWeek.ToString("yyyy-MM-dd");
-                endDate = endOfWeek.ToString("yyyy-MM-dd");
-            }
-            DateTime start = DateTime.Parse(startDate);
-            DateTime end = DateTime.Parse(endDate);
-
-            issues = issues.Where(i => i.CreateDate.Date >= start && i.CreateDate.Date <= end).ToList();
-
-            if (selectedCategories != null && selectedCategories.Length > 0)
-                issues = issues
-                    .Where(i => i.CategoryTypeID.HasValue && selectedCategories
-                    .Contains(i.CategoryTypeID.Value))
-                    .ToList();
-
-            var groupedIssuesCreate = issues
-                .GroupBy(i => i.CreateDate.Date)
-                .OrderBy(g => g.Key)
-                .ToDictionary(g => g.Key, g => g.Count());
-
-            var groupedIssuesDone = issues
-                .Where(i => i.EndDate!=null)
-                .GroupBy(i => i.EndDate.Value.Date)
-                .OrderBy(g => g.Key)
-                .ToDictionary(g => g.Key, g => g.Count());
-
-            string chartDataCreate = "";
-            string chartDataDone= "";
-
-            Dictionary<DateTime, int> dateIssue = new Dictionary<DateTime, int>();
-
-            for (DateTime date = start; date <= end; date = date.AddDays(1))
-            {
-                chartDataDone += "{";
-                chartDataDone += $"x: '{date.Date.ToString("dd.MM.yy")}', y: {(groupedIssuesDone.ContainsKey(date) ? groupedIssuesDone[date] : 0)}";
-                chartDataDone += "}, ";
-
-                chartDataCreate += "{";
-                chartDataCreate += $"x: '{date.Date.ToString("dd.MM.yy")}', y: {(groupedIssuesCreate.ContainsKey(date) ? groupedIssuesCreate[date] : 0)}";
-                chartDataCreate += "}, ";
-            }
+            var (chartDataCreate, chartDataDone) = _chartService.GetChartData(issues, startDate, endDate, selectedCategories);
 
             ViewBag.StartDate = startDate;
             ViewBag.EndDate = endDate;
 
-            ViewBag.CompletedIssues = completedIssues;
             ViewBag.StatusCounts = statusCounts;
 
             ViewBag.CompletionPercentage = completionPercentage;
@@ -176,12 +145,11 @@ namespace diplom.Controllers
                 return Redirect("/Users/Authorization");
 
             var allProjects = _context.Project
-                .Where(x => x.UserProjects
-                .Any(ub => ub.ProjectID == x.ID
+                .Where(x => x.UserProjects != null && x.UserProjects.Any(ub => ub.ProjectID == x.ID
                     && ub.UserID == currentUser.ID
                     && ub.IsActive))
-                .Include(p => p.UserProjects)
-                .ToList();
+            .Include(p => p.UserProjects)
+            .ToList();
 
             var userProject = _context.UserProject.FirstOrDefault(x => x.UserID == currentUser.ID);
 
@@ -205,59 +173,6 @@ namespace diplom.Controllers
             ViewBag.UserRole = userProject?.UserRole;
 
             return View(filteredProjects.ToList());
-        }
-
-        //Сортировка списка ответсвенных с количеством их задач
-        public List<SelectListItem> GetSortedResponsibilities(int projectID)
-        {
-            return _context.UserProject
-                .Where(up => up.ProjectID == projectID)
-                .Select(up => new
-                {
-                    up.UserID,
-                    UserName = up.User.LName + " " + up.User.FName,
-                    TaskCount = _context.Issue
-                        .Count(t => t.ProjectID == projectID
-                            && !t.IsDelete
-                            && t.PerformerID == up.UserID),
-                    NearestDeadline = _context.Issue
-                        .Where(t => t.ProjectID == projectID
-                            && !t.IsDelete
-                            && t.PerformerID == up.UserID
-                            && t.DeadlineDate.HasValue)
-                        .Min(t => t.DeadlineDate)
-                })
-                .AsEnumerable()
-                .OrderBy(u => u.TaskCount)
-                .ThenBy(u => u.NearestDeadline)
-                .Select(u => new SelectListItem
-                {
-                    Value = u.UserID.ToString(),
-                    Text = $"{u.UserName} ({u.TaskCount} {GetTaskWord(u.TaskCount)})"
-                })
-                .ToList();
-        }
-
-        //Метод корректного отображения слова задача
-        public static string GetTaskWord(int count)
-        {
-            count = Math.Abs(count) % 100;
-            var lastDigit = count % 10;
-
-            if (count >= 11 && count <= 14)
-                return "задач";
-
-            switch (lastDigit)
-            {
-                case 1:
-                    return "задача";
-                case 2:
-                case 3:
-                case 4:
-                    return "задачи";
-                default:
-                    return "задач";
-            }
         }
 
         //Изменение списка ответственных в зависимости от выбранной категории
@@ -308,7 +223,7 @@ namespace diplom.Controllers
             .Select(u => new
             {
                 ID = u.UserID,
-                Name = $"{u.UserName} ({u.TaskCount} {GetTaskWord(u.TaskCount)})",
+                Name = $"{u.UserName} ({u.TaskCount} {_sortUsersService.GetTaskWord(u.TaskCount)})",
             }).ToList();
 
             return Json(performers);
@@ -366,7 +281,7 @@ namespace diplom.Controllers
             ViewBag.ProjectName = currentProject.Name;
             ViewBag.ProjectID = currentProject.ID;
 
-            var reponsibilities = GetSortedResponsibilities(currentUser.ID);
+            var reponsibilities = _sortUsersService.GetSortedResponsibilities(currentUser.ID);
 
             var categories = _context.CategoryType.Where(x => x.ProjectID == currentUser.ID)
                 .Select(c => new SelectListItem
@@ -456,7 +371,7 @@ namespace diplom.Controllers
                 .OrderBy(up => up.UserRole)
                 .ToList();
 
-            var userIdsInProject = currentProject.UserProjects.ToList();
+            var userIdsInProject = currentProject.UserProjects?.ToList();
 
             var expirationTime = DateTime.Now.AddHours(-24);
 
@@ -779,7 +694,7 @@ namespace diplom.Controllers
 
             var allCategories = _context.CategoryType.Where(c => c.ProjectID == projectID).ToList();
 
-            userProject.CategoryTypes.Clear();
+            userProject.CategoryTypes?.Clear();
 
             if (selectedCategories != null && selectedCategories.Count != 0)
             {
@@ -787,7 +702,7 @@ namespace diplom.Controllers
                 {
                     var category = allCategories.FirstOrDefault(c => c.ID == categoryId);
                     if (category != null)
-                        userProject.CategoryTypes.Add(category);
+                        userProject.CategoryTypes?.Add(category);
                 }
             };
 
@@ -1024,7 +939,8 @@ namespace diplom.Controllers
             else
                 currIssue.DeadlineDate = null;
 
-            if (issue.StatusTypeID == _context.StatusType.FirstOrDefault(x => x.Name == "Завершенные" && x.ProjectID == currIssue.ProjectID).ID)
+            var completedStatusType = _context.StatusType.FirstOrDefault(x => x.Name == "Завершенные" && x.ProjectID == currIssue.ProjectID);
+            if (completedStatusType != null && issue.StatusTypeID == completedStatusType.ID)
                 currIssue.EndDate = DateTime.Now.Date;
             else if (currIssue.StatusType == _context.StatusType.FirstOrDefault(x => x.Name == "Завершенные" && x.ProjectID == currIssue.ProjectID))
                 currIssue.EndDate = null;
@@ -1138,11 +1054,11 @@ namespace diplom.Controllers
                 newStatus == null ||
                 !await _userService.UserIsInProject(currIssue.ProjectID, currentUser.ID))
                 return NotFound();
-
+            var completedStatusType = _context.StatusType.FirstOrDefault(x => x.Name == "Завершенные" && x.ProjectID == currIssue.ProjectID);
             if (currIssue.StatusTypeID == currStatusID)
                 return Redirect($"/Projects/Project/{currIssue.ProjectID}");
 
-            else if (currStatusID == _context.StatusType.FirstOrDefault(x => x.Name == "Завершенные" && x.ProjectID == currIssue.ProjectID).ID)
+            else if (completedStatusType != null && currStatusID != completedStatusType.ID)
                     currIssue.EndDate = DateTime.Now.Date;
             else if (currIssue.StatusType == _context.StatusType.FirstOrDefault(x => x.Name == "Завершенные" && x.ProjectID == currIssue.ProjectID))
                 currIssue.EndDate = null;
@@ -1175,27 +1091,7 @@ namespace diplom.Controllers
                 .OrderByDescending(x => x.DateTime)
                 .ToList();
 
-            using var workbook = new ClosedXML.Excel.XLWorkbook();
-            var worksheet = workbook.Worksheets.Add("Project History");
-            worksheet.Cell(1, 1).Value = "ДАТА";
-            worksheet.Cell(1, 2).Value = "ДЕЙСТВИЕ";
-
-            var headerRange = worksheet.Range("A1:B1");
-            headerRange.Style.Font.Bold = true;
-            headerRange.Style.Alignment.Horizontal = ClosedXML.Excel.XLAlignmentHorizontalValues.Center;
-
-            int row = 2;
-            foreach (var log in logs)
-            {
-                worksheet.Cell(row, 1).Value = log.DateTime.ToString("dd.MM.yyyy HH:mm");
-                worksheet.Cell(row, 2).Value = log.Event;
-                row++;
-            }
-            worksheet.Columns().AdjustToContents();
-
-            using var stream = new MemoryStream();
-            workbook.SaveAs(stream);
-            var content = stream.ToArray();
+            byte[] content = _excelReportService.CreateExcelLog(logs, currentProject.Name);
 
             return File(
                 content,
