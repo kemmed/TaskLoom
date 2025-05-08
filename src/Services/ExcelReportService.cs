@@ -2,14 +2,14 @@
 using System.Net;
 using System.Text.Json;
 using System.Threading.Tasks;
-using diplom.Models;
-using diplom.Data;
+using taskloom.Models;
+using taskloom.Data;
 using Microsoft.CodeAnalysis;
 using DocumentFormat.OpenXml.Spreadsheet;
-using Project = diplom.Models.Project;
+using Project = taskloom.Models.Project;
 using Microsoft.EntityFrameworkCore;
 
-namespace diplom.Services
+namespace taskloom.Services
 {
     public class ExcelReportService
     {

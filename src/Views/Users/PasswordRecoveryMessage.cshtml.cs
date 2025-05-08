@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
-namespace diplom.Views.Users
+namespace taskloom.Views.Users
 {
     public class PasswordRecoveryMessageModel : PageModel
     {

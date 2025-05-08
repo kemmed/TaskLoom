@@ -5,9 +5,9 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using diplom.Data;
-using diplom.Models;
-using diplom.Services;
+using taskloom.Data;
+using taskloom.Models;
+using taskloom.Services;
 using System.Text;
 using System.Security.Cryptography;
 using NuGet.Common;
@@ -15,17 +15,17 @@ using System.Net;
 using Microsoft.AspNetCore.Http;
 using Microsoft.CodeAnalysis;
 
-namespace diplom.Controllers
+namespace taskloom.Controllers
 {
     public class UsersController : Controller
     {
-        private readonly diplomContext _context;
+        private readonly taskloomContext _context;
         private readonly MailService _mailService;
         private readonly TokenService _tokenService;
         private readonly PasswordService _passwordService;
         private readonly UserProjectService _userService;
 
-        public UsersController(diplomContext context, MailService mailService, TokenService tokenService, PasswordService passwordService, UserProjectService userService)
+        public UsersController(taskloomContext context, MailService mailService, TokenService tokenService, PasswordService passwordService, UserProjectService userService)
         {
             _context = context;
             _mailService = mailService;

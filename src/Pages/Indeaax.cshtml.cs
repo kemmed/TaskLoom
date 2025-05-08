@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
-namespace diplom.Pages
+namespace taskloom.Pages
 {
     public class IndexModel : PageModel
     {

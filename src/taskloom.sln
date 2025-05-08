@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.11.35327.3
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "diplom", "diplom.csproj", "{567FE84D-A6D1-448F-9F57-E5C55C7A62DE}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "taskloom", "taskloom.csproj", "{567FE84D-A6D1-448F-9F57-E5C55C7A62DE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

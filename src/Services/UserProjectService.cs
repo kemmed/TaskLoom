@@ -2,20 +2,20 @@
 using System.Net;
 using System.Text.Json;
 using System.Threading.Tasks;
-using diplom.Models;
-using diplom.Data;
+using taskloom.Models;
+using taskloom.Data;
 using Microsoft.CodeAnalysis;
 using DocumentFormat.OpenXml.Spreadsheet;
-using Project = diplom.Models.Project;
+using Project = taskloom.Models.Project;
 using Microsoft.EntityFrameworkCore;
 
-namespace diplom.Services
+namespace taskloom.Services
 {
     public class UserProjectService
     {
-        private readonly diplomContext _context;
+        private readonly taskloomContext _context;
 
-        public UserProjectService(diplomContext context)
+        public UserProjectService(taskloomContext context)
         {
             _context = context;
         }

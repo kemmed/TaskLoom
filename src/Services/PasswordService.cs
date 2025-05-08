@@ -1,4 +1,4 @@
-﻿namespace diplom.Services
+﻿namespace taskloom.Services
 {
     using System;
     using System.Security.Cryptography;

@@ -1,4 +1,4 @@
-﻿namespace diplom.Models
+﻿namespace taskloom.Models
 {
     public enum ProjectStatus {InProcess, Completed, Frozen}
     

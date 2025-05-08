@@ -1,4 +1,4 @@
-﻿namespace diplom.Services
+﻿namespace taskloom.Services
 {
     using System;
     public class TokenService

@@ -1,4 +1,4 @@
-﻿namespace diplom.Models
+﻿namespace taskloom.Models
 {
     public class PriorityType
     {

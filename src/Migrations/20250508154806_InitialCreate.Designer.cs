@@ -4,15 +4,15 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using diplom.Data;
+using taskloom.Data;
 
 #nullable disable
 
-namespace diplom.Migrations
+namespace taskloom.Migrations
 {
-    [DbContext(typeof(diplomContext))]
-    [Migration("20250506161343_UpdateTables")]
-    partial class UpdateTables
+    [DbContext(typeof(taskloomContext))]
+    [Migration("20250508154806_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -35,7 +35,7 @@ namespace diplom.Migrations
                     b.ToTable("CategoryTypeUserProject");
                 });
 
-            modelBuilder.Entity("diplom.Models.CategoryType", b =>
+            modelBuilder.Entity("taskloom.Models.CategoryType", b =>
                 {
                     b.Property<int>("ID")
                         .ValueGeneratedOnAdd()
@@ -55,7 +55,7 @@ namespace diplom.Migrations
                     b.ToTable("CategoryType");
                 });
 
-            modelBuilder.Entity("diplom.Models.Issue", b =>
+            modelBuilder.Entity("taskloom.Models.Issue", b =>
                 {
                     b.Property<int>("ID")
                         .ValueGeneratedOnAdd()
@@ -118,7 +118,7 @@ namespace diplom.Migrations
                     b.ToTable("Issue");
                 });
 
-            modelBuilder.Entity("diplom.Models.Log", b =>
+            modelBuilder.Entity("taskloom.Models.Log", b =>
                 {
                     b.Property<int>("ID")
                         .ValueGeneratedOnAdd()
@@ -141,7 +141,7 @@ namespace diplom.Migrations
                     b.ToTable("Log");
                 });
 
-            modelBuilder.Entity("diplom.Models.PriorityType", b =>
+            modelBuilder.Entity("taskloom.Models.PriorityType", b =>
                 {
                     b.Property<int>("ID")
                         .ValueGeneratedOnAdd()
@@ -161,7 +161,7 @@ namespace diplom.Migrations
                     b.ToTable("PriorityType");
                 });
 
-            modelBuilder.Entity("diplom.Models.Project", b =>
+            modelBuilder.Entity("taskloom.Models.Project", b =>
                 {
                     b.Property<int>("ID")
                         .ValueGeneratedOnAdd()
@@ -199,7 +199,7 @@ namespace diplom.Migrations
                     b.ToTable("Project");
                 });
 
-            modelBuilder.Entity("diplom.Models.StatusType", b =>
+            modelBuilder.Entity("taskloom.Models.StatusType", b =>
                 {
                     b.Property<int>("ID")
                         .ValueGeneratedOnAdd()
@@ -219,7 +219,7 @@ namespace diplom.Migrations
                     b.ToTable("StatusType");
                 });
 
-            modelBuilder.Entity("diplom.Models.User", b =>
+            modelBuilder.Entity("taskloom.Models.User", b =>
                 {
                     b.Property<int>("ID")
                         .ValueGeneratedOnAdd()
@@ -259,7 +259,7 @@ namespace diplom.Migrations
                     b.ToTable("User");
                 });
 
-            modelBuilder.Entity("diplom.Models.UserProject", b =>
+            modelBuilder.Entity("taskloom.Models.UserProject", b =>
                 {
                     b.Property<int>("ID")
                         .ValueGeneratedOnAdd()
@@ -297,22 +297,22 @@ namespace diplom.Migrations
 
             modelBuilder.Entity("CategoryTypeUserProject", b =>
                 {
-                    b.HasOne("diplom.Models.CategoryType", null)
+                    b.HasOne("taskloom.Models.CategoryType", null)
                         .WithMany()
                         .HasForeignKey("CategoryTypesID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("diplom.Models.UserProject", null)
+                    b.HasOne("taskloom.Models.UserProject", null)
                         .WithMany()
                         .HasForeignKey("UserProjectsID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("diplom.Models.CategoryType", b =>
+            modelBuilder.Entity("taskloom.Models.CategoryType", b =>
                 {
-                    b.HasOne("diplom.Models.Project", "Project")
+                    b.HasOne("taskloom.Models.Project", "Project")
                         .WithMany("CategoryTypes")
                         .HasForeignKey("ProjectID")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -321,36 +321,36 @@ namespace diplom.Migrations
                     b.Navigation("Project");
                 });
 
-            modelBuilder.Entity("diplom.Models.Issue", b =>
+            modelBuilder.Entity("taskloom.Models.Issue", b =>
                 {
-                    b.HasOne("diplom.Models.CategoryType", "CategoryType")
+                    b.HasOne("taskloom.Models.CategoryType", "CategoryType")
                         .WithMany()
                         .HasForeignKey("CategoryTypeID");
 
-                    b.HasOne("diplom.Models.User", "Creator")
+                    b.HasOne("taskloom.Models.User", "Creator")
                         .WithMany("Issues")
                         .HasForeignKey("CreatorID")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("diplom.Models.User", "Performer")
+                    b.HasOne("taskloom.Models.User", "Performer")
                         .WithMany()
                         .HasForeignKey("PerformerID")
                         .OnDelete(DeleteBehavior.SetNull);
 
-                    b.HasOne("diplom.Models.PriorityType", "PriorityType")
+                    b.HasOne("taskloom.Models.PriorityType", "PriorityType")
                         .WithMany()
                         .HasForeignKey("PriorityTypeID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("diplom.Models.Project", "Project")
+                    b.HasOne("taskloom.Models.Project", "Project")
                         .WithMany("Issues")
                         .HasForeignKey("ProjectID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("diplom.Models.StatusType", "StatusType")
+                    b.HasOne("taskloom.Models.StatusType", "StatusType")
                         .WithMany()
                         .HasForeignKey("StatusTypeID")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -369,9 +369,9 @@ namespace diplom.Migrations
                     b.Navigation("StatusType");
                 });
 
-            modelBuilder.Entity("diplom.Models.Log", b =>
+            modelBuilder.Entity("taskloom.Models.Log", b =>
                 {
-                    b.HasOne("diplom.Models.Project", "Project")
+                    b.HasOne("taskloom.Models.Project", "Project")
                         .WithMany("Logs")
                         .HasForeignKey("ProjectID")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -380,9 +380,9 @@ namespace diplom.Migrations
                     b.Navigation("Project");
                 });
 
-            modelBuilder.Entity("diplom.Models.PriorityType", b =>
+            modelBuilder.Entity("taskloom.Models.PriorityType", b =>
                 {
-                    b.HasOne("diplom.Models.Project", "Project")
+                    b.HasOne("taskloom.Models.Project", "Project")
                         .WithMany("PriorityTypes")
                         .HasForeignKey("ProjectID")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -391,16 +391,16 @@ namespace diplom.Migrations
                     b.Navigation("Project");
                 });
 
-            modelBuilder.Entity("diplom.Models.Project", b =>
+            modelBuilder.Entity("taskloom.Models.Project", b =>
                 {
-                    b.HasOne("diplom.Models.User", null)
+                    b.HasOne("taskloom.Models.User", null)
                         .WithMany("Projects")
                         .HasForeignKey("UserID");
                 });
 
-            modelBuilder.Entity("diplom.Models.StatusType", b =>
+            modelBuilder.Entity("taskloom.Models.StatusType", b =>
                 {
-                    b.HasOne("diplom.Models.Project", "Project")
+                    b.HasOne("taskloom.Models.Project", "Project")
                         .WithMany("StatusTypes")
                         .HasForeignKey("ProjectID")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -409,15 +409,15 @@ namespace diplom.Migrations
                     b.Navigation("Project");
                 });
 
-            modelBuilder.Entity("diplom.Models.UserProject", b =>
+            modelBuilder.Entity("taskloom.Models.UserProject", b =>
                 {
-                    b.HasOne("diplom.Models.Project", "Project")
+                    b.HasOne("taskloom.Models.Project", "Project")
                         .WithMany("UserProjects")
                         .HasForeignKey("ProjectID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("diplom.Models.User", "User")
+                    b.HasOne("taskloom.Models.User", "User")
                         .WithMany("UserProjects")
                         .HasForeignKey("UserID")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -428,7 +428,7 @@ namespace diplom.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("diplom.Models.Project", b =>
+            modelBuilder.Entity("taskloom.Models.Project", b =>
                 {
                     b.Navigation("CategoryTypes");
 
@@ -443,7 +443,7 @@ namespace diplom.Migrations
                     b.Navigation("UserProjects");
                 });
 
-            modelBuilder.Entity("diplom.Models.User", b =>
+            modelBuilder.Entity("taskloom.Models.User", b =>
                 {
                     b.Navigation("Issues");
 

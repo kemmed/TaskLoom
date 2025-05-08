@@ -1,18 +1,18 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using diplom.Data;
-using diplom.Services;
+using taskloom.Data;
+using taskloom.Services;
 using System.Text.Json.Serialization;
 
-namespace diplom
+namespace taskloom
 {
     public class Program
     {
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
-            builder.Services.AddDbContext<diplomContext>(options =>
-                options.UseSqlite(builder.Configuration.GetConnectionString("diplomContext") ?? throw new InvalidOperationException("Connection string 'diplomContext' not found.")));
+            builder.Services.AddDbContext<taskloomContext>(options =>
+                options.UseSqlite(builder.Configuration.GetConnectionString("taskloomContext") ?? throw new InvalidOperationException("Connection string 'taskloomContext' not found.")));
 
             builder.Services.AddControllersWithViews()
                 .AddJsonOptions(options =>

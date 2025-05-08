@@ -5,27 +5,27 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using diplom.Data;
-using diplom.Models;
+using taskloom.Data;
+using taskloom.Models;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Microsoft.CodeAnalysis;
 using Microsoft.Build.Evaluation;
-using diplom.Services;
+using taskloom.Services;
 using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages.Manage;
 using System.Net;
 using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.Blazor;
 using DocumentFormat.OpenXml.Spreadsheet;
 using DocumentFormat.OpenXml.Bibliography;
-using Issue = diplom.Models.Issue;
+using Issue = taskloom.Models.Issue;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 using System.Xml.Linq;
 
-namespace diplom.Controllers
+namespace taskloom.Controllers
 {
     public class ProjectsController : Controller
     {
-        private readonly diplomContext _context;
+        private readonly taskloomContext _context;
         private readonly MailService _mailService;
         private readonly TokenService _tokenService;
         private readonly LogService _logService;
@@ -35,7 +35,7 @@ namespace diplom.Controllers
         private readonly ExcelReportService _excelReportService;
 
 
-        public ProjectsController(diplomContext context, 
+        public ProjectsController(taskloomContext context, 
             MailService mailService, 
             TokenService tokenService, 
             LogService logService, 
@@ -239,7 +239,7 @@ namespace diplom.Controllers
             if (currentProject == null || currentUser == null)
                 return NotFound();
 
-            UserProject? currentUserProject = await _userService.GetUserProjectByID(currentProject.ID, currentProject.ID);
+            UserProject? currentUserProject = await _userService.GetUserProjectByID(currentProject.ID, currentUser.ID);
             if (currentUserProject == null)
                 return NotFound();
 

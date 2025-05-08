@@ -2,16 +2,16 @@
 using System.Net;
 using System.Text.Json;
 using System.Threading.Tasks;
-using diplom.Models;
-using diplom.Data;
+using taskloom.Models;
+using taskloom.Data;
 
-namespace diplom.Services
+namespace taskloom.Services
 {
     public class LogService
     {
-        private readonly diplomContext _context;
+        private readonly taskloomContext _context;
 
-        public LogService(diplomContext context)
+        public LogService(taskloomContext context)
         {
             _context = context;
         }

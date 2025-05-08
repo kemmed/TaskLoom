@@ -1,4 +1,4 @@
-﻿namespace diplom.Models
+﻿namespace taskloom.Models
 {
     public enum UserRoles { Admin, Manager, Employee}
     public class UserProject

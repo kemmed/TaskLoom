@@ -3,13 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
-using diplom.Models;
+using taskloom.Models;
 
-namespace diplom.Data
+namespace taskloom.Data
 {
-    public class diplomContext : DbContext
+    public class taskloomContext : DbContext
     {
-        public diplomContext (DbContextOptions<diplomContext> options)
+        public taskloomContext (DbContextOptions<taskloomContext> options)
             : base(options)
         {
 
@@ -36,14 +36,14 @@ namespace diplom.Data
         }
 
 
-        public DbSet<diplom.Models.User> User { get; set; } = default!;
-        public DbSet<diplom.Models.Project> Project { get; set; } = default!;
-        public DbSet<diplom.Models.UserProject> UserProject { get; set; } = default!;
-        public DbSet<diplom.Models.CategoryType> CategoryType { get; set; } = default!;
-        public DbSet<diplom.Models.Issue> Issue { get; set; } = default!;
-        public DbSet<diplom.Models.Log> Log { get; set; } = default!;
-        public DbSet<diplom.Models.PriorityType> PriorityType { get; set; } = default!;
-        public DbSet<diplom.Models.StatusType> StatusType { get; set; } = default!;
+        public DbSet<taskloom.Models.User> User { get; set; } = default!;
+        public DbSet<taskloom.Models.Project> Project { get; set; } = default!;
+        public DbSet<taskloom.Models.UserProject> UserProject { get; set; } = default!;
+        public DbSet<taskloom.Models.CategoryType> CategoryType { get; set; } = default!;
+        public DbSet<taskloom.Models.Issue> Issue { get; set; } = default!;
+        public DbSet<taskloom.Models.Log> Log { get; set; } = default!;
+        public DbSet<taskloom.Models.PriorityType> PriorityType { get; set; } = default!;
+        public DbSet<taskloom.Models.StatusType> StatusType { get; set; } = default!;
 
     }
 }
