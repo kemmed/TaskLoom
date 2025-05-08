@@ -5,6 +5,11 @@
     {
         private readonly Random _rnd = new();
 
+        /// <summary>
+        /// Генерирует случайный токен длиной 16 символов.
+        /// Токен состоит из букв английского алфавита (от 'a' до 'z').
+        /// </summary>
+        /// <returns>Сгенерированный токен.</returns>
         public string GenerateToken()
         {
             string token = "";

@@ -13,6 +13,12 @@ namespace diplom.Services
 {
     public class ExcelReportService
     {
+        /// <summary>
+        /// Создает Excel-файл с логами проекта.
+        /// </summary>
+        /// <param name="logs">Список логов для записи в Excel.</param>
+        /// <param name="projectName">Название проекта, используемое в названии листа.</param>
+        /// <returns>Массив байтов, представляющий созданный Excel-файл.</returns>
         public byte[] CreateExcelLog(List<Log> logs, string projectName)
         {
             using var workbook = new ClosedXML.Excel.XLWorkbook();

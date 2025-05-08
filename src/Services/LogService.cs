@@ -16,6 +16,12 @@ namespace diplom.Services
             _context = context;
         }
 
+        /// <summary>
+        /// Записывает и сохраняет действие пользователя в лог проекта.
+        /// </summary>
+        /// <param name="projectID">Идентификатор проекта, к которому относится действие.</param>
+        /// <param name="action">Описание действия, которое было выполнено.</param>
+        /// <param name="userID">Идентификатор пользователя, выполнившего действие. Если не указан, используется значение null.</param>
         public void LogAction(int projectID, string action, int? userID = null)
         {
             User? user = userID.HasValue ? _context.User.FirstOrDefault(u => u.ID == userID.Value) : null;

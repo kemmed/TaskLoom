@@ -16,6 +16,12 @@ namespace diplom.Services
 
             _mailSettings = mailConfig?.MailSettings ?? throw new InvalidOperationException("Ошибка при чтении параметров почты.");
         }
+        /// <summary>
+        /// Отправляет электронное письмо.
+        /// </summary>
+        /// <param name="body">Тело письма.</param>
+        /// <param name="topic">Тема письма.</param>
+        /// <param name="recipientEmail">Адрес получателя.</param>
         public void SendEmail(string body, string topic, string recipientEmail)
         {
 

@@ -20,6 +20,14 @@ namespace diplom.Services
             this._context = context;
         }
 
+        /// <summary>
+        /// Получает данные для графиков создания и завершения задач.
+        /// </summary>
+        /// <param name="issues">Список задач для графика.</param>
+        /// <param name="startDate">Начальная дата для фильтрации задач. Если не указана, используется начало текущей недели.</param>
+        /// <param name="endDate">Конечная дата для фильтрации задач. Если не указана, используется конец текущей недели.</param>
+        /// <param name="selectedCategories">Массив выбранных категорий задач для фильтрации. Если пустой, фильтрация по категориям не применяется.</param>
+        /// <returns>Строковое представление данных для графика созранных и выполненных задач.</returns>
         public (string chartDataCreate, string chartDataDone) GetChartData(List<Models.Issue> issues, string? startDate, string? endDate, int[]? selectedCategories)
         {
             if (string.IsNullOrEmpty(startDate) || string.IsNullOrEmpty(endDate))

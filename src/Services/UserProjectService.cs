@@ -17,9 +17,14 @@ namespace diplom.Services
 
         public UserProjectService(diplomContext context)
         {
-            this._context = context;
+            _context = context;
         }
 
+        /// <summary>
+        /// Получает текущего пользователя из сессии.
+        /// </summary>
+        /// <param name="httpContext">HTTP-контекст.</param>
+        /// <returns>Текущий пользователь. Null если пользователь не найден.</returns>
         public async Task<User?> GetCurrentUser(HttpContext httpContext)
         {
             int? userSessionID = httpContext.Session.GetInt32("UserID");
@@ -29,6 +34,11 @@ namespace diplom.Services
             User? user = await _context.User.FindAsync(userSessionID);
             return user;
         }
+        /// <summary>
+        /// Получает пользователя по его идентификатору.
+        /// </summary>
+        /// <param name="userID">Идентификатор пользователя.</param>
+        /// <returns>Текущий пользователь. Null если пользователь не найден.</returns>
         public async Task<User?> GetUserByID(int? userID)
         {
             if (userID == null)
@@ -37,6 +47,11 @@ namespace diplom.Services
             User? user = await _context.User.FindAsync(userID);
             return user;
         }
+        /// <summary>
+        /// Получает проект по его идентификатору, включая связанные данные.
+        /// </summary>
+        /// <param name="projectID">Идентификатор проекта.</param>
+        /// <returns>Проект. Null если проект не найден.</returns>
         public async Task<Project?> GetProjectByID(int? projectID)
         {
             if (projectID == null)
@@ -52,6 +67,12 @@ namespace diplom.Services
                 .FirstOrDefaultAsync(x=>x.ID==projectID);
             return project;
         }
+        /// <summary>
+        /// Получает связь пользователя с проектом по идентификаторам проекта и пользователя.
+        /// </summary>
+        /// <param name="projectID">Идентификатор проекта.</param>
+        /// <param name="userID">Идентификатор пользователя.</param>
+        /// <returns>Связь пользователя с проектом. Null если связь не найдена.</returns>
         public async Task<UserProject?> GetUserProjectByID(int? projectID, int? userID)
         {
             if (projectID == null || userID == null)
@@ -63,6 +84,12 @@ namespace diplom.Services
 
             return userProject;
         }
+
+        /// <summary>
+        /// Получает связь пользователя с проектом по идентификатору связи.
+        /// </summary>
+        /// <param name="userProjectID">Идентификатор связи пользователя с проектом.</param>
+        /// <returns>Связь пользователя с проектом. Null если связь не найдена.</returns>
         public async Task<UserProject?> GetUserProjectByID(int? userProjectID)
         {
             if (userProjectID == null)
@@ -73,6 +100,12 @@ namespace diplom.Services
             return userProject;
         }
 
+        /// <summary>
+        /// Проверяет, состоит ли пользователь в проекте.
+        /// </summary>
+        /// <param name="projectID">Идентификатор проекта.</param>
+        /// <param name="userID">Идентификатор пользователя.</param>
+        /// <returns>Значение true, если пользователь состоит в проекте, иначе false.</returns>
         public async Task<bool> UserIsInProject(int? projectID, int? userID)
         {
             if (projectID == null || userID == null)

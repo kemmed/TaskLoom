@@ -18,8 +18,15 @@ namespace diplom.Services
 
         public SortUsersService(diplomContext context)
         {
-            this._context = context;
+            _context = context;
         }
+
+        /// <summary>
+        /// Возвращает отсортированный список ответственных пользователей за проект.
+        /// Сортировка осуществляется по количеству задач и ближайшему сроку выполнения задач.
+        /// </summary>
+        /// <param name="projectID">Идентификатор проекта.</param>
+        /// <returns>Список, содержащий информацию о пользователях и их задачах.</returns>
         public List<SelectListItem> GetSortedResponsibilities(int projectID)
         {
             return _context.UserProject
@@ -50,6 +57,11 @@ namespace diplom.Services
                 .ToList();
         }
 
+        /// <summary>
+        /// Возвращает правильное склонение слова "задача" в зависимости от их количества.
+        /// </summary>
+        /// <param name="count">Количество задач.</param>
+        /// <returns>Строка с правильным склонением слова "задача".</returns>
         public string GetTaskWord(int count)
         {
             count = Math.Abs(count) % 100;
