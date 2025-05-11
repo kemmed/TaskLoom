@@ -29,7 +29,7 @@ namespace taskloom.Controllers
         private readonly MailService _mailService;
         private readonly TokenService _tokenService;
         private readonly LogService _logService;
-        private readonly UserProjectService _userService;
+        private readonly UserProjectService _userProjectService;
         private readonly ChartService _chartService;
         private readonly SortUsersService _sortUsersService;
         private readonly ExcelReportService _excelReportService;
@@ -39,7 +39,7 @@ namespace taskloom.Controllers
             MailService mailService, 
             TokenService tokenService, 
             LogService logService, 
-            UserProjectService userService, 
+            UserProjectService userProjectService, 
             ChartService chartService,
             SortUsersService sortUsersService,
             ExcelReportService excelReportService)
@@ -48,7 +48,7 @@ namespace taskloom.Controllers
             _mailService = mailService;
             _tokenService = tokenService;
             _logService = logService;
-            _userService = userService;
+            _userProjectService = userProjectService;
             _chartService = chartService;
             _sortUsersService = sortUsersService;
             _excelReportService = excelReportService;
@@ -62,8 +62,8 @@ namespace taskloom.Controllers
         [HttpGet("/Projects/ProjectStatistics/{projectID}")]
         public async Task<IActionResult> ProjectStatistics(int projectID, string? startDate = null, string? endDate = null, int[]? selectedCategories = null)
         {
-            User? currentUser = await _userService.GetCurrentUser(HttpContext);
-            Models.Project? currentProject = await _userService.GetProjectByID(projectID);
+            User? currentUser = await _userProjectService.GetCurrentUser(HttpContext);
+            Models.Project? currentProject = await _userProjectService.GetProjectByID(projectID);
             if (currentProject == null || currentUser == null)
                 return NotFound();
 
@@ -100,6 +100,7 @@ namespace taskloom.Controllers
                 };
 
             var userStatistics = currentProject.UserProjects?
+                .Where(up=>up.IsActive)
                 .Select(up => up.User)
                 .Where(user => user != null)
                 .Select(user => new
@@ -140,7 +141,7 @@ namespace taskloom.Controllers
         }
         public async Task<IActionResult> AllProjects(string? statusFilter = null)
         {
-            User? currentUser = await _userService.GetCurrentUser(HttpContext);
+            User? currentUser = await _userProjectService.GetCurrentUser(HttpContext);
             if (currentUser == null)
                 return Redirect("/Users/Authorization");
 
@@ -179,15 +180,15 @@ namespace taskloom.Controllers
         [HttpGet("/Projects/GetPerformersByCategory")]
         public async Task<IActionResult> GetPerformersByCategory(int projectID, int? categoryTypeID)
         {
-            User? currentUser = await _userService.GetCurrentUser(HttpContext);
-            Models.Project? currentProject = await _userService.GetProjectByID(projectID);
+            User? currentUser = await _userProjectService.GetCurrentUser(HttpContext);
+            Models.Project? currentProject = await _userProjectService.GetProjectByID(projectID);
             if (currentProject == null ||
                 currentUser == null ||
-                !await _userService.UserIsInProject(currentProject.ID, currentUser.ID))
+                !await _userProjectService.UserIsInProject(currentProject.ID, currentUser.ID))
                 return NotFound();
 
             var users = await _context.UserProject
-                .Where(up => up.ProjectID == projectID)
+                .Where(up => up.ProjectID == projectID && up.IsActive)
                 .Include(up => up.User)
                 .Include(up => up.CategoryTypes)
                 .ToListAsync();
@@ -234,12 +235,12 @@ namespace taskloom.Controllers
         public async Task<IActionResult> Project(int projectID, string filter = "all")
         {
 
-            User? currentUser = await _userService.GetCurrentUser(HttpContext);
-            Models.Project? currentProject = await _userService.GetProjectByID(projectID);
+            User? currentUser = await _userProjectService.GetCurrentUser(HttpContext);
+            Models.Project? currentProject = await _userProjectService.GetProjectByID(projectID);
             if (currentProject == null || currentUser == null)
                 return NotFound();
 
-            UserProject? currentUserProject = await _userService.GetUserProjectByID(currentProject.ID, currentUser.ID);
+            UserProject? currentUserProject = await _userProjectService.GetUserProjectByID(currentProject.ID, currentUser.ID);
             if (currentUserProject == null)
                 return NotFound();
 
@@ -281,7 +282,7 @@ namespace taskloom.Controllers
             ViewBag.ProjectName = currentProject.Name;
             ViewBag.ProjectID = currentProject.ID;
 
-            var reponsibilities = _sortUsersService.GetSortedResponsibilities(currentUser.ID);
+            var reponsibilities = _sortUsersService.GetSortedResponsibilities(currentProject.ID);
 
             var categories = _context.CategoryType.Where(x => x.ProjectID == currentUser.ID)
                 .Select(c => new SelectListItem
@@ -326,11 +327,11 @@ namespace taskloom.Controllers
         [HttpGet("/Projects/ProjectHistory/{projectID}")]
         public async Task<IActionResult> ProjectHistory(int projectID)
         {
-            User? currentUser = await _userService.GetCurrentUser(HttpContext);
-            Models.Project? currentProject = await _userService.GetProjectByID(projectID);
+            User? currentUser = await _userProjectService.GetCurrentUser(HttpContext);
+            Models.Project? currentProject = await _userProjectService.GetProjectByID(projectID);
             if (currentProject == null ||
                 currentUser == null ||
-                !await _userService.UserIsInProject(currentProject.ID, currentUser.ID))
+                !await _userProjectService.UserIsInProject(currentProject.ID, currentUser.ID))
                 return NotFound();
 
             var log = _context.Log
@@ -345,7 +346,7 @@ namespace taskloom.Controllers
         [HttpGet("/Projects/ProjectSettings/{projectID}")]
         public async Task<IActionResult> ProjectSettings(int projectID)
         {
-            User? currentUser = await _userService.GetCurrentUser(HttpContext);
+            User? currentUser = await _userProjectService.GetCurrentUser(HttpContext);
             if (currentUser == null)
                 return NotFound();
 
@@ -362,7 +363,7 @@ namespace taskloom.Controllers
             if (currentProject == null)
                 return NotFound();
 
-            UserProject? currUserProject = await _userService.GetUserProjectByID(currentProject.ID, currentProject.ID);
+            UserProject? currUserProject = await _userProjectService.GetUserProjectByID(currentProject.ID, currentProject.ID);
 
             if (currentProject == null || currUserProject == null)
                 return NotFound();
@@ -392,11 +393,11 @@ namespace taskloom.Controllers
         [HttpGet("/Projects/DeletedIssueArchive/{projectID}")]
         public async Task<IActionResult> DeletedIssueArchive(int projectID)
         {
-            User? currentUser = await _userService.GetCurrentUser(HttpContext);
-            Models.Project? currentProject = await _userService.GetProjectByID(projectID);
+            User? currentUser = await _userProjectService.GetCurrentUser(HttpContext);
+            Models.Project? currentProject = await _userProjectService.GetProjectByID(projectID);
             if (currentProject == null ||
                 currentUser == null ||
-                !await _userService.UserIsInProject(currentProject.ID, currentUser.ID))
+                !await _userProjectService.UserIsInProject(currentProject.ID, currentUser.ID))
                 return NotFound();
 
             var issue = _context.Issue
@@ -416,7 +417,7 @@ namespace taskloom.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> CreateProject([Bind("ID,Name,Description,DeadlineDate")] Models.Project project)
         {
-            User? currentUser = await _userService.GetCurrentUser(HttpContext);
+            User? currentUser = await _userProjectService.GetCurrentUser(HttpContext);
             if (currentUser == null)
                 return NotFound();
 
@@ -480,11 +481,11 @@ namespace taskloom.Controllers
         [HttpPost]
         public async Task<IActionResult> EditProject([Bind("ID,Name,Description,Status,DeadlineDate")] Models.Project project, IFormCollection formData, int projectID, string? returnUrl = null)
         {
-            User? currentUser = await _userService.GetCurrentUser(HttpContext);
-            Models.Project? currentProject = await _userService.GetProjectByID(projectID);
+            User? currentUser = await _userProjectService.GetCurrentUser(HttpContext);
+            Models.Project? currentProject = await _userProjectService.GetProjectByID(projectID);
             if (currentProject == null ||
                 currentUser == null ||
-                !await _userService.UserIsInProject(currentProject.ID, currentUser.ID))
+                !await _userProjectService.UserIsInProject(currentProject.ID, currentUser.ID))
                 return NotFound();
 
             string oldName = currentProject.Name;
@@ -538,11 +539,11 @@ namespace taskloom.Controllers
         [HttpPost]
         public async Task<IActionResult> InviteUser([Bind("Email")] User user, int projectID)
         {
-            User? currentUser = await _userService.GetCurrentUser(HttpContext);
-            Models.Project? currentProject = await _userService.GetProjectByID(projectID);
+            User? currentUser = await _userProjectService.GetCurrentUser(HttpContext);
+            Models.Project? currentProject = await _userProjectService.GetProjectByID(projectID);
             if (currentProject == null ||
                 currentUser == null ||
-                !await _userService.UserIsInProject(currentProject.ID, currentUser.ID))
+                !await _userProjectService.UserIsInProject(currentProject.ID, currentUser.ID))
                 return NotFound();
 
             string message;
@@ -551,14 +552,14 @@ namespace taskloom.Controllers
             if (invitedUser == null || !invitedUser.IsActive)
             {
                 message = "Пользователя с таким email не существует в системе.";
-                return RedirectToAction("InviteUserMessage", new { message, currentProject.ID });
+                return RedirectToAction("InviteUserMessage", new { message = message, projectID = currentProject.ID });
             }
-            var existingUserProject = await _userService.GetUserProjectByID(currentProject.ID, invitedUser.ID);
+            var existingUserProject = await _userProjectService.GetUserProjectByID(currentProject.ID, invitedUser.ID);
 
             if (existingUserProject != null)
             {
                 message = "Этот пользователь уже присоединен к проекту.";
-                return RedirectToAction("InviteUserMessage", new { message, currentProject.ID });
+                return RedirectToAction("InviteUserMessage", new { message = message, projectID = currentProject.ID });
             }
 
             string inviteToken = _tokenService.GenerateToken();
@@ -594,7 +595,7 @@ namespace taskloom.Controllers
             await _context.SaveChangesAsync();
 
             message = "Приглашение успешно отправлено. Дождитесь, пока пользователь примет ваше приглашение.";
-            return RedirectToAction("InviteUserMessage", new { message, currentProject.ID });
+            return RedirectToAction("InviteUserMessage", new { message = message, projectID = currentProject.ID });
         }
 
         //Принятие приглашения
@@ -609,12 +610,12 @@ namespace taskloom.Controllers
                 ViewBag.success = false;
                 return View();
             }
-            Models.Project? currentProject = await _userService.GetProjectByID(userProject.ProjectID);
-            User? currentUser = await _userService.GetUserByID(userProject.UserID);
+            Models.Project? currentProject = await _userProjectService.GetProjectByID(userProject.ProjectID);
+            User? currentUser = await _userProjectService.GetUserByID(userProject.UserID);
 
             if (currentProject == null ||
                 currentUser == null ||
-                !await _userService.UserIsInProject(currentProject.ID, currentUser.ID))
+                !await _userProjectService.UserIsInProject(currentProject.ID, currentUser.ID))
             {
                 ViewBag.message = "Ошибка присоединения к проекту.";
                 ViewBag.success = false;
@@ -654,15 +655,15 @@ namespace taskloom.Controllers
         [HttpPost]
         public async Task<IActionResult> RemoveUserFromProject(int userProjectID)
         {
-            UserProject? userProject = await _userService.GetUserProjectByID(userProjectID);
+            UserProject? userProject = await _userProjectService.GetUserProjectByID(userProjectID);
             if (userProject == null)
                 return NotFound();
 
-            User? currentUser = await _userService.GetCurrentUser(HttpContext);
-            Models.Project? currentProject = await _userService.GetProjectByID(userProject.ProjectID);
+            User? currentUser = await _userProjectService.GetCurrentUser(HttpContext);
+            Models.Project? currentProject = await _userProjectService.GetProjectByID(userProject.ProjectID);
             if (currentProject == null ||
                 currentUser == null ||
-                !await _userService.UserIsInProject(currentProject.ID, currentUser.ID))
+                !await _userProjectService.UserIsInProject(currentProject.ID, currentUser.ID))
                 return NotFound();
 
             // Добавление записи в лог
@@ -679,8 +680,8 @@ namespace taskloom.Controllers
         [HttpPost]
         public async Task<IActionResult> AssignCategoriesToUser(int userProjectID, int projectID, List<int> selectedCategories)
         {
-            User? currentUser = await _userService.GetCurrentUser(HttpContext);
-            Models.Project? currentProject = await _userService.GetProjectByID(projectID);
+            User? currentUser = await _userProjectService.GetCurrentUser(HttpContext);
+            Models.Project? currentProject = await _userProjectService.GetProjectByID(projectID);
             UserProject? userProject = _context.UserProject
                 .Include(x => x.User)
                 .Include(up => up.CategoryTypes)
@@ -689,7 +690,7 @@ namespace taskloom.Controllers
             if (currentProject == null || 
                 currentUser == null || 
                 userProject == null || 
-                !await _userService.UserIsInProject(currentProject.ID, currentUser.ID))
+                !await _userProjectService.UserIsInProject(currentProject.ID, currentUser.ID))
                 return NotFound();
 
             var allCategories = _context.CategoryType.Where(c => c.ProjectID == projectID).ToList();
@@ -718,12 +719,12 @@ namespace taskloom.Controllers
         [HttpPost]
         public async Task<IActionResult> LeaveProject(int projectID)
         {
-            User? currentUser = await _userService.GetCurrentUser(HttpContext);
-            Models.Project? currentProject = await _userService.GetProjectByID(projectID);
+            User? currentUser = await _userProjectService.GetCurrentUser(HttpContext);
+            Models.Project? currentProject = await _userProjectService.GetProjectByID(projectID);
             if (currentUser == null || currentProject == null)
                 return NotFound();
 
-            UserProject? userProject = await _userService.GetUserProjectByID(projectID, currentUser.ID);
+            UserProject? userProject = await _userProjectService.GetUserProjectByID(projectID, currentUser.ID);
 
             if (userProject == null)
                 return NotFound();
@@ -741,17 +742,17 @@ namespace taskloom.Controllers
         [HttpPost]
         public async Task<IActionResult> EditUserRole(int userProjectID, UserRoles newRole)
         {
-            User? currentUser = await _userService.GetCurrentUser(HttpContext);
+            User? currentUser = await _userProjectService.GetCurrentUser(HttpContext);
             UserProject? userProject = _context.UserProject
                 .Include(x => x.User)
                 .FirstOrDefault(x => x.ID == userProjectID);
 
             if (userProject == null ||
                 currentUser == null ||
-                !await _userService.UserIsInProject(userProject.ProjectID, currentUser.ID))
+                !await _userProjectService.UserIsInProject(userProject.ProjectID, currentUser.ID))
                 return NotFound();
 
-            UserProject? userProjectEditor = await _userService.GetUserProjectByID(userProject.ProjectID, currentUser.ID);
+            UserProject? userProjectEditor = await _userProjectService.GetUserProjectByID(userProject.ProjectID, currentUser.ID);
             if (userProjectEditor == null)
                 return NotFound();
 
@@ -783,11 +784,11 @@ namespace taskloom.Controllers
         [HttpPost]
         public async Task<IActionResult> AddCategory([Bind("ID,Name")] CategoryType categoryType, IFormCollection formData, int projectID)
         {
-            User? currentUser = await _userService.GetCurrentUser(HttpContext);
-            Models.Project? currentProject = await _userService.GetProjectByID(projectID);
+            User? currentUser = await _userProjectService.GetCurrentUser(HttpContext);
+            Models.Project? currentProject = await _userProjectService.GetProjectByID(projectID);
             if (currentProject == null ||
                 currentUser == null ||
-                !await _userService.UserIsInProject(currentProject.ID, currentUser.ID))
+                !await _userProjectService.UserIsInProject(currentProject.ID, currentUser.ID))
                 return NotFound();
 
             categoryType.Project = currentProject;
@@ -808,11 +809,11 @@ namespace taskloom.Controllers
         [HttpPost]
         public async Task<IActionResult> EditCategory([Bind("ID,Name")] CategoryType categoryType, int categoryID)
         {
-            User? currentUser = await _userService.GetCurrentUser(HttpContext);
-            Models.Project? currentProject = await _userService.GetProjectByID(categoryType.ProjectID);
+            User? currentUser = await _userProjectService.GetCurrentUser(HttpContext);
+            Models.Project? currentProject = await _userProjectService.GetProjectByID(categoryType.ProjectID);
             if (currentProject == null ||
                 currentUser == null ||
-                !await _userService.UserIsInProject(currentProject.ID, currentUser.ID))
+                !await _userProjectService.UserIsInProject(currentProject.ID, currentUser.ID))
                 return NotFound();
 
             CategoryType? category = _context.CategoryType.FirstOrDefault(x => x.ID == categoryID);
@@ -834,16 +835,16 @@ namespace taskloom.Controllers
         [HttpPost]
         public async Task<IActionResult> DeleteCategory(int categoryID)
         {
-            User? currentUser = await _userService.GetCurrentUser(HttpContext);
+            User? currentUser = await _userProjectService.GetCurrentUser(HttpContext);
 
             CategoryType? category = _context.CategoryType.FirstOrDefault(x => x.ID == categoryID);
             if (category == null)
                 return NotFound();
-            Models.Project? currentProject = await _userService.GetProjectByID(category.ProjectID);
+            Models.Project? currentProject = await _userProjectService.GetProjectByID(category.ProjectID);
 
             if (currentProject == null ||
                 currentUser == null ||
-                !await _userService.UserIsInProject(currentProject.ID, currentUser.ID))
+                !await _userProjectService.UserIsInProject(currentProject.ID, currentUser.ID))
                 return NotFound();
 
             if (category.Project.Issues != null)
@@ -871,11 +872,11 @@ namespace taskloom.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateIssueAsync([Bind("Name, Description, DeadlineDate, PerformerID, PriorityTypeID, CategoryTypeID")] Issue issue, int projectID)
         {
-            User? currentUser = await _userService.GetCurrentUser(HttpContext);
-            Models.Project? currentProject = await _userService.GetProjectByID(projectID);
+            User? currentUser = await _userProjectService.GetCurrentUser(HttpContext);
+            Models.Project? currentProject = await _userProjectService.GetProjectByID(projectID);
             if (currentProject == null ||
                 currentUser == null ||
-                !await _userService.UserIsInProject(currentProject.ID, currentUser.ID))
+                !await _userProjectService.UserIsInProject(currentProject.ID, currentUser.ID))
                 return NotFound();
 
             StatusType? statusType = currentProject.StatusTypes.FirstOrDefault(x => x.Name == "В процессе");
@@ -912,11 +913,11 @@ namespace taskloom.Controllers
         [HttpPost]
         public async Task<IActionResult> UpdateIssueAsync([Bind("ID, Name, Description, DeadlineDate, PerformerID, PriorityTypeID, StatusTypeID, CategoryTypeID")] Issue issue, int issueID)
         {
-            User? currentUser = await _userService.GetCurrentUser(HttpContext);
+            User? currentUser = await _userProjectService.GetCurrentUser(HttpContext);
             Issue? currIssue = _context.Issue.FirstOrDefault(x => x.ID == issueID);
             if (currIssue == null ||
                 currentUser == null ||
-                !await _userService.UserIsInProject(currIssue.ProjectID, currentUser.ID))
+                !await _userProjectService.UserIsInProject(currIssue.ProjectID, currentUser.ID))
                 return NotFound();
 
 
@@ -1001,11 +1002,11 @@ namespace taskloom.Controllers
         [HttpPost]
         public async Task<IActionResult> DeleteIssue(int issueID)
         {
-            User? currentUser = await _userService.GetCurrentUser(HttpContext);
+            User? currentUser = await _userProjectService.GetCurrentUser(HttpContext);
             Issue? currIssue = _context.Issue.FirstOrDefault(x => x.ID == issueID);
             if (currIssue == null ||
                 currentUser == null ||
-                !await _userService.UserIsInProject(currIssue.ProjectID, currentUser.ID))
+                !await _userProjectService.UserIsInProject(currIssue.ProjectID, currentUser.ID))
                 return NotFound();
 
             currIssue.IsDelete = true;
@@ -1023,11 +1024,11 @@ namespace taskloom.Controllers
         [HttpPost]
         public async Task<IActionResult> RestoreIssue(int issueID)
         {
-            User? currentUser = await _userService.GetCurrentUser(HttpContext);
+            User? currentUser = await _userProjectService.GetCurrentUser(HttpContext);
             Issue? currIssue = _context.Issue.FirstOrDefault(x => x.ID == issueID);
             if (currIssue == null ||
                 currentUser == null ||
-                !await _userService.UserIsInProject(currIssue.ProjectID, currentUser.ID))
+                !await _userProjectService.UserIsInProject(currIssue.ProjectID, currentUser.ID))
                 return NotFound();
 
             currIssue.IsDelete = false;
@@ -1046,13 +1047,13 @@ namespace taskloom.Controllers
         [HttpGet]
         public async Task<IActionResult> UpdateIssueStatusAsync(int currIssueID, int currStatusID)
         {
-            User? currentUser = await _userService.GetCurrentUser(HttpContext);
+            User? currentUser = await _userProjectService.GetCurrentUser(HttpContext);
             Issue? currIssue = _context.Issue.Include(x=>x.StatusType).FirstOrDefault(x => x.ID == currIssueID);
             StatusType? newStatus = _context.StatusType.FirstOrDefault(x => x.ID == currStatusID);
             if (currIssue == null ||
                 currentUser == null ||
                 newStatus == null ||
-                !await _userService.UserIsInProject(currIssue.ProjectID, currentUser.ID))
+                !await _userProjectService.UserIsInProject(currIssue.ProjectID, currentUser.ID))
                 return NotFound();
             var completedStatusType = _context.StatusType.FirstOrDefault(x => x.Name == "Завершенные" && x.ProjectID == currIssue.ProjectID);
             if (currIssue.StatusTypeID == currStatusID)
@@ -1079,11 +1080,11 @@ namespace taskloom.Controllers
         [HttpGet("/Projects/DownloadHistory/{projectID}")]
         public async Task<IActionResult> DownloadHistoryAsync(int projectID)
         {
-            User? currentUser = await _userService.GetCurrentUser(HttpContext);
-            Models.Project? currentProject = await _userService.GetProjectByID(projectID);
+            User? currentUser = await _userProjectService.GetCurrentUser(HttpContext);
+            Models.Project? currentProject = await _userProjectService.GetProjectByID(projectID);
             if (currentProject == null ||
                 currentUser == null ||
-                !await _userService.UserIsInProject(currentProject.ID, currentUser.ID))
+                !await _userProjectService.UserIsInProject(currentProject.ID, currentUser.ID))
                 return NotFound();
 
             var logs = _context.Log

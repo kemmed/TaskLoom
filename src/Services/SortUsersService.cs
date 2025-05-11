@@ -30,7 +30,7 @@ namespace taskloom.Services
         public List<SelectListItem> GetSortedResponsibilities(int projectID)
         {
             return _context.UserProject
-                .Where(up => up.ProjectID == projectID)
+                .Where(up => up.ProjectID == projectID && up.IsActive)
                 .Select(up => new
                 {
                     up.UserID,
