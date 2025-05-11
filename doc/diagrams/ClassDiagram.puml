@@ -1,0 +1,128 @@
+@startuml classDiagram
+
+skinparam linetype ortho
+left to right direction
+
+class CategoryType {
+  +int ID
+  +required string Name
+  +int ProjectID
+  +Project Project
+  +List<UserProject> UserProjects
+}
+
+class Issue {
+  +int ID
+  +required string Name
+  +string? Description
+  +DateTime CreateDate
+  +DateTime? EndDate
+  +DateTime? DeadlineDate
+  +int CreatorID
+  +int? PerformerID
+  +int ProjectID
+  +int PriorityTypeID
+  +bool IsDelete
+  +DateTime? DeleteDate
+  +int? CategoryTypeID
+  +int StatusTypeID
+  +StatusType StatusType
+  +CategoryType? CategoryType
+  +PriorityType PriorityType
+  +Project Project
+  +User Creator
+  +User? Performer
+}
+
+class Log {
+  +int ID
+  +DateTime DateTime
+  +required string Event
+  +int ProjectID
+  +Project Project
+}
+
+class Project {
+  +int ID
+  +required string Name
+  +string? Description
+  +DateTime? EndDate
+  +DateTime? DeadlineDate
+  +DateTime CreateDate
+  +ProjectStatus Status
+  +bool IsDelete
+  +List<Issue>? Issues
+  +List<PriorityType> PriorityTypes
+  +List<StatusType> StatusTypes
+  +List<CategoryType>? CategoryTypes
+  +List<UserProject> UserProjects
+  +List<Log>? Logs
+  +string ConvertStatus(ProjectStatus projectStatus)
+}
+
+class PriorityType {
+  +int ID
+  +required string Name
+  +int ProjectID
+  +Project Project
+}
+
+class StatusType {
+  +int ID
+  +required string Name
+  +int ProjectID
+  +Project Project
+}
+
+class User {
+  +int ID
+  +string? FName
+  +string? LName
+  +required string Email
+  +required string HashPass
+  +bool IsActive
+  +string? RegToken
+  +DateTime? RegTokenDate
+  +string? PassRecoveryToken
+  +DateTime? PassRecoveryTokenDate
+  +List<UserProject> UserProjects
+  +List<Project>? Projects
+  +List<Issue>? Issues
+}
+
+enum UserRoles {
+  Admin
+  Manager
+  Employee
+}
+
+class UserProject {
+  +int ID
+  +int UserID
+  +int ProjectID
+  +UserRoles UserRole
+  +string? InviteToken
+  +DateTime? InviteTokenDate
+  +bool IsCreator
+  +bool IsActive
+  +User User
+  +Project Project
+  +List<CategoryType>? CategoryTypes
+  +string ConvertRoles(UserRoles userRoles)
+}
+
+CategoryType  o--  UserProject
+Issue  o--  StatusType
+Issue  o--  CategoryType
+Issue  o--  PriorityType 
+Issue  --*  Project 
+Issue  --o  User 
+Issue  --o User 
+Project  o--  PriorityType 
+Project  o--  StatusType 
+Project  o--  CategoryType 
+Project  o--  UserProject 
+Project  *--  Log 
+User  o--  UserProject 
+User  o--  Project 
+@enduml

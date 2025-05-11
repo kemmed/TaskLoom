@@ -1,0 +1,25 @@
+@startuml Login
+actor Пользователь as User
+participant "Веб-браузер" as Browser
+participant "Пользовательский контроллер" as LC
+participant "Сервис проекта и пользователя" as US
+participant "База данных" as DB
+
+User -> Browser: Запросить страницу входа
+Browser -> LC: GET /Users/Login
+LC -> Browser: Вернуть страницу входа
+
+User -> Browser: Ввести email и пароль и отправить
+Browser -> LC: POST /Users/Login с данными пользователя
+
+LC -> US: Найти пользователя по email
+US -> DB: Выполнить запрос для поиска пользователя
+DB --> US: Возвращаем пользователя
+US --> LC: Возвращаем пользователя
+
+alt Пользователь найден и пароль верный
+    LC -> Browser: Установить сессию и перенаправить на страницу проектов
+else Пользователь не найден или пароль неверный
+    LC -> Browser: Перенаправить на страницу ошибки авторизации
+end
+@enduml

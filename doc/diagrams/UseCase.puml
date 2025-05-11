@@ -16,16 +16,16 @@ package "Система управления проектами" {
     }
 
     rectangle "Работа с проектами" {
-        usecase "Работать с проектами" as BoardUC
-            usecase "Создать проект" as BoardCreateUC
-            usecase "Изменить проект" as BoardEditUC
-            usecase "Удалить проект" as BoardDeleteUC
+        usecase "Работать с проектами" as ProjectUC
+            usecase "Создать проект" as ProjectCreateUC
+            usecase "Изменить проект" as ProjectEditUC
+            usecase "Удалить проект" as ProjectDeleteUC
     }
-    rectangle "Работа с катогориями" {
-        usecase "Работать с катогориями" as СategoryUC
-            usecase "Создать катогорию" as СategoryCreateUC
-            usecase "Изменить катогорию" as СategoryEditUC
-            usecase "Удалить катогорию" as СategoryDeleteUC
+    rectangle "Работа с категориями" {
+        usecase "Работать с катeгориями" as СategoryUC
+            usecase "Создать катeгорию" as СategoryCreateUC
+            usecase "Изменить катeгорию" as СategoryEditUC
+            usecase "Удалить катeгорию" as СategoryDeleteUC
     }
 
     rectangle "Работа с задачами" {
@@ -33,14 +33,22 @@ package "Система управления проектами" {
             usecase "Добавить задачу" as TaskCreateUC
             usecase "Редактировать задачу" as TaskEditUC
             usecase "Удалить задачу" as TaskDeletetUC
+            usecase "Восстановить задачу" as TaskRestoreUC
             usecase "Переместить задачу" as TaskMoveUC
     }
 
     rectangle "Совместная работа" {
         usecase "Совместная работа" as СollaborationUC
             usecase "Пригласить пользователя на доску" as InviteUC
-            usecase "Удалить пользователя из доски" as RemoveUC
+            usecase "Удалить пользователя из проекта" as RemoveUC
             usecase "Редактировать роль" as UpdateUC
+            usecase "Назначать категории" as UserCategoryUC
+    }
+
+     rectangle "Лог и статистика" {
+            usecase "Просмотр лога" as LogUC
+            usecase "Сохранение лога" as SaveLogUC
+            usecase "Просмотр статистики" as StatisticsUC
     }
 
 
@@ -64,17 +72,23 @@ Employee -- TaskUC
     TaskUC ..> TaskCreateUC: "include"
     TaskUC ..> TaskEditUC: "include"
     TaskUC ..> TaskDeletetUC: "include"
+    TaskUC ..> TaskRestoreUC: "include"
     TaskUC ..> TaskMoveUC: "include"
 
 Admin -- СollaborationUC
     СollaborationUC ..> InviteUC: "include"
     СollaborationUC ..> RemoveUC: "include"
     СollaborationUC ..> UpdateUC: "include"
+    СollaborationUC ..> UserCategoryUC: "include"
 
 
-Admin -- BoardUC
-    BoardUC ..> BoardCreateUC: "include"
-    BoardUC ..> BoardEditUC: "include"
-    BoardUC ..> BoardDeleteUC: "include"
+Admin -- ProjectUC
+    ProjectUC ..> ProjectCreateUC: "include"
+    ProjectUC ..> ProjectEditUC: "include"
+    ProjectUC ..> ProjectDeleteUC: "include"
+
+Admin -- LogUC
+Admin -- StatisticsUC
+LogUC ..> SaveLogUC: "include"
 }
 @enduml
