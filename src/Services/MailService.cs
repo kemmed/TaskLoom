@@ -22,7 +22,7 @@ namespace taskloom.Services
         /// <param name="body">Тело письма.</param>
         /// <param name="topic">Тема письма.</param>
         /// <param name="recipientEmail">Адрес получателя.</param>
-        public void SendEmail(string body, string topic, string recipientEmail)
+        public virtual void SendEmail(string body, string topic, string recipientEmail)
         {
 
             MailMessage mail = new MailMessage();

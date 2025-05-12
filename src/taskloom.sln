@@ -5,6 +5,11 @@ VisualStudioVersion = 17.11.35327.3
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "taskloom", "taskloom.csproj", "{567FE84D-A6D1-448F-9F57-E5C55C7A62DE}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests", "..\TestUserController\Tests.csproj", "{F2A1B9EC-4817-4BF4-9BE1-E5E1D9897112}"
+	ProjectSection(ProjectDependencies) = postProject
+		{567FE84D-A6D1-448F-9F57-E5C55C7A62DE} = {567FE84D-A6D1-448F-9F57-E5C55C7A62DE}
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +20,10 @@ Global
 		{567FE84D-A6D1-448F-9F57-E5C55C7A62DE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{567FE84D-A6D1-448F-9F57-E5C55C7A62DE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{567FE84D-A6D1-448F-9F57-E5C55C7A62DE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F2A1B9EC-4817-4BF4-9BE1-E5E1D9897112}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F2A1B9EC-4817-4BF4-9BE1-E5E1D9897112}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F2A1B9EC-4817-4BF4-9BE1-E5E1D9897112}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F2A1B9EC-4817-4BF4-9BE1-E5E1D9897112}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

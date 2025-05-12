@@ -11,7 +11,7 @@
         /// </summary>
         /// <param name="password">Пароль для хеширования.</param>
         /// <returns>Хеш пароля.</returns>
-        public string HashPassword(string password)
+        public virtual string HashPassword(string password)
         {
             byte[] passwordBytes = Encoding.UTF8.GetBytes(password);
             using (SHA256 sha256 = SHA256.Create())
@@ -39,7 +39,7 @@
         /// </summary>
         /// <param name="password">Пароль для проверки.</param>
         /// <returns>Значение true, если пароль допустим, иначе false.</returns>
-        public bool IsPasswordValid(string password)
+        public virtual bool IsPasswordValid(string password)
         {
             if (string.IsNullOrEmpty(password) || password.Length < 8)
                 return false;

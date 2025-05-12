@@ -22,7 +22,7 @@ namespace taskloom.Services
         /// <param name="projectID">Идентификатор проекта, к которому относится действие.</param>
         /// <param name="action">Описание действия, которое было выполнено.</param>
         /// <param name="userID">Идентификатор пользователя, выполнившего действие. Если не указан, используется значение null.</param>
-        public void LogAction(int projectID, string action, int? userID = null)
+        public virtual void LogAction(int projectID, string action, int? userID = null)
         {
             User? user = userID.HasValue ? _context.User.FirstOrDefault(u => u.ID == userID.Value) : null;
             string userName = user != null ? $"{user.FName} {user.LName}" : " ";

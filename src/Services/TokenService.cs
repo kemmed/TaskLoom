@@ -10,7 +10,7 @@
         /// Токен состоит из букв английского алфавита (от 'a' до 'z').
         /// </summary>
         /// <returns>Сгенерированный токен.</returns>
-        public string GenerateToken()
+        public virtual string GenerateToken()
         {
             string token = "";
             for (int i = 0; i < 16; i++)

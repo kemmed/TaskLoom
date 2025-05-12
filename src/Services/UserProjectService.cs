@@ -25,7 +25,7 @@ namespace taskloom.Services
         /// </summary>
         /// <param name="httpContext">HTTP-контекст.</param>
         /// <returns>Текущий пользователь. Null если пользователь не найден.</returns>
-        public async Task<User?> GetCurrentUser(HttpContext httpContext)
+        public virtual async Task<User?> GetCurrentUser(HttpContext httpContext)
         {
             int? userSessionID = httpContext.Session.GetInt32("UserID");
             if (userSessionID == null)
