@@ -15,7 +15,7 @@ namespace taskloom.Migrations
         protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
-            modelBuilder.HasAnnotation("ProductVersion", "8.0.11");
+            modelBuilder.HasAnnotation("ProductVersion", "9.0.5");
 
             modelBuilder.Entity("CategoryTypeUserProject", b =>
                 {
@@ -29,7 +29,7 @@ namespace taskloom.Migrations
 
                     b.HasIndex("UserProjectsID");
 
-                    b.ToTable("CategoryTypeUserProject", (string)null);
+                    b.ToTable("CategoryTypeUserProject");
                 });
 
             modelBuilder.Entity("taskloom.Models.CategoryType", b =>
@@ -49,7 +49,7 @@ namespace taskloom.Migrations
 
                     b.HasIndex("ProjectID");
 
-                    b.ToTable("CategoryType", (string)null);
+                    b.ToTable("CategoryType");
                 });
 
             modelBuilder.Entity("taskloom.Models.Issue", b =>
@@ -112,7 +112,7 @@ namespace taskloom.Migrations
 
                     b.HasIndex("StatusTypeID");
 
-                    b.ToTable("Issue", (string)null);
+                    b.ToTable("Issue");
                 });
 
             modelBuilder.Entity("taskloom.Models.Log", b =>
@@ -135,7 +135,7 @@ namespace taskloom.Migrations
 
                     b.HasIndex("ProjectID");
 
-                    b.ToTable("Log", (string)null);
+                    b.ToTable("Log");
                 });
 
             modelBuilder.Entity("taskloom.Models.PriorityType", b =>
@@ -155,7 +155,7 @@ namespace taskloom.Migrations
 
                     b.HasIndex("ProjectID");
 
-                    b.ToTable("PriorityType", (string)null);
+                    b.ToTable("PriorityType");
                 });
 
             modelBuilder.Entity("taskloom.Models.Project", b =>
@@ -193,7 +193,7 @@ namespace taskloom.Migrations
 
                     b.HasIndex("UserID");
 
-                    b.ToTable("Project", (string)null);
+                    b.ToTable("Project");
                 });
 
             modelBuilder.Entity("taskloom.Models.StatusType", b =>
@@ -213,7 +213,7 @@ namespace taskloom.Migrations
 
                     b.HasIndex("ProjectID");
 
-                    b.ToTable("StatusType", (string)null);
+                    b.ToTable("StatusType");
                 });
 
             modelBuilder.Entity("taskloom.Models.User", b =>
@@ -253,7 +253,7 @@ namespace taskloom.Migrations
 
                     b.HasKey("ID");
 
-                    b.ToTable("User", (string)null);
+                    b.ToTable("User");
                 });
 
             modelBuilder.Entity("taskloom.Models.UserProject", b =>
@@ -289,7 +289,7 @@ namespace taskloom.Migrations
 
                     b.HasIndex("UserID");
 
-                    b.ToTable("UserProject", (string)null);
+                    b.ToTable("UserProject");
                 });
 
             modelBuilder.Entity("CategoryTypeUserProject", b =>

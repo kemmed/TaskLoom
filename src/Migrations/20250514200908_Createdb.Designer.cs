@@ -11,14 +11,14 @@ using taskloom.Data;
 namespace taskloom.Migrations
 {
     [DbContext(typeof(taskloomContext))]
-    [Migration("20250508154806_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20250514200908_Createdb")]
+    partial class Createdb
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
-            modelBuilder.HasAnnotation("ProductVersion", "8.0.11");
+            modelBuilder.HasAnnotation("ProductVersion", "9.0.5");
 
             modelBuilder.Entity("CategoryTypeUserProject", b =>
                 {
