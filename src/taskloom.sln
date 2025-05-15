@@ -3,7 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.11.35327.3
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "taskloom", "taskloom.csproj", "{567FE84D-A6D1-448F-9F57-E5C55C7A62DE}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "taskloom", "app\taskloom.csproj", "{06EDBC88-1DA1-91F7-0547-DB20C02235D6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests", "tests\Tests.csproj", "{9CF47860-2CEA-F379-09D8-9AEF27965D12}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -11,10 +13,14 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{567FE84D-A6D1-448F-9F57-E5C55C7A62DE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{567FE84D-A6D1-448F-9F57-E5C55C7A62DE}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{567FE84D-A6D1-448F-9F57-E5C55C7A62DE}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{567FE84D-A6D1-448F-9F57-E5C55C7A62DE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{06EDBC88-1DA1-91F7-0547-DB20C02235D6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{06EDBC88-1DA1-91F7-0547-DB20C02235D6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{06EDBC88-1DA1-91F7-0547-DB20C02235D6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{06EDBC88-1DA1-91F7-0547-DB20C02235D6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9CF47860-2CEA-F379-09D8-9AEF27965D12}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9CF47860-2CEA-F379-09D8-9AEF27965D12}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9CF47860-2CEA-F379-09D8-9AEF27965D12}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9CF47860-2CEA-F379-09D8-9AEF27965D12}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
