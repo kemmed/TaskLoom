@@ -42,7 +42,7 @@ namespace taskloom.Services
             DateTime start = DateTime.Parse(startDate);
             DateTime end = DateTime.Parse(endDate);
 
-            issues = issues.Where(i => i.CreateDate.Date >= start && i.CreateDate.Date <= end).ToList();
+            issues = issues.Where(i => i.CreateDate.Date >= start && i.CreateDate.Date <= end && !i.IsDelete).ToList();
 
             if (selectedCategories != null && selectedCategories.Length > 0)
             {

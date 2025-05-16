@@ -1059,7 +1059,7 @@ namespace taskloom.Controllers
             if (currIssue.StatusTypeID == currStatusID)
                 return Redirect($"/Projects/Project/{currIssue.ProjectID}");
 
-            else if (completedStatusType != null && currStatusID != completedStatusType.ID)
+            else if (completedStatusType != null && currStatusID == completedStatusType.ID)
                     currIssue.EndDate = DateTime.Now.Date;
             else if (currIssue.StatusType == _context.StatusType.FirstOrDefault(x => x.Name == "Завершенные" && x.ProjectID == currIssue.ProjectID))
                 currIssue.EndDate = null;

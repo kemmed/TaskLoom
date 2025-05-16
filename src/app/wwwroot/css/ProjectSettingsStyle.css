@@ -133,8 +133,9 @@
     margin-bottom:15px;
     text-decoration:none;
 }
-.category-item{
+.category-item {
     margin-bottom: 10px;
+    text-align: left;
 }
 .category-list {
     text-align: left;
