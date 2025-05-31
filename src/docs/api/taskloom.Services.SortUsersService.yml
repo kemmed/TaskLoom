@@ -1,0 +1,584 @@
+### YamlMime:ManagedReference
+items:
+- uid: taskloom.Services.SortUsersService
+  commentId: T:taskloom.Services.SortUsersService
+  id: SortUsersService
+  parent: taskloom.Services
+  children:
+  - taskloom.Services.SortUsersService.#ctor(taskloom.Data.taskloomContext)
+  - taskloom.Services.SortUsersService.GetSortedResponsibilities(System.Int32)
+  - taskloom.Services.SortUsersService.GetTaskWord(System.Int32)
+  langs:
+  - csharp
+  - vb
+  name: SortUsersService
+  nameWithType: SortUsersService
+  fullName: taskloom.Services.SortUsersService
+  type: Class
+  source:
+    remote:
+      path: src/app/Services/SortUsersService.cs
+      branch: main
+      repo: https://github.com/kemmed/TaskLoom
+    id: SortUsersService
+    path: app/Services/SortUsersService.cs
+    startLine: 14
+  assemblies:
+  - taskloom
+  namespace: taskloom.Services
+  syntax:
+    content: public class SortUsersService
+    content.vb: Public Class SortUsersService
+  inheritance:
+  - System.Object
+  inheritedMembers:
+  - System.Object.Equals(System.Object)
+  - System.Object.Equals(System.Object,System.Object)
+  - System.Object.GetHashCode
+  - System.Object.GetType
+  - System.Object.MemberwiseClone
+  - System.Object.ReferenceEquals(System.Object,System.Object)
+  - System.Object.ToString
+- uid: taskloom.Services.SortUsersService.#ctor(taskloom.Data.taskloomContext)
+  commentId: M:taskloom.Services.SortUsersService.#ctor(taskloom.Data.taskloomContext)
+  id: '#ctor(taskloom.Data.taskloomContext)'
+  parent: taskloom.Services.SortUsersService
+  langs:
+  - csharp
+  - vb
+  name: SortUsersService(taskloomContext)
+  nameWithType: SortUsersService.SortUsersService(taskloomContext)
+  fullName: taskloom.Services.SortUsersService.SortUsersService(taskloom.Data.taskloomContext)
+  type: Constructor
+  source:
+    remote:
+      path: src/app/Services/SortUsersService.cs
+      branch: main
+      repo: https://github.com/kemmed/TaskLoom
+    id: .ctor
+    path: app/Services/SortUsersService.cs
+    startLine: 18
+  assemblies:
+  - taskloom
+  namespace: taskloom.Services
+  syntax:
+    content: public SortUsersService(taskloomContext context)
+    parameters:
+    - id: context
+      type: taskloom.Data.taskloomContext
+    content.vb: Public Sub New(context As taskloomContext)
+  overload: taskloom.Services.SortUsersService.#ctor*
+  nameWithType.vb: SortUsersService.New(taskloomContext)
+  fullName.vb: taskloom.Services.SortUsersService.New(taskloom.Data.taskloomContext)
+  name.vb: New(taskloomContext)
+- uid: taskloom.Services.SortUsersService.GetSortedResponsibilities(System.Int32)
+  commentId: M:taskloom.Services.SortUsersService.GetSortedResponsibilities(System.Int32)
+  id: GetSortedResponsibilities(System.Int32)
+  parent: taskloom.Services.SortUsersService
+  langs:
+  - csharp
+  - vb
+  name: GetSortedResponsibilities(int)
+  nameWithType: SortUsersService.GetSortedResponsibilities(int)
+  fullName: taskloom.Services.SortUsersService.GetSortedResponsibilities(int)
+  type: Method
+  source:
+    remote:
+      path: src/app/Services/SortUsersService.cs
+      branch: main
+      repo: https://github.com/kemmed/TaskLoom
+    id: GetSortedResponsibilities
+    path: app/Services/SortUsersService.cs
+    startLine: 29
+  assemblies:
+  - taskloom
+  namespace: taskloom.Services
+  summary: >-
+    Возвращает отсортированный список ответственных пользователей за проект.
+
+    Сортировка осуществляется по количеству задач и ближайшему сроку выполнения задач.
+  example: []
+  syntax:
+    content: public List<SelectListItem> GetSortedResponsibilities(int projectID)
+    parameters:
+    - id: projectID
+      type: System.Int32
+      description: Идентификатор проекта.
+    return:
+      type: System.Collections.Generic.List{Microsoft.AspNetCore.Mvc.Rendering.SelectListItem}
+      description: Список, содержащий информацию о пользователях и их задачах.
+    content.vb: Public Function GetSortedResponsibilities(projectID As Integer) As List(Of SelectListItem)
+  overload: taskloom.Services.SortUsersService.GetSortedResponsibilities*
+  nameWithType.vb: SortUsersService.GetSortedResponsibilities(Integer)
+  fullName.vb: taskloom.Services.SortUsersService.GetSortedResponsibilities(Integer)
+  name.vb: GetSortedResponsibilities(Integer)
+- uid: taskloom.Services.SortUsersService.GetTaskWord(System.Int32)
+  commentId: M:taskloom.Services.SortUsersService.GetTaskWord(System.Int32)
+  id: GetTaskWord(System.Int32)
+  parent: taskloom.Services.SortUsersService
+  langs:
+  - csharp
+  - vb
+  name: GetTaskWord(int)
+  nameWithType: SortUsersService.GetTaskWord(int)
+  fullName: taskloom.Services.SortUsersService.GetTaskWord(int)
+  type: Method
+  source:
+    remote:
+      path: src/app/Services/SortUsersService.cs
+      branch: main
+      repo: https://github.com/kemmed/TaskLoom
+    id: GetTaskWord
+    path: app/Services/SortUsersService.cs
+    startLine: 64
+  assemblies:
+  - taskloom
+  namespace: taskloom.Services
+  summary: Возвращает правильное склонение слова "задача" в зависимости от их количества.
+  example: []
+  syntax:
+    content: public string GetTaskWord(int count)
+    parameters:
+    - id: count
+      type: System.Int32
+      description: Количество задач.
+    return:
+      type: System.String
+      description: Строка с правильным склонением слова "задача".
+    content.vb: Public Function GetTaskWord(count As Integer) As String
+  overload: taskloom.Services.SortUsersService.GetTaskWord*
+  nameWithType.vb: SortUsersService.GetTaskWord(Integer)
+  fullName.vb: taskloom.Services.SortUsersService.GetTaskWord(Integer)
+  name.vb: GetTaskWord(Integer)
+references:
+- uid: taskloom.Services
+  commentId: N:taskloom.Services
+  href: taskloom.html
+  name: taskloom.Services
+  nameWithType: taskloom.Services
+  fullName: taskloom.Services
+  spec.csharp:
+  - uid: taskloom
+    name: taskloom
+    href: taskloom.html
+  - name: .
+  - uid: taskloom.Services
+    name: Services
+    href: taskloom.Services.html
+  spec.vb:
+  - uid: taskloom
+    name: taskloom
+    href: taskloom.html
+  - name: .
+  - uid: taskloom.Services
+    name: Services
+    href: taskloom.Services.html
+- uid: System.Object
+  commentId: T:System.Object
+  parent: System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object
+  name: object
+  nameWithType: object
+  fullName: object
+  nameWithType.vb: Object
+  fullName.vb: Object
+  name.vb: Object
+- uid: System.Object.Equals(System.Object)
+  commentId: M:System.Object.Equals(System.Object)
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)
+  name: Equals(object)
+  nameWithType: object.Equals(object)
+  fullName: object.Equals(object)
+  nameWithType.vb: Object.Equals(Object)
+  fullName.vb: Object.Equals(Object)
+  name.vb: Equals(Object)
+  spec.csharp:
+  - uid: System.Object.Equals(System.Object)
+    name: Equals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)
+  - name: (
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+  spec.vb:
+  - uid: System.Object.Equals(System.Object)
+    name: Equals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)
+  - name: (
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+- uid: System.Object.Equals(System.Object,System.Object)
+  commentId: M:System.Object.Equals(System.Object,System.Object)
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)
+  name: Equals(object, object)
+  nameWithType: object.Equals(object, object)
+  fullName: object.Equals(object, object)
+  nameWithType.vb: Object.Equals(Object, Object)
+  fullName.vb: Object.Equals(Object, Object)
+  name.vb: Equals(Object, Object)
+  spec.csharp:
+  - uid: System.Object.Equals(System.Object,System.Object)
+    name: Equals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)
+  - name: (
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: ','
+  - name: " "
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+  spec.vb:
+  - uid: System.Object.Equals(System.Object,System.Object)
+    name: Equals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)
+  - name: (
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: ','
+  - name: " "
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+- uid: System.Object.GetHashCode
+  commentId: M:System.Object.GetHashCode
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.gethashcode
+  name: GetHashCode()
+  nameWithType: object.GetHashCode()
+  fullName: object.GetHashCode()
+  nameWithType.vb: Object.GetHashCode()
+  fullName.vb: Object.GetHashCode()
+  spec.csharp:
+  - uid: System.Object.GetHashCode
+    name: GetHashCode
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.gethashcode
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: System.Object.GetHashCode
+    name: GetHashCode
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.gethashcode
+  - name: (
+  - name: )
+- uid: System.Object.GetType
+  commentId: M:System.Object.GetType
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.gettype
+  name: GetType()
+  nameWithType: object.GetType()
+  fullName: object.GetType()
+  nameWithType.vb: Object.GetType()
+  fullName.vb: Object.GetType()
+  spec.csharp:
+  - uid: System.Object.GetType
+    name: GetType
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.gettype
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: System.Object.GetType
+    name: GetType
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.gettype
+  - name: (
+  - name: )
+- uid: System.Object.MemberwiseClone
+  commentId: M:System.Object.MemberwiseClone
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.memberwiseclone
+  name: MemberwiseClone()
+  nameWithType: object.MemberwiseClone()
+  fullName: object.MemberwiseClone()
+  nameWithType.vb: Object.MemberwiseClone()
+  fullName.vb: Object.MemberwiseClone()
+  spec.csharp:
+  - uid: System.Object.MemberwiseClone
+    name: MemberwiseClone
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.memberwiseclone
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: System.Object.MemberwiseClone
+    name: MemberwiseClone
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.memberwiseclone
+  - name: (
+  - name: )
+- uid: System.Object.ReferenceEquals(System.Object,System.Object)
+  commentId: M:System.Object.ReferenceEquals(System.Object,System.Object)
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.referenceequals
+  name: ReferenceEquals(object, object)
+  nameWithType: object.ReferenceEquals(object, object)
+  fullName: object.ReferenceEquals(object, object)
+  nameWithType.vb: Object.ReferenceEquals(Object, Object)
+  fullName.vb: Object.ReferenceEquals(Object, Object)
+  name.vb: ReferenceEquals(Object, Object)
+  spec.csharp:
+  - uid: System.Object.ReferenceEquals(System.Object,System.Object)
+    name: ReferenceEquals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.referenceequals
+  - name: (
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: ','
+  - name: " "
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+  spec.vb:
+  - uid: System.Object.ReferenceEquals(System.Object,System.Object)
+    name: ReferenceEquals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.referenceequals
+  - name: (
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: ','
+  - name: " "
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+- uid: System.Object.ToString
+  commentId: M:System.Object.ToString
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.tostring
+  name: ToString()
+  nameWithType: object.ToString()
+  fullName: object.ToString()
+  nameWithType.vb: Object.ToString()
+  fullName.vb: Object.ToString()
+  spec.csharp:
+  - uid: System.Object.ToString
+    name: ToString
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.tostring
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: System.Object.ToString
+    name: ToString
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.tostring
+  - name: (
+  - name: )
+- uid: System
+  commentId: N:System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system
+  name: System
+  nameWithType: System
+  fullName: System
+- uid: taskloom.Services.SortUsersService.#ctor*
+  commentId: Overload:taskloom.Services.SortUsersService.#ctor
+  href: taskloom.Services.SortUsersService.html#taskloom_Services_SortUsersService__ctor_taskloom_Data_taskloomContext_
+  name: SortUsersService
+  nameWithType: SortUsersService.SortUsersService
+  fullName: taskloom.Services.SortUsersService.SortUsersService
+  nameWithType.vb: SortUsersService.New
+  fullName.vb: taskloom.Services.SortUsersService.New
+  name.vb: New
+- uid: taskloom.Data.taskloomContext
+  commentId: T:taskloom.Data.taskloomContext
+  parent: taskloom.Data
+  href: taskloom.Data.taskloomContext.html
+  name: taskloomContext
+  nameWithType: taskloomContext
+  fullName: taskloom.Data.taskloomContext
+- uid: taskloom.Data
+  commentId: N:taskloom.Data
+  href: taskloom.html
+  name: taskloom.Data
+  nameWithType: taskloom.Data
+  fullName: taskloom.Data
+  spec.csharp:
+  - uid: taskloom
+    name: taskloom
+    href: taskloom.html
+  - name: .
+  - uid: taskloom.Data
+    name: Data
+    href: taskloom.Data.html
+  spec.vb:
+  - uid: taskloom
+    name: taskloom
+    href: taskloom.html
+  - name: .
+  - uid: taskloom.Data
+    name: Data
+    href: taskloom.Data.html
+- uid: taskloom.Services.SortUsersService.GetSortedResponsibilities*
+  commentId: Overload:taskloom.Services.SortUsersService.GetSortedResponsibilities
+  href: taskloom.Services.SortUsersService.html#taskloom_Services_SortUsersService_GetSortedResponsibilities_System_Int32_
+  name: GetSortedResponsibilities
+  nameWithType: SortUsersService.GetSortedResponsibilities
+  fullName: taskloom.Services.SortUsersService.GetSortedResponsibilities
+- uid: System.Int32
+  commentId: T:System.Int32
+  parent: System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.int32
+  name: int
+  nameWithType: int
+  fullName: int
+  nameWithType.vb: Integer
+  fullName.vb: Integer
+  name.vb: Integer
+- uid: System.Collections.Generic.List{Microsoft.AspNetCore.Mvc.Rendering.SelectListItem}
+  commentId: T:System.Collections.Generic.List{Microsoft.AspNetCore.Mvc.Rendering.SelectListItem}
+  parent: System.Collections.Generic
+  definition: System.Collections.Generic.List`1
+  href: https://learn.microsoft.com/dotnet/api/system.collections.generic.list-1
+  name: List<SelectListItem>
+  nameWithType: List<SelectListItem>
+  fullName: System.Collections.Generic.List<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem>
+  nameWithType.vb: List(Of SelectListItem)
+  fullName.vb: System.Collections.Generic.List(Of Microsoft.AspNetCore.Mvc.Rendering.SelectListItem)
+  name.vb: List(Of SelectListItem)
+  spec.csharp:
+  - uid: System.Collections.Generic.List`1
+    name: List
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.list-1
+  - name: <
+  - uid: Microsoft.AspNetCore.Mvc.Rendering.SelectListItem
+    name: SelectListItem
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.mvc.rendering.selectlistitem
+  - name: '>'
+  spec.vb:
+  - uid: System.Collections.Generic.List`1
+    name: List
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.list-1
+  - name: (
+  - name: Of
+  - name: " "
+  - uid: Microsoft.AspNetCore.Mvc.Rendering.SelectListItem
+    name: SelectListItem
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.mvc.rendering.selectlistitem
+  - name: )
+- uid: System.Collections.Generic.List`1
+  commentId: T:System.Collections.Generic.List`1
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.collections.generic.list-1
+  name: List<T>
+  nameWithType: List<T>
+  fullName: System.Collections.Generic.List<T>
+  nameWithType.vb: List(Of T)
+  fullName.vb: System.Collections.Generic.List(Of T)
+  name.vb: List(Of T)
+  spec.csharp:
+  - uid: System.Collections.Generic.List`1
+    name: List
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.list-1
+  - name: <
+  - name: T
+  - name: '>'
+  spec.vb:
+  - uid: System.Collections.Generic.List`1
+    name: List
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.list-1
+  - name: (
+  - name: Of
+  - name: " "
+  - name: T
+  - name: )
+- uid: System.Collections.Generic
+  commentId: N:System.Collections.Generic
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system
+  name: System.Collections.Generic
+  nameWithType: System.Collections.Generic
+  fullName: System.Collections.Generic
+  spec.csharp:
+  - uid: System
+    name: System
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system
+  - name: .
+  - uid: System.Collections
+    name: Collections
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections
+  - name: .
+  - uid: System.Collections.Generic
+    name: Generic
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic
+  spec.vb:
+  - uid: System
+    name: System
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system
+  - name: .
+  - uid: System.Collections
+    name: Collections
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections
+  - name: .
+  - uid: System.Collections.Generic
+    name: Generic
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic
+- uid: taskloom.Services.SortUsersService.GetTaskWord*
+  commentId: Overload:taskloom.Services.SortUsersService.GetTaskWord
+  href: taskloom.Services.SortUsersService.html#taskloom_Services_SortUsersService_GetTaskWord_System_Int32_
+  name: GetTaskWord
+  nameWithType: SortUsersService.GetTaskWord
+  fullName: taskloom.Services.SortUsersService.GetTaskWord
+- uid: System.String
+  commentId: T:System.String
+  parent: System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.string
+  name: string
+  nameWithType: string
+  fullName: string
+  nameWithType.vb: String
+  fullName.vb: String
+  name.vb: String

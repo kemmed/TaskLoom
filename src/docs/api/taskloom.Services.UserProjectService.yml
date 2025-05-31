@@ -1,0 +1,931 @@
+### YamlMime:ManagedReference
+items:
+- uid: taskloom.Services.UserProjectService
+  commentId: T:taskloom.Services.UserProjectService
+  id: UserProjectService
+  parent: taskloom.Services
+  children:
+  - taskloom.Services.UserProjectService.#ctor(taskloom.Data.taskloomContext)
+  - taskloom.Services.UserProjectService.GetCurrentUser(Microsoft.AspNetCore.Http.HttpContext)
+  - taskloom.Services.UserProjectService.GetProjectByID(System.Nullable{System.Int32})
+  - taskloom.Services.UserProjectService.GetUserByID(System.Nullable{System.Int32})
+  - taskloom.Services.UserProjectService.GetUserProjectByID(System.Nullable{System.Int32})
+  - taskloom.Services.UserProjectService.GetUserProjectByID(System.Nullable{System.Int32},System.Nullable{System.Int32})
+  - taskloom.Services.UserProjectService.UserIsInProject(System.Nullable{System.Int32},System.Nullable{System.Int32})
+  langs:
+  - csharp
+  - vb
+  name: UserProjectService
+  nameWithType: UserProjectService
+  fullName: taskloom.Services.UserProjectService
+  type: Class
+  source:
+    remote:
+      path: src/app/Services/UserProjectService.cs
+      branch: main
+      repo: https://github.com/kemmed/TaskLoom
+    id: UserProjectService
+    path: app/Services/UserProjectService.cs
+    startLine: 13
+  assemblies:
+  - taskloom
+  namespace: taskloom.Services
+  syntax:
+    content: public class UserProjectService
+    content.vb: Public Class UserProjectService
+  inheritance:
+  - System.Object
+  inheritedMembers:
+  - System.Object.Equals(System.Object)
+  - System.Object.Equals(System.Object,System.Object)
+  - System.Object.GetHashCode
+  - System.Object.GetType
+  - System.Object.MemberwiseClone
+  - System.Object.ReferenceEquals(System.Object,System.Object)
+  - System.Object.ToString
+- uid: taskloom.Services.UserProjectService.#ctor(taskloom.Data.taskloomContext)
+  commentId: M:taskloom.Services.UserProjectService.#ctor(taskloom.Data.taskloomContext)
+  id: '#ctor(taskloom.Data.taskloomContext)'
+  parent: taskloom.Services.UserProjectService
+  langs:
+  - csharp
+  - vb
+  name: UserProjectService(taskloomContext)
+  nameWithType: UserProjectService.UserProjectService(taskloomContext)
+  fullName: taskloom.Services.UserProjectService.UserProjectService(taskloom.Data.taskloomContext)
+  type: Constructor
+  source:
+    remote:
+      path: src/app/Services/UserProjectService.cs
+      branch: main
+      repo: https://github.com/kemmed/TaskLoom
+    id: .ctor
+    path: app/Services/UserProjectService.cs
+    startLine: 17
+  assemblies:
+  - taskloom
+  namespace: taskloom.Services
+  syntax:
+    content: public UserProjectService(taskloomContext context)
+    parameters:
+    - id: context
+      type: taskloom.Data.taskloomContext
+    content.vb: Public Sub New(context As taskloomContext)
+  overload: taskloom.Services.UserProjectService.#ctor*
+  nameWithType.vb: UserProjectService.New(taskloomContext)
+  fullName.vb: taskloom.Services.UserProjectService.New(taskloom.Data.taskloomContext)
+  name.vb: New(taskloomContext)
+- uid: taskloom.Services.UserProjectService.GetCurrentUser(Microsoft.AspNetCore.Http.HttpContext)
+  commentId: M:taskloom.Services.UserProjectService.GetCurrentUser(Microsoft.AspNetCore.Http.HttpContext)
+  id: GetCurrentUser(Microsoft.AspNetCore.Http.HttpContext)
+  parent: taskloom.Services.UserProjectService
+  langs:
+  - csharp
+  - vb
+  name: GetCurrentUser(HttpContext)
+  nameWithType: UserProjectService.GetCurrentUser(HttpContext)
+  fullName: taskloom.Services.UserProjectService.GetCurrentUser(Microsoft.AspNetCore.Http.HttpContext)
+  type: Method
+  source:
+    remote:
+      path: src/app/Services/UserProjectService.cs
+      branch: main
+      repo: https://github.com/kemmed/TaskLoom
+    id: GetCurrentUser
+    path: app/Services/UserProjectService.cs
+    startLine: 27
+  assemblies:
+  - taskloom
+  namespace: taskloom.Services
+  summary: Получает текущего пользователя из сессии.
+  example: []
+  syntax:
+    content: public virtual Task<User?> GetCurrentUser(HttpContext httpContext)
+    parameters:
+    - id: httpContext
+      type: Microsoft.AspNetCore.Http.HttpContext
+      description: HTTP-контекст.
+    return:
+      type: System.Threading.Tasks.Task{taskloom.Models.User}
+      description: Текущий пользователь. Null если пользователь не найден.
+    content.vb: Public Overridable Function GetCurrentUser(httpContext As HttpContext) As Task(Of User)
+  overload: taskloom.Services.UserProjectService.GetCurrentUser*
+- uid: taskloom.Services.UserProjectService.GetUserByID(System.Nullable{System.Int32})
+  commentId: M:taskloom.Services.UserProjectService.GetUserByID(System.Nullable{System.Int32})
+  id: GetUserByID(System.Nullable{System.Int32})
+  parent: taskloom.Services.UserProjectService
+  langs:
+  - csharp
+  - vb
+  name: GetUserByID(int?)
+  nameWithType: UserProjectService.GetUserByID(int?)
+  fullName: taskloom.Services.UserProjectService.GetUserByID(int?)
+  type: Method
+  source:
+    remote:
+      path: src/app/Services/UserProjectService.cs
+      branch: main
+      repo: https://github.com/kemmed/TaskLoom
+    id: GetUserByID
+    path: app/Services/UserProjectService.cs
+    startLine: 41
+  assemblies:
+  - taskloom
+  namespace: taskloom.Services
+  summary: Получает пользователя по его идентификатору.
+  example: []
+  syntax:
+    content: public Task<User?> GetUserByID(int? userID)
+    parameters:
+    - id: userID
+      type: System.Nullable{System.Int32}
+      description: Идентификатор пользователя.
+    return:
+      type: System.Threading.Tasks.Task{taskloom.Models.User}
+      description: Текущий пользователь. Null если пользователь не найден.
+    content.vb: Public Function GetUserByID(userID As Integer?) As Task(Of User)
+  overload: taskloom.Services.UserProjectService.GetUserByID*
+  nameWithType.vb: UserProjectService.GetUserByID(Integer?)
+  fullName.vb: taskloom.Services.UserProjectService.GetUserByID(Integer?)
+  name.vb: GetUserByID(Integer?)
+- uid: taskloom.Services.UserProjectService.GetProjectByID(System.Nullable{System.Int32})
+  commentId: M:taskloom.Services.UserProjectService.GetProjectByID(System.Nullable{System.Int32})
+  id: GetProjectByID(System.Nullable{System.Int32})
+  parent: taskloom.Services.UserProjectService
+  langs:
+  - csharp
+  - vb
+  name: GetProjectByID(int?)
+  nameWithType: UserProjectService.GetProjectByID(int?)
+  fullName: taskloom.Services.UserProjectService.GetProjectByID(int?)
+  type: Method
+  source:
+    remote:
+      path: src/app/Services/UserProjectService.cs
+      branch: main
+      repo: https://github.com/kemmed/TaskLoom
+    id: GetProjectByID
+    path: app/Services/UserProjectService.cs
+    startLine: 54
+  assemblies:
+  - taskloom
+  namespace: taskloom.Services
+  summary: Получает проект по его идентификатору, включая связанные данные.
+  example: []
+  syntax:
+    content: public Task<Project?> GetProjectByID(int? projectID)
+    parameters:
+    - id: projectID
+      type: System.Nullable{System.Int32}
+      description: Идентификатор проекта.
+    return:
+      type: System.Threading.Tasks.Task{taskloom.Models.Project}
+      description: Проект. Null если проект не найден.
+    content.vb: Public Function GetProjectByID(projectID As Integer?) As Task(Of Project)
+  overload: taskloom.Services.UserProjectService.GetProjectByID*
+  nameWithType.vb: UserProjectService.GetProjectByID(Integer?)
+  fullName.vb: taskloom.Services.UserProjectService.GetProjectByID(Integer?)
+  name.vb: GetProjectByID(Integer?)
+- uid: taskloom.Services.UserProjectService.GetUserProjectByID(System.Nullable{System.Int32},System.Nullable{System.Int32})
+  commentId: M:taskloom.Services.UserProjectService.GetUserProjectByID(System.Nullable{System.Int32},System.Nullable{System.Int32})
+  id: GetUserProjectByID(System.Nullable{System.Int32},System.Nullable{System.Int32})
+  parent: taskloom.Services.UserProjectService
+  langs:
+  - csharp
+  - vb
+  name: GetUserProjectByID(int?, int?)
+  nameWithType: UserProjectService.GetUserProjectByID(int?, int?)
+  fullName: taskloom.Services.UserProjectService.GetUserProjectByID(int?, int?)
+  type: Method
+  source:
+    remote:
+      path: src/app/Services/UserProjectService.cs
+      branch: main
+      repo: https://github.com/kemmed/TaskLoom
+    id: GetUserProjectByID
+    path: app/Services/UserProjectService.cs
+    startLine: 75
+  assemblies:
+  - taskloom
+  namespace: taskloom.Services
+  summary: Получает связь пользователя с проектом по идентификаторам проекта и пользователя.
+  example: []
+  syntax:
+    content: public Task<UserProject?> GetUserProjectByID(int? projectID, int? userID)
+    parameters:
+    - id: projectID
+      type: System.Nullable{System.Int32}
+      description: Идентификатор проекта.
+    - id: userID
+      type: System.Nullable{System.Int32}
+      description: Идентификатор пользователя.
+    return:
+      type: System.Threading.Tasks.Task{taskloom.Models.UserProject}
+      description: Связь пользователя с проектом. Null если связь не найдена.
+    content.vb: Public Function GetUserProjectByID(projectID As Integer?, userID As Integer?) As Task(Of UserProject)
+  overload: taskloom.Services.UserProjectService.GetUserProjectByID*
+  nameWithType.vb: UserProjectService.GetUserProjectByID(Integer?, Integer?)
+  fullName.vb: taskloom.Services.UserProjectService.GetUserProjectByID(Integer?, Integer?)
+  name.vb: GetUserProjectByID(Integer?, Integer?)
+- uid: taskloom.Services.UserProjectService.GetUserProjectByID(System.Nullable{System.Int32})
+  commentId: M:taskloom.Services.UserProjectService.GetUserProjectByID(System.Nullable{System.Int32})
+  id: GetUserProjectByID(System.Nullable{System.Int32})
+  parent: taskloom.Services.UserProjectService
+  langs:
+  - csharp
+  - vb
+  name: GetUserProjectByID(int?)
+  nameWithType: UserProjectService.GetUserProjectByID(int?)
+  fullName: taskloom.Services.UserProjectService.GetUserProjectByID(int?)
+  type: Method
+  source:
+    remote:
+      path: src/app/Services/UserProjectService.cs
+      branch: main
+      repo: https://github.com/kemmed/TaskLoom
+    id: GetUserProjectByID
+    path: app/Services/UserProjectService.cs
+    startLine: 92
+  assemblies:
+  - taskloom
+  namespace: taskloom.Services
+  summary: Получает связь пользователя с проектом по идентификатору связи.
+  example: []
+  syntax:
+    content: public Task<UserProject?> GetUserProjectByID(int? userProjectID)
+    parameters:
+    - id: userProjectID
+      type: System.Nullable{System.Int32}
+      description: Идентификатор связи пользователя с проектом.
+    return:
+      type: System.Threading.Tasks.Task{taskloom.Models.UserProject}
+      description: Связь пользователя с проектом. Null если связь не найдена.
+    content.vb: Public Function GetUserProjectByID(userProjectID As Integer?) As Task(Of UserProject)
+  overload: taskloom.Services.UserProjectService.GetUserProjectByID*
+  nameWithType.vb: UserProjectService.GetUserProjectByID(Integer?)
+  fullName.vb: taskloom.Services.UserProjectService.GetUserProjectByID(Integer?)
+  name.vb: GetUserProjectByID(Integer?)
+- uid: taskloom.Services.UserProjectService.UserIsInProject(System.Nullable{System.Int32},System.Nullable{System.Int32})
+  commentId: M:taskloom.Services.UserProjectService.UserIsInProject(System.Nullable{System.Int32},System.Nullable{System.Int32})
+  id: UserIsInProject(System.Nullable{System.Int32},System.Nullable{System.Int32})
+  parent: taskloom.Services.UserProjectService
+  langs:
+  - csharp
+  - vb
+  name: UserIsInProject(int?, int?)
+  nameWithType: UserProjectService.UserIsInProject(int?, int?)
+  fullName: taskloom.Services.UserProjectService.UserIsInProject(int?, int?)
+  type: Method
+  source:
+    remote:
+      path: src/app/Services/UserProjectService.cs
+      branch: main
+      repo: https://github.com/kemmed/TaskLoom
+    id: UserIsInProject
+    path: app/Services/UserProjectService.cs
+    startLine: 108
+  assemblies:
+  - taskloom
+  namespace: taskloom.Services
+  summary: Проверяет, состоит ли пользователь в проекте.
+  example: []
+  syntax:
+    content: public Task<bool> UserIsInProject(int? projectID, int? userID)
+    parameters:
+    - id: projectID
+      type: System.Nullable{System.Int32}
+      description: Идентификатор проекта.
+    - id: userID
+      type: System.Nullable{System.Int32}
+      description: Идентификатор пользователя.
+    return:
+      type: System.Threading.Tasks.Task{System.Boolean}
+      description: Значение true, если пользователь состоит в проекте, иначе false.
+    content.vb: Public Function UserIsInProject(projectID As Integer?, userID As Integer?) As Task(Of Boolean)
+  overload: taskloom.Services.UserProjectService.UserIsInProject*
+  nameWithType.vb: UserProjectService.UserIsInProject(Integer?, Integer?)
+  fullName.vb: taskloom.Services.UserProjectService.UserIsInProject(Integer?, Integer?)
+  name.vb: UserIsInProject(Integer?, Integer?)
+references:
+- uid: taskloom.Services
+  commentId: N:taskloom.Services
+  href: taskloom.html
+  name: taskloom.Services
+  nameWithType: taskloom.Services
+  fullName: taskloom.Services
+  spec.csharp:
+  - uid: taskloom
+    name: taskloom
+    href: taskloom.html
+  - name: .
+  - uid: taskloom.Services
+    name: Services
+    href: taskloom.Services.html
+  spec.vb:
+  - uid: taskloom
+    name: taskloom
+    href: taskloom.html
+  - name: .
+  - uid: taskloom.Services
+    name: Services
+    href: taskloom.Services.html
+- uid: System.Object
+  commentId: T:System.Object
+  parent: System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object
+  name: object
+  nameWithType: object
+  fullName: object
+  nameWithType.vb: Object
+  fullName.vb: Object
+  name.vb: Object
+- uid: System.Object.Equals(System.Object)
+  commentId: M:System.Object.Equals(System.Object)
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)
+  name: Equals(object)
+  nameWithType: object.Equals(object)
+  fullName: object.Equals(object)
+  nameWithType.vb: Object.Equals(Object)
+  fullName.vb: Object.Equals(Object)
+  name.vb: Equals(Object)
+  spec.csharp:
+  - uid: System.Object.Equals(System.Object)
+    name: Equals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)
+  - name: (
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+  spec.vb:
+  - uid: System.Object.Equals(System.Object)
+    name: Equals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)
+  - name: (
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+- uid: System.Object.Equals(System.Object,System.Object)
+  commentId: M:System.Object.Equals(System.Object,System.Object)
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)
+  name: Equals(object, object)
+  nameWithType: object.Equals(object, object)
+  fullName: object.Equals(object, object)
+  nameWithType.vb: Object.Equals(Object, Object)
+  fullName.vb: Object.Equals(Object, Object)
+  name.vb: Equals(Object, Object)
+  spec.csharp:
+  - uid: System.Object.Equals(System.Object,System.Object)
+    name: Equals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)
+  - name: (
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: ','
+  - name: " "
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+  spec.vb:
+  - uid: System.Object.Equals(System.Object,System.Object)
+    name: Equals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)
+  - name: (
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: ','
+  - name: " "
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+- uid: System.Object.GetHashCode
+  commentId: M:System.Object.GetHashCode
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.gethashcode
+  name: GetHashCode()
+  nameWithType: object.GetHashCode()
+  fullName: object.GetHashCode()
+  nameWithType.vb: Object.GetHashCode()
+  fullName.vb: Object.GetHashCode()
+  spec.csharp:
+  - uid: System.Object.GetHashCode
+    name: GetHashCode
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.gethashcode
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: System.Object.GetHashCode
+    name: GetHashCode
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.gethashcode
+  - name: (
+  - name: )
+- uid: System.Object.GetType
+  commentId: M:System.Object.GetType
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.gettype
+  name: GetType()
+  nameWithType: object.GetType()
+  fullName: object.GetType()
+  nameWithType.vb: Object.GetType()
+  fullName.vb: Object.GetType()
+  spec.csharp:
+  - uid: System.Object.GetType
+    name: GetType
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.gettype
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: System.Object.GetType
+    name: GetType
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.gettype
+  - name: (
+  - name: )
+- uid: System.Object.MemberwiseClone
+  commentId: M:System.Object.MemberwiseClone
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.memberwiseclone
+  name: MemberwiseClone()
+  nameWithType: object.MemberwiseClone()
+  fullName: object.MemberwiseClone()
+  nameWithType.vb: Object.MemberwiseClone()
+  fullName.vb: Object.MemberwiseClone()
+  spec.csharp:
+  - uid: System.Object.MemberwiseClone
+    name: MemberwiseClone
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.memberwiseclone
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: System.Object.MemberwiseClone
+    name: MemberwiseClone
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.memberwiseclone
+  - name: (
+  - name: )
+- uid: System.Object.ReferenceEquals(System.Object,System.Object)
+  commentId: M:System.Object.ReferenceEquals(System.Object,System.Object)
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.referenceequals
+  name: ReferenceEquals(object, object)
+  nameWithType: object.ReferenceEquals(object, object)
+  fullName: object.ReferenceEquals(object, object)
+  nameWithType.vb: Object.ReferenceEquals(Object, Object)
+  fullName.vb: Object.ReferenceEquals(Object, Object)
+  name.vb: ReferenceEquals(Object, Object)
+  spec.csharp:
+  - uid: System.Object.ReferenceEquals(System.Object,System.Object)
+    name: ReferenceEquals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.referenceequals
+  - name: (
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: ','
+  - name: " "
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+  spec.vb:
+  - uid: System.Object.ReferenceEquals(System.Object,System.Object)
+    name: ReferenceEquals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.referenceequals
+  - name: (
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: ','
+  - name: " "
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+- uid: System.Object.ToString
+  commentId: M:System.Object.ToString
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.tostring
+  name: ToString()
+  nameWithType: object.ToString()
+  fullName: object.ToString()
+  nameWithType.vb: Object.ToString()
+  fullName.vb: Object.ToString()
+  spec.csharp:
+  - uid: System.Object.ToString
+    name: ToString
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.tostring
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: System.Object.ToString
+    name: ToString
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.tostring
+  - name: (
+  - name: )
+- uid: System
+  commentId: N:System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system
+  name: System
+  nameWithType: System
+  fullName: System
+- uid: taskloom.Services.UserProjectService.#ctor*
+  commentId: Overload:taskloom.Services.UserProjectService.#ctor
+  href: taskloom.Services.UserProjectService.html#taskloom_Services_UserProjectService__ctor_taskloom_Data_taskloomContext_
+  name: UserProjectService
+  nameWithType: UserProjectService.UserProjectService
+  fullName: taskloom.Services.UserProjectService.UserProjectService
+  nameWithType.vb: UserProjectService.New
+  fullName.vb: taskloom.Services.UserProjectService.New
+  name.vb: New
+- uid: taskloom.Data.taskloomContext
+  commentId: T:taskloom.Data.taskloomContext
+  parent: taskloom.Data
+  href: taskloom.Data.taskloomContext.html
+  name: taskloomContext
+  nameWithType: taskloomContext
+  fullName: taskloom.Data.taskloomContext
+- uid: taskloom.Data
+  commentId: N:taskloom.Data
+  href: taskloom.html
+  name: taskloom.Data
+  nameWithType: taskloom.Data
+  fullName: taskloom.Data
+  spec.csharp:
+  - uid: taskloom
+    name: taskloom
+    href: taskloom.html
+  - name: .
+  - uid: taskloom.Data
+    name: Data
+    href: taskloom.Data.html
+  spec.vb:
+  - uid: taskloom
+    name: taskloom
+    href: taskloom.html
+  - name: .
+  - uid: taskloom.Data
+    name: Data
+    href: taskloom.Data.html
+- uid: taskloom.Services.UserProjectService.GetCurrentUser*
+  commentId: Overload:taskloom.Services.UserProjectService.GetCurrentUser
+  href: taskloom.Services.UserProjectService.html#taskloom_Services_UserProjectService_GetCurrentUser_Microsoft_AspNetCore_Http_HttpContext_
+  name: GetCurrentUser
+  nameWithType: UserProjectService.GetCurrentUser
+  fullName: taskloom.Services.UserProjectService.GetCurrentUser
+- uid: Microsoft.AspNetCore.Http.HttpContext
+  commentId: T:Microsoft.AspNetCore.Http.HttpContext
+  parent: Microsoft.AspNetCore.Http
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.http.httpcontext
+  name: HttpContext
+  nameWithType: HttpContext
+  fullName: Microsoft.AspNetCore.Http.HttpContext
+- uid: System.Threading.Tasks.Task{taskloom.Models.User}
+  commentId: T:System.Threading.Tasks.Task{taskloom.Models.User}
+  parent: System.Threading.Tasks
+  definition: System.Threading.Tasks.Task`1
+  href: https://learn.microsoft.com/dotnet/api/system.threading.tasks.task-1
+  name: Task<User>
+  nameWithType: Task<User>
+  fullName: System.Threading.Tasks.Task<taskloom.Models.User>
+  nameWithType.vb: Task(Of User)
+  fullName.vb: System.Threading.Tasks.Task(Of taskloom.Models.User)
+  name.vb: Task(Of User)
+  spec.csharp:
+  - uid: System.Threading.Tasks.Task`1
+    name: Task
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.threading.tasks.task-1
+  - name: <
+  - uid: taskloom.Models.User
+    name: User
+    href: taskloom.Models.User.html
+  - name: '>'
+  spec.vb:
+  - uid: System.Threading.Tasks.Task`1
+    name: Task
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.threading.tasks.task-1
+  - name: (
+  - name: Of
+  - name: " "
+  - uid: taskloom.Models.User
+    name: User
+    href: taskloom.Models.User.html
+  - name: )
+- uid: Microsoft.AspNetCore.Http
+  commentId: N:Microsoft.AspNetCore.Http
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/microsoft
+  name: Microsoft.AspNetCore.Http
+  nameWithType: Microsoft.AspNetCore.Http
+  fullName: Microsoft.AspNetCore.Http
+  spec.csharp:
+  - uid: Microsoft
+    name: Microsoft
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/microsoft
+  - name: .
+  - uid: Microsoft.AspNetCore
+    name: AspNetCore
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore
+  - name: .
+  - uid: Microsoft.AspNetCore.Http
+    name: Http
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.http
+  spec.vb:
+  - uid: Microsoft
+    name: Microsoft
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/microsoft
+  - name: .
+  - uid: Microsoft.AspNetCore
+    name: AspNetCore
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore
+  - name: .
+  - uid: Microsoft.AspNetCore.Http
+    name: Http
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.http
+- uid: System.Threading.Tasks.Task`1
+  commentId: T:System.Threading.Tasks.Task`1
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.threading.tasks.task-1
+  name: Task<TResult>
+  nameWithType: Task<TResult>
+  fullName: System.Threading.Tasks.Task<TResult>
+  nameWithType.vb: Task(Of TResult)
+  fullName.vb: System.Threading.Tasks.Task(Of TResult)
+  name.vb: Task(Of TResult)
+  spec.csharp:
+  - uid: System.Threading.Tasks.Task`1
+    name: Task
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.threading.tasks.task-1
+  - name: <
+  - name: TResult
+  - name: '>'
+  spec.vb:
+  - uid: System.Threading.Tasks.Task`1
+    name: Task
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.threading.tasks.task-1
+  - name: (
+  - name: Of
+  - name: " "
+  - name: TResult
+  - name: )
+- uid: System.Threading.Tasks
+  commentId: N:System.Threading.Tasks
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system
+  name: System.Threading.Tasks
+  nameWithType: System.Threading.Tasks
+  fullName: System.Threading.Tasks
+  spec.csharp:
+  - uid: System
+    name: System
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system
+  - name: .
+  - uid: System.Threading
+    name: Threading
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.threading
+  - name: .
+  - uid: System.Threading.Tasks
+    name: Tasks
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.threading.tasks
+  spec.vb:
+  - uid: System
+    name: System
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system
+  - name: .
+  - uid: System.Threading
+    name: Threading
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.threading
+  - name: .
+  - uid: System.Threading.Tasks
+    name: Tasks
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.threading.tasks
+- uid: taskloom.Services.UserProjectService.GetUserByID*
+  commentId: Overload:taskloom.Services.UserProjectService.GetUserByID
+  href: taskloom.Services.UserProjectService.html#taskloom_Services_UserProjectService_GetUserByID_System_Nullable_System_Int32__
+  name: GetUserByID
+  nameWithType: UserProjectService.GetUserByID
+  fullName: taskloom.Services.UserProjectService.GetUserByID
+- uid: System.Nullable{System.Int32}
+  commentId: T:System.Nullable{System.Int32}
+  parent: System
+  definition: System.Nullable`1
+  href: https://learn.microsoft.com/dotnet/api/system.int32
+  name: int?
+  nameWithType: int?
+  fullName: int?
+  nameWithType.vb: Integer?
+  fullName.vb: Integer?
+  name.vb: Integer?
+  spec.csharp:
+  - uid: System.Int32
+    name: int
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.int32
+  - name: '?'
+  spec.vb:
+  - uid: System.Int32
+    name: Integer
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.int32
+  - name: '?'
+- uid: System.Nullable`1
+  commentId: T:System.Nullable`1
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.nullable-1
+  name: Nullable<T>
+  nameWithType: Nullable<T>
+  fullName: System.Nullable<T>
+  nameWithType.vb: Nullable(Of T)
+  fullName.vb: System.Nullable(Of T)
+  name.vb: Nullable(Of T)
+  spec.csharp:
+  - uid: System.Nullable`1
+    name: Nullable
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.nullable-1
+  - name: <
+  - name: T
+  - name: '>'
+  spec.vb:
+  - uid: System.Nullable`1
+    name: Nullable
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.nullable-1
+  - name: (
+  - name: Of
+  - name: " "
+  - name: T
+  - name: )
+- uid: taskloom.Services.UserProjectService.GetProjectByID*
+  commentId: Overload:taskloom.Services.UserProjectService.GetProjectByID
+  href: taskloom.Services.UserProjectService.html#taskloom_Services_UserProjectService_GetProjectByID_System_Nullable_System_Int32__
+  name: GetProjectByID
+  nameWithType: UserProjectService.GetProjectByID
+  fullName: taskloom.Services.UserProjectService.GetProjectByID
+- uid: System.Threading.Tasks.Task{taskloom.Models.Project}
+  commentId: T:System.Threading.Tasks.Task{taskloom.Models.Project}
+  parent: System.Threading.Tasks
+  definition: System.Threading.Tasks.Task`1
+  href: https://learn.microsoft.com/dotnet/api/system.threading.tasks.task-1
+  name: Task<Project>
+  nameWithType: Task<Project>
+  fullName: System.Threading.Tasks.Task<taskloom.Models.Project>
+  nameWithType.vb: Task(Of Project)
+  fullName.vb: System.Threading.Tasks.Task(Of taskloom.Models.Project)
+  name.vb: Task(Of Project)
+  spec.csharp:
+  - uid: System.Threading.Tasks.Task`1
+    name: Task
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.threading.tasks.task-1
+  - name: <
+  - uid: taskloom.Models.Project
+    name: Project
+    href: taskloom.Models.Project.html
+  - name: '>'
+  spec.vb:
+  - uid: System.Threading.Tasks.Task`1
+    name: Task
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.threading.tasks.task-1
+  - name: (
+  - name: Of
+  - name: " "
+  - uid: taskloom.Models.Project
+    name: Project
+    href: taskloom.Models.Project.html
+  - name: )
+- uid: taskloom.Services.UserProjectService.GetUserProjectByID*
+  commentId: Overload:taskloom.Services.UserProjectService.GetUserProjectByID
+  href: taskloom.Services.UserProjectService.html#taskloom_Services_UserProjectService_GetUserProjectByID_System_Nullable_System_Int32__System_Nullable_System_Int32__
+  name: GetUserProjectByID
+  nameWithType: UserProjectService.GetUserProjectByID
+  fullName: taskloom.Services.UserProjectService.GetUserProjectByID
+- uid: System.Threading.Tasks.Task{taskloom.Models.UserProject}
+  commentId: T:System.Threading.Tasks.Task{taskloom.Models.UserProject}
+  parent: System.Threading.Tasks
+  definition: System.Threading.Tasks.Task`1
+  href: https://learn.microsoft.com/dotnet/api/system.threading.tasks.task-1
+  name: Task<UserProject>
+  nameWithType: Task<UserProject>
+  fullName: System.Threading.Tasks.Task<taskloom.Models.UserProject>
+  nameWithType.vb: Task(Of UserProject)
+  fullName.vb: System.Threading.Tasks.Task(Of taskloom.Models.UserProject)
+  name.vb: Task(Of UserProject)
+  spec.csharp:
+  - uid: System.Threading.Tasks.Task`1
+    name: Task
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.threading.tasks.task-1
+  - name: <
+  - uid: taskloom.Models.UserProject
+    name: UserProject
+    href: taskloom.Models.UserProject.html
+  - name: '>'
+  spec.vb:
+  - uid: System.Threading.Tasks.Task`1
+    name: Task
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.threading.tasks.task-1
+  - name: (
+  - name: Of
+  - name: " "
+  - uid: taskloom.Models.UserProject
+    name: UserProject
+    href: taskloom.Models.UserProject.html
+  - name: )
+- uid: taskloom.Services.UserProjectService.UserIsInProject*
+  commentId: Overload:taskloom.Services.UserProjectService.UserIsInProject
+  href: taskloom.Services.UserProjectService.html#taskloom_Services_UserProjectService_UserIsInProject_System_Nullable_System_Int32__System_Nullable_System_Int32__
+  name: UserIsInProject
+  nameWithType: UserProjectService.UserIsInProject
+  fullName: taskloom.Services.UserProjectService.UserIsInProject
+- uid: System.Threading.Tasks.Task{System.Boolean}
+  commentId: T:System.Threading.Tasks.Task{System.Boolean}
+  parent: System.Threading.Tasks
+  definition: System.Threading.Tasks.Task`1
+  href: https://learn.microsoft.com/dotnet/api/system.threading.tasks.task-1
+  name: Task<bool>
+  nameWithType: Task<bool>
+  fullName: System.Threading.Tasks.Task<bool>
+  nameWithType.vb: Task(Of Boolean)
+  fullName.vb: System.Threading.Tasks.Task(Of Boolean)
+  name.vb: Task(Of Boolean)
+  spec.csharp:
+  - uid: System.Threading.Tasks.Task`1
+    name: Task
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.threading.tasks.task-1
+  - name: <
+  - uid: System.Boolean
+    name: bool
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.boolean
+  - name: '>'
+  spec.vb:
+  - uid: System.Threading.Tasks.Task`1
+    name: Task
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.threading.tasks.task-1
+  - name: (
+  - name: Of
+  - name: " "
+  - uid: System.Boolean
+    name: Boolean
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.boolean
+  - name: )

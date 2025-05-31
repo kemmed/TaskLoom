@@ -1,0 +1,85 @@
+{
+    "items": [
+        {
+            "name": "taskloom.Services",
+            "href": "taskloom.Services.html",
+            "topicHref": "taskloom.Services.html",
+            "topicUid": "taskloom.Services",
+            "type": "Namespace",
+            "items": [
+                {
+                    "name": "ChartService",
+                    "href": "taskloom.Services.ChartService.html",
+                    "topicHref": "taskloom.Services.ChartService.html",
+                    "topicUid": "taskloom.Services.ChartService",
+                    "type": "Class"
+                },
+                {
+                    "name": "ExcelReportService",
+                    "href": "taskloom.Services.ExcelReportService.html",
+                    "topicHref": "taskloom.Services.ExcelReportService.html",
+                    "topicUid": "taskloom.Services.ExcelReportService",
+                    "type": "Class"
+                },
+                {
+                    "name": "LogService",
+                    "href": "taskloom.Services.LogService.html",
+                    "topicHref": "taskloom.Services.LogService.html",
+                    "topicUid": "taskloom.Services.LogService",
+                    "type": "Class"
+                },
+                {
+                    "name": "MailConfig",
+                    "href": "taskloom.Services.MailConfig.html",
+                    "topicHref": "taskloom.Services.MailConfig.html",
+                    "topicUid": "taskloom.Services.MailConfig",
+                    "type": "Class"
+                },
+                {
+                    "name": "MailService",
+                    "href": "taskloom.Services.MailService.html",
+                    "topicHref": "taskloom.Services.MailService.html",
+                    "topicUid": "taskloom.Services.MailService",
+                    "type": "Class"
+                },
+                {
+                    "name": "MailSettings",
+                    "href": "taskloom.Services.MailSettings.html",
+                    "topicHref": "taskloom.Services.MailSettings.html",
+                    "topicUid": "taskloom.Services.MailSettings",
+                    "type": "Class"
+                },
+                {
+                    "name": "PasswordService",
+                    "href": "taskloom.Services.PasswordService.html",
+                    "topicHref": "taskloom.Services.PasswordService.html",
+                    "topicUid": "taskloom.Services.PasswordService",
+                    "type": "Class"
+                },
+                {
+                    "name": "SortUsersService",
+                    "href": "taskloom.Services.SortUsersService.html",
+                    "topicHref": "taskloom.Services.SortUsersService.html",
+                    "topicUid": "taskloom.Services.SortUsersService",
+                    "type": "Class"
+                },
+                {
+                    "name": "TokenService",
+                    "href": "taskloom.Services.TokenService.html",
+                    "topicHref": "taskloom.Services.TokenService.html",
+                    "topicUid": "taskloom.Services.TokenService",
+                    "type": "Class"
+                },
+                {
+                    "name": "UserProjectService",
+                    "href": "taskloom.Services.UserProjectService.html",
+                    "topicHref": "taskloom.Services.UserProjectService.html",
+                    "topicUid": "taskloom.Services.UserProjectService",
+                    "type": "Class"
+                }
+            ]
+        }
+    ],
+    "memberLayout": "SamePage",
+    "pdf": true
+}

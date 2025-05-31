@@ -1,0 +1,140 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>taskloom</name>
+    </assembly>
+    <members>
+        <member name="T:taskloom.Migrations.Createdb">
+            <inheritdoc />
+        </member>
+        <member name="M:taskloom.Migrations.Createdb.Up(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:taskloom.Migrations.Createdb.Down(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:taskloom.Migrations.Createdb.BuildTargetModel(Microsoft.EntityFrameworkCore.ModelBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:taskloom.Services.ChartService.GetChartData(System.Collections.Generic.List{taskloom.Models.Issue},System.String,System.String,System.Int32[])">
+            <summary>
+            Получает данные для графиков создания и завершения задач.
+            </summary>
+            <param name="issues">Список задач для графика.</param>
+            <param name="startDate">Начальная дата для фильтрации задач. Если не указана, используется начало текущей недели.</param>
+            <param name="endDate">Конечная дата для фильтрации задач. Если не указана, используется конец текущей недели.</param>
+            <param name="selectedCategories">Массив выбранных категорий задач для фильтрации. Если пустой, фильтрация по категориям не применяется.</param>
+            <returns>Строковое представление данных для графика созранных и выполненных задач.</returns>
+        </member>
+        <member name="M:taskloom.Services.ExcelReportService.CreateExcelLog(System.Collections.Generic.List{taskloom.Models.Log},System.String)">
+            <summary>
+            Создает Excel-файл с логами проекта.
+            </summary>
+            <param name="logs">Список логов для записи в Excel.</param>
+            <param name="projectName">Название проекта, используемое в названии листа.</param>
+            <returns>Массив байтов, представляющий созданный Excel-файл.</returns>
+        </member>
+        <member name="M:taskloom.Services.LogService.LogAction(System.Int32,System.String,System.Nullable{System.Int32})">
+            <summary>
+            Записывает и сохраняет действие пользователя в лог проекта.
+            </summary>
+            <param name="projectID">Идентификатор проекта, к которому относится действие.</param>
+            <param name="action">Описание действия, которое было выполнено.</param>
+            <param name="userID">Идентификатор пользователя, выполнившего действие. Если не указан, используется значение null.</param>
+        </member>
+        <member name="M:taskloom.Services.MailService.SendEmail(System.String,System.String,System.String)">
+            <summary>
+            Отправляет электронное письмо.
+            </summary>
+            <param name="body">Тело письма.</param>
+            <param name="topic">Тема письма.</param>
+            <param name="recipientEmail">Адрес получателя.</param>
+        </member>
+        <member name="M:taskloom.Services.PasswordService.HashPassword(System.String)">
+            <summary>
+            Хеширует пароль с использованием алгоритма SHA256.
+            </summary>
+            <param name="password">Пароль для хеширования.</param>
+            <returns>Хеш пароля.</returns>
+        </member>
+        <member name="M:taskloom.Services.PasswordService.IsPasswordValid(System.String)">
+            <summary>
+            Проверяет, является ли пароль допустимым.
+            Пароль считается допустимым, если он содержит:
+            - Минимум 8 символов,
+            - Хотя бы одну заглавную букву,
+            - Хотя бы одну строчную букву,
+            - Хотя бы одну цифру,
+            - Хотя бы один специальный символ.
+            </summary>
+            <param name="password">Пароль для проверки.</param>
+            <returns>Значение true, если пароль допустим, иначе false.</returns>
+        </member>
+        <member name="M:taskloom.Services.SortUsersService.GetSortedResponsibilities(System.Int32)">
+            <summary>
+            Возвращает отсортированный список ответственных пользователей за проект.
+            Сортировка осуществляется по количеству задач и ближайшему сроку выполнения задач.
+            </summary>
+            <param name="projectID">Идентификатор проекта.</param>
+            <returns>Список, содержащий информацию о пользователях и их задачах.</returns>
+        </member>
+        <member name="M:taskloom.Services.SortUsersService.GetTaskWord(System.Int32)">
+            <summary>
+            Возвращает правильное склонение слова "задача" в зависимости от их количества.
+            </summary>
+            <param name="count">Количество задач.</param>
+            <returns>Строка с правильным склонением слова "задача".</returns>
+        </member>
+        <member name="M:taskloom.Services.TokenService.GenerateToken">
+            <summary>
+            Генерирует случайный токен длиной 16 символов.
+            Токен состоит из букв английского алфавита (от 'a' до 'z').
+            </summary>
+            <returns>Сгенерированный токен.</returns>
+        </member>
+        <member name="M:taskloom.Services.UserProjectService.GetCurrentUser(Microsoft.AspNetCore.Http.HttpContext)">
+            <summary>
+            Получает текущего пользователя из сессии.
+            </summary>
+            <param name="httpContext">HTTP-контекст.</param>
+            <returns>Текущий пользователь. Null если пользователь не найден.</returns>
+        </member>
+        <member name="M:taskloom.Services.UserProjectService.GetUserByID(System.Nullable{System.Int32})">
+            <summary>
+            Получает пользователя по его идентификатору.
+            </summary>
+            <param name="userID">Идентификатор пользователя.</param>
+            <returns>Текущий пользователь. Null если пользователь не найден.</returns>
+        </member>
+        <member name="M:taskloom.Services.UserProjectService.GetProjectByID(System.Nullable{System.Int32})">
+            <summary>
+            Получает проект по его идентификатору, включая связанные данные.
+            </summary>
+            <param name="projectID">Идентификатор проекта.</param>
+            <returns>Проект. Null если проект не найден.</returns>
+        </member>
+        <member name="M:taskloom.Services.UserProjectService.GetUserProjectByID(System.Nullable{System.Int32},System.Nullable{System.Int32})">
+            <summary>
+            Получает связь пользователя с проектом по идентификаторам проекта и пользователя.
+            </summary>
+            <param name="projectID">Идентификатор проекта.</param>
+            <param name="userID">Идентификатор пользователя.</param>
+            <returns>Связь пользователя с проектом. Null если связь не найдена.</returns>
+        </member>
+        <member name="M:taskloom.Services.UserProjectService.GetUserProjectByID(System.Nullable{System.Int32})">
+            <summary>
+            Получает связь пользователя с проектом по идентификатору связи.
+            </summary>
+            <param name="userProjectID">Идентификатор связи пользователя с проектом.</param>
+            <returns>Связь пользователя с проектом. Null если связь не найдена.</returns>
+        </member>
+        <member name="M:taskloom.Services.UserProjectService.UserIsInProject(System.Nullable{System.Int32},System.Nullable{System.Int32})">
+            <summary>
+            Проверяет, состоит ли пользователь в проекте.
+            </summary>
+            <param name="projectID">Идентификатор проекта.</param>
+            <param name="userID">Идентификатор пользователя.</param>
+            <returns>Значение true, если пользователь состоит в проекте, иначе false.</returns>
+        </member>
+    </members>
+</doc>

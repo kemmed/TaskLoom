@@ -1,0 +1,117 @@
+### YamlMime:ManagedReference
+items:
+- uid: taskloom.Services
+  commentId: N:taskloom.Services
+  id: taskloom.Services
+  children:
+  - taskloom.Services.ChartService
+  - taskloom.Services.ExcelReportService
+  - taskloom.Services.LogService
+  - taskloom.Services.MailConfig
+  - taskloom.Services.MailService
+  - taskloom.Services.MailSettings
+  - taskloom.Services.PasswordService
+  - taskloom.Services.SortUsersService
+  - taskloom.Services.TokenService
+  - taskloom.Services.UserProjectService
+  langs:
+  - csharp
+  - vb
+  name: taskloom.Services
+  nameWithType: taskloom.Services
+  fullName: taskloom.Services
+  type: Namespace
+  assemblies:
+  - taskloom
+references:
+- uid: taskloom.Services.ChartService
+  commentId: T:taskloom.Services.ChartService
+  parent: taskloom.Services
+  href: taskloom.Services.ChartService.html
+  name: ChartService
+  nameWithType: ChartService
+  fullName: taskloom.Services.ChartService
+- uid: taskloom.Services.ExcelReportService
+  commentId: T:taskloom.Services.ExcelReportService
+  parent: taskloom.Services
+  href: taskloom.Services.ExcelReportService.html
+  name: ExcelReportService
+  nameWithType: ExcelReportService
+  fullName: taskloom.Services.ExcelReportService
+- uid: taskloom.Services.LogService
+  commentId: T:taskloom.Services.LogService
+  parent: taskloom.Services
+  href: taskloom.Services.LogService.html
+  name: LogService
+  nameWithType: LogService
+  fullName: taskloom.Services.LogService
+- uid: taskloom.Services.MailService
+  commentId: T:taskloom.Services.MailService
+  parent: taskloom.Services
+  href: taskloom.Services.MailService.html
+  name: MailService
+  nameWithType: MailService
+  fullName: taskloom.Services.MailService
+- uid: taskloom.Services.MailSettings
+  commentId: T:taskloom.Services.MailSettings
+  parent: taskloom.Services
+  href: taskloom.Services.MailSettings.html
+  name: MailSettings
+  nameWithType: MailSettings
+  fullName: taskloom.Services.MailSettings
+- uid: taskloom.Services.MailConfig
+  commentId: T:taskloom.Services.MailConfig
+  href: taskloom.Services.MailConfig.html
+  name: MailConfig
+  nameWithType: MailConfig
+  fullName: taskloom.Services.MailConfig
+- uid: taskloom.Services.PasswordService
+  commentId: T:taskloom.Services.PasswordService
+  parent: taskloom.Services
+  href: taskloom.Services.PasswordService.html
+  name: PasswordService
+  nameWithType: PasswordService
+  fullName: taskloom.Services.PasswordService
+- uid: taskloom.Services.SortUsersService
+  commentId: T:taskloom.Services.SortUsersService
+  parent: taskloom.Services
+  href: taskloom.Services.SortUsersService.html
+  name: SortUsersService
+  nameWithType: SortUsersService
+  fullName: taskloom.Services.SortUsersService
+- uid: taskloom.Services.TokenService
+  commentId: T:taskloom.Services.TokenService
+  parent: taskloom.Services
+  href: taskloom.Services.TokenService.html
+  name: TokenService
+  nameWithType: TokenService
+  fullName: taskloom.Services.TokenService
+- uid: taskloom.Services.UserProjectService
+  commentId: T:taskloom.Services.UserProjectService
+  parent: taskloom.Services
+  href: taskloom.Services.UserProjectService.html
+  name: UserProjectService
+  nameWithType: UserProjectService
+  fullName: taskloom.Services.UserProjectService
+- uid: taskloom.Services
+  commentId: N:taskloom.Services
+  href: taskloom.html
+  name: taskloom.Services
+  nameWithType: taskloom.Services
+  fullName: taskloom.Services
+  spec.csharp:
+  - uid: taskloom
+    name: taskloom
+    href: taskloom.html
+  - name: .
+  - uid: taskloom.Services
+    name: Services
+    href: taskloom.Services.html
+  spec.vb:
+  - uid: taskloom
+    name: taskloom
+    href: taskloom.html
+  - name: .
+  - uid: taskloom.Services
+    name: Services
+    href: taskloom.Services.html

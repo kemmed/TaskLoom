@@ -1,0 +1,36 @@
+### YamlMime:TableOfContent
+
+- uid: taskloom.Services
+  name: taskloom.Services
+  type: Namespace
+  items:
+  - uid: taskloom.Services.ChartService
+    name: ChartService
+    type: Class
+  - uid: taskloom.Services.ExcelReportService
+    name: ExcelReportService
+    type: Class
+  - uid: taskloom.Services.LogService
+    name: LogService
+    type: Class
+  - uid: taskloom.Services.MailConfig
+    name: MailConfig
+    type: Class
+  - uid: taskloom.Services.MailService
+    name: MailService
+    type: Class
+  - uid: taskloom.Services.MailSettings
+    name: MailSettings
+    type: Class
+  - uid: taskloom.Services.PasswordService
+    name: PasswordService
+    type: Class
+  - uid: taskloom.Services.SortUsersService
+    name: SortUsersService
+    type: Class
+  - uid: taskloom.Services.TokenService
+    name: TokenService
+    type: Class
+  - uid: taskloom.Services.UserProjectService
+    name: UserProjectService
+    type: Class
