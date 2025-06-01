@@ -2,7 +2,7 @@
 
 - uid: taskloom.Services
   name: taskloom.Services
-  type: Namespace
+  type: Пространство имен
   items:
   - uid: taskloom.Services.ChartService
     name: ChartService

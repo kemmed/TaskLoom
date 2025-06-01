@@ -20,7 +20,7 @@
       <meta name="loc:inThisArticle" content="In this article">
       <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
       <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
-      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:tocFilter" content="Сортировка по заголовку">
       <meta name="loc:nextArticle" content="Next">
       <meta name="loc:prevArticle" content="Previous">
       <meta name="loc:themeLight" content="Light">
@@ -54,7 +54,7 @@
             <div id="navbar">
               <form class="search" role="search" id="search">
                 <i class="bi bi-search"></i>
-                <input class="form-control" id="search-query" type="search" disabled placeholder="Search" autocomplete="off" aria-label="Search">
+                <input class="form-control" id="search-query" type="search" disabled placeholder="Поиск" autocomplete="off" aria-label="Поиск">
               </form>
             </div>
           </div>
@@ -93,8 +93,8 @@ Class UserProjectService  <a class="header-action link-secondary" title="View so
   </h1>
 
   <div class="facts text-secondary">
-    <dl><dt>Namespace</dt><dd><a class="xref" href="taskloom.html">taskloom</a>.<a class="xref" href="taskloom.Services.html">Services</a></dd></dl>
-  <dl><dt>Assembly</dt><dd>taskloom.dll</dd></dl>
+    <dl><dt>Пространство имен</dt><dd><a class="xref" href="taskloom.html">taskloom</a>.<a class="xref" href="taskloom.Services.html">Services</a></dd></dl>
+  <dl><dt>Сборка</dt><dd>taskloom.dll</dd></dl>
   </div>
 
   <div class="markdown summary"></div>
@@ -148,7 +148,7 @@ Class UserProjectService  <a class="header-action link-secondary" title="View so
 
 
 
-  <h2 class="section" id="constructors">Constructors
+  <h2 class="section" id="constructors">Конструкторы
 </h2>
 
 
@@ -166,7 +166,7 @@ Class UserProjectService  <a class="header-action link-secondary" title="View so
     <pre><code class="lang-csharp hljs">public UserProjectService(taskloomContext context)</code></pre>
   </div>
 
-  <h4 class="section">Parameters</h4>
+  <h4 class="section">Параметры</h4>
   <dl class="parameters">
     <dt><code>context</code> <a class="xref" href="taskloom.Data.taskloomContext.html">taskloomContext</a></dt>
     <dd></dd>
@@ -183,7 +183,7 @@ Class UserProjectService  <a class="header-action link-secondary" title="View so
 
 
 
-  <h2 class="section" id="methods">Methods
+  <h2 class="section" id="methods">Методы
 </h2>
 
 
@@ -202,14 +202,14 @@ Class UserProjectService  <a class="header-action link-secondary" title="View so
     <pre><code class="lang-csharp hljs">public virtual Task&lt;User?&gt; GetCurrentUser(HttpContext httpContext)</code></pre>
   </div>
 
-  <h4 class="section">Parameters</h4>
+  <h4 class="section">Параметры</h4>
   <dl class="parameters">
     <dt><code>httpContext</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.http.httpcontext">HttpContext</a></dt>
     <dd><p>HTTP-контекст.</p>
 </dd>
   </dl>
 
-  <h4 class="section">Returns</h4>
+  <h4 class="section">Возврат</h4>
   <dl class="parameters">
     <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.tasks.task-1">Task</a>&lt;<a class="xref" href="taskloom.Models.User.html">User</a>&gt;</dt>
     <dd><p>Текущий пользователь. Null если пользователь не найден.</p>
@@ -241,14 +241,14 @@ Class UserProjectService  <a class="header-action link-secondary" title="View so
     <pre><code class="lang-csharp hljs">public Task&lt;Project?&gt; GetProjectByID(int? projectID)</code></pre>
   </div>
 
-  <h4 class="section">Parameters</h4>
+  <h4 class="section">Параметры</h4>
   <dl class="parameters">
     <dt><code>projectID</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a>?</dt>
     <dd><p>Идентификатор проекта.</p>
 </dd>
   </dl>
 
-  <h4 class="section">Returns</h4>
+  <h4 class="section">Возврат</h4>
   <dl class="parameters">
     <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.tasks.task-1">Task</a>&lt;<a class="xref" href="taskloom.Models.Project.html">Project</a>&gt;</dt>
     <dd><p>Проект. Null если проект не найден.</p>
@@ -280,14 +280,14 @@ Class UserProjectService  <a class="header-action link-secondary" title="View so
     <pre><code class="lang-csharp hljs">public Task&lt;User?&gt; GetUserByID(int? userID)</code></pre>
   </div>
 
-  <h4 class="section">Parameters</h4>
+  <h4 class="section">Параметры</h4>
   <dl class="parameters">
     <dt><code>userID</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a>?</dt>
     <dd><p>Идентификатор пользователя.</p>
 </dd>
   </dl>
 
-  <h4 class="section">Returns</h4>
+  <h4 class="section">Возврат</h4>
   <dl class="parameters">
     <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.tasks.task-1">Task</a>&lt;<a class="xref" href="taskloom.Models.User.html">User</a>&gt;</dt>
     <dd><p>Текущий пользователь. Null если пользователь не найден.</p>
@@ -319,14 +319,14 @@ Class UserProjectService  <a class="header-action link-secondary" title="View so
     <pre><code class="lang-csharp hljs">public Task&lt;UserProject?&gt; GetUserProjectByID(int? userProjectID)</code></pre>
   </div>
 
-  <h4 class="section">Parameters</h4>
+  <h4 class="section">Параметры</h4>
   <dl class="parameters">
     <dt><code>userProjectID</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a>?</dt>
     <dd><p>Идентификатор связи пользователя с проектом.</p>
 </dd>
   </dl>
 
-  <h4 class="section">Returns</h4>
+  <h4 class="section">Возврат</h4>
   <dl class="parameters">
     <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.tasks.task-1">Task</a>&lt;<a class="xref" href="taskloom.Models.UserProject.html">UserProject</a>&gt;</dt>
     <dd><p>Связь пользователя с проектом. Null если связь не найдена.</p>
@@ -358,7 +358,7 @@ Class UserProjectService  <a class="header-action link-secondary" title="View so
     <pre><code class="lang-csharp hljs">public Task&lt;UserProject?&gt; GetUserProjectByID(int? projectID, int? userID)</code></pre>
   </div>
 
-  <h4 class="section">Parameters</h4>
+  <h4 class="section">Параметры</h4>
   <dl class="parameters">
     <dt><code>projectID</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a>?</dt>
     <dd><p>Идентификатор проекта.</p>
@@ -368,7 +368,7 @@ Class UserProjectService  <a class="header-action link-secondary" title="View so
 </dd>
   </dl>
 
-  <h4 class="section">Returns</h4>
+  <h4 class="section">Возврат</h4>
   <dl class="parameters">
     <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.tasks.task-1">Task</a>&lt;<a class="xref" href="taskloom.Models.UserProject.html">UserProject</a>&gt;</dt>
     <dd><p>Связь пользователя с проектом. Null если связь не найдена.</p>
@@ -400,7 +400,7 @@ Class UserProjectService  <a class="header-action link-secondary" title="View so
     <pre><code class="lang-csharp hljs">public Task&lt;bool&gt; UserIsInProject(int? projectID, int? userID)</code></pre>
   </div>
 
-  <h4 class="section">Parameters</h4>
+  <h4 class="section">Параметры</h4>
   <dl class="parameters">
     <dt><code>projectID</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a>?</dt>
     <dd><p>Идентификатор проекта.</p>
@@ -410,7 +410,7 @@ Class UserProjectService  <a class="header-action link-secondary" title="View so
 </dd>
   </dl>
 
-  <h4 class="section">Returns</h4>
+  <h4 class="section">Возврат</h4>
   <dl class="parameters">
     <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.tasks.task-1">Task</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a>&gt;</dt>
     <dd><p>Значение true, если пользователь состоит в проекте, иначе false.</p>

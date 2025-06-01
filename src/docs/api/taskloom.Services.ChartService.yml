@@ -120,14 +120,14 @@ items:
 references:
 - uid: taskloom.Services
   commentId: N:taskloom.Services
-  href: taskloom.html
+  href: taskloom.Services.html
   name: taskloom.Services
   nameWithType: taskloom.Services
   fullName: taskloom.Services
   spec.csharp:
   - uid: taskloom
     name: taskloom
-    href: taskloom.html
+    href: taskloom.Services.html
   - name: .
   - uid: taskloom.Services
     name: Services
@@ -135,7 +135,7 @@ references:
   spec.vb:
   - uid: taskloom
     name: taskloom
-    href: taskloom.html
+    href: taskloom.Services.html
   - name: .
   - uid: taskloom.Services
     name: Services
@@ -395,14 +395,14 @@ references:
   fullName: taskloom.Data.taskloomContext
 - uid: taskloom.Data
   commentId: N:taskloom.Data
-  href: taskloom.html
+  href: taskloom.Services.html
   name: taskloom.Data
   nameWithType: taskloom.Data
   fullName: taskloom.Data
   spec.csharp:
   - uid: taskloom
     name: taskloom
-    href: taskloom.html
+    href: taskloom.Services.html
   - name: .
   - uid: taskloom.Data
     name: Data
@@ -410,7 +410,7 @@ references:
   spec.vb:
   - uid: taskloom
     name: taskloom
-    href: taskloom.html
+    href: taskloom.Services.html
   - name: .
   - uid: taskloom.Data
     name: Data

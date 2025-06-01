@@ -20,7 +20,7 @@ items:
   name: taskloom.Services
   nameWithType: taskloom.Services
   fullName: taskloom.Services
-  type: Namespace
+  type: Пространство имен
   assemblies:
   - taskloom
 references:

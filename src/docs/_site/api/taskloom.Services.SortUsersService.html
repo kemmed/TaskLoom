@@ -20,7 +20,7 @@
       <meta name="loc:inThisArticle" content="In this article">
       <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
       <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
-      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:tocFilter" content="Сортировка по заголовку">
       <meta name="loc:nextArticle" content="Next">
       <meta name="loc:prevArticle" content="Previous">
       <meta name="loc:themeLight" content="Light">
@@ -54,7 +54,7 @@
             <div id="navbar">
               <form class="search" role="search" id="search">
                 <i class="bi bi-search"></i>
-                <input class="form-control" id="search-query" type="search" disabled placeholder="Search" autocomplete="off" aria-label="Search">
+                <input class="form-control" id="search-query" type="search" disabled placeholder="Поиск" autocomplete="off" aria-label="Поиск">
               </form>
             </div>
           </div>
@@ -93,8 +93,8 @@ Class SortUsersService  <a class="header-action link-secondary" title="View sour
   </h1>
 
   <div class="facts text-secondary">
-    <dl><dt>Namespace</dt><dd><a class="xref" href="taskloom.html">taskloom</a>.<a class="xref" href="taskloom.Services.html">Services</a></dd></dl>
-  <dl><dt>Assembly</dt><dd>taskloom.dll</dd></dl>
+    <dl><dt>Пространство имен</dt><dd><a class="xref" href="taskloom.html">taskloom</a>.<a class="xref" href="taskloom.Services.html">Services</a></dd></dl>
+  <dl><dt>Сборка</dt><dd>taskloom.dll</dd></dl>
   </div>
 
   <div class="markdown summary"></div>
@@ -148,7 +148,7 @@ Class SortUsersService  <a class="header-action link-secondary" title="View sour
 
 
 
-  <h2 class="section" id="constructors">Constructors
+  <h2 class="section" id="constructors">Конструкторы
 </h2>
 
 
@@ -166,7 +166,7 @@ Class SortUsersService  <a class="header-action link-secondary" title="View sour
     <pre><code class="lang-csharp hljs">public SortUsersService(taskloomContext context)</code></pre>
   </div>
 
-  <h4 class="section">Parameters</h4>
+  <h4 class="section">Параметры</h4>
   <dl class="parameters">
     <dt><code>context</code> <a class="xref" href="taskloom.Data.taskloomContext.html">taskloomContext</a></dt>
     <dd></dd>
@@ -183,7 +183,7 @@ Class SortUsersService  <a class="header-action link-secondary" title="View sour
 
 
 
-  <h2 class="section" id="methods">Methods
+  <h2 class="section" id="methods">Методы
 </h2>
 
 
@@ -203,14 +203,14 @@ Class SortUsersService  <a class="header-action link-secondary" title="View sour
     <pre><code class="lang-csharp hljs">public List&lt;SelectListItem&gt; GetSortedResponsibilities(int projectID)</code></pre>
   </div>
 
-  <h4 class="section">Parameters</h4>
+  <h4 class="section">Параметры</h4>
   <dl class="parameters">
     <dt><code>projectID</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
     <dd><p>Идентификатор проекта.</p>
 </dd>
   </dl>
 
-  <h4 class="section">Returns</h4>
+  <h4 class="section">Возврат</h4>
   <dl class="parameters">
     <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.list-1">List</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.mvc.rendering.selectlistitem">SelectListItem</a>&gt;</dt>
     <dd><p>Список, содержащий информацию о пользователях и их задачах.</p>
@@ -242,14 +242,14 @@ Class SortUsersService  <a class="header-action link-secondary" title="View sour
     <pre><code class="lang-csharp hljs">public string GetTaskWord(int count)</code></pre>
   </div>
 
-  <h4 class="section">Parameters</h4>
+  <h4 class="section">Параметры</h4>
   <dl class="parameters">
     <dt><code>count</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
     <dd><p>Количество задач.</p>
 </dd>
   </dl>
 
-  <h4 class="section">Returns</h4>
+  <h4 class="section">Возврат</h4>
   <dl class="parameters">
     <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
     <dd><p>Строка с правильным склонением слова &quot;задача&quot;.</p>
