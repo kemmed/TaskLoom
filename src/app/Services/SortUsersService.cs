@@ -29,6 +29,8 @@ namespace taskloom.Services
         /// <returns>Список, содержащий информацию о пользователях и их задачах.</returns>
         public List<SelectListItem> GetSortedResponsibilities(int projectID)
         {
+            var completedStatusName = "Завершенные";
+
             return _context.UserProject
                 .Where(up => up.ProjectID == projectID && up.IsActive)
                 .Select(up => new
@@ -38,12 +40,14 @@ namespace taskloom.Services
                     TaskCount = _context.Issue
                         .Count(t => t.ProjectID == projectID
                             && !t.IsDelete
-                            && t.PerformerID == up.UserID),
+                            && t.PerformerID == up.UserID
+                            && t.StatusType.Name != completedStatusName),
                     NearestDeadline = _context.Issue
                         .Where(t => t.ProjectID == projectID
                             && !t.IsDelete
                             && t.PerformerID == up.UserID
-                            && t.DeadlineDate.HasValue)
+                            && t.DeadlineDate.HasValue
+                            && t.StatusType.Name != completedStatusName)
                         .Min(t => t.DeadlineDate)
                 })
                 .AsEnumerable()

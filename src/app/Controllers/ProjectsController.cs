@@ -116,6 +116,8 @@ namespace taskloom.Controllers
                         ((i.EndDate == null && i.DeadlineDate.HasValue && DateTime.Now.Date >= i.DeadlineDate.Value.Date) ||
                         (i.EndDate.HasValue && i.DeadlineDate.HasValue && i.EndDate.Value.Date > i.DeadlineDate.Value.Date)))
                 })
+                 .OrderBy(u => u.CompletedLater)
+                 .ThenByDescending(u => u.CompletedOnTime)
                 .ToList();
 
             var (chartDataCreate, chartDataDone) = _chartService.GetChartData(issues, startDate, endDate, selectedCategories);
@@ -549,6 +551,7 @@ namespace taskloom.Controllers
             string message;
             var invitedUser = await _context.User.FirstOrDefaultAsync(m => m.Email == user.Email);
 
+            string inviteToken = _tokenService.GenerateToken();
             if (invitedUser == null || !invitedUser.IsActive)
             {
                 message = "Пользователя с таким email не существует в системе.";
@@ -556,25 +559,33 @@ namespace taskloom.Controllers
             }
             var existingUserProject = await _userProjectService.GetUserProjectByID(currentProject.ID, invitedUser.ID);
 
-            if (existingUserProject != null)
+            if (existingUserProject != null && existingUserProject.IsActive)
             {
                 message = "Этот пользователь уже присоединен к проекту.";
                 return RedirectToAction("InviteUserMessage", new { message = message, projectID = currentProject.ID });
             }
 
-            string inviteToken = _tokenService.GenerateToken();
-
-            var userProject = new UserProject
+            else if (existingUserProject != null && !existingUserProject.IsActive)
             {
-                UserID = invitedUser.ID,
-                ProjectID = currentProject.ID,
-                UserRole = UserRoles.Employee,
-                InviteToken = inviteToken,
-                InviteTokenDate = DateTime.Now,
-                IsActive = false
-            };
+                existingUserProject.InviteToken = inviteToken;
+                existingUserProject.InviteTokenDate = DateTime.Now;
 
-            _context.UserProject.Add(userProject);
+            }
+            else
+            {
+                var userProject = new UserProject
+                {
+                    UserID = invitedUser.ID,
+                    ProjectID = currentProject.ID,
+                    UserRole = UserRoles.Employee,
+                    InviteToken = inviteToken,
+                    InviteTokenDate = DateTime.Now,
+                    IsActive = false
+                };
+
+                _context.UserProject.Add(userProject);
+            }
+
 
             string inviteLink = $"https://localhost:7297/Projects/AcceptInvite?token={inviteToken}&projectID={currentProject.ID}";
 
@@ -807,10 +818,10 @@ namespace taskloom.Controllers
         }
         //Редактирование категории
         [HttpPost]
-        public async Task<IActionResult> EditCategory([Bind("ID,Name")] CategoryType categoryType, int categoryID)
+        public async Task<IActionResult> EditCategory([Bind("ID,Name")] CategoryType categoryType, int categoryID, int projectID)
         {
             User? currentUser = await _userProjectService.GetCurrentUser(HttpContext);
-            Models.Project? currentProject = await _userProjectService.GetProjectByID(categoryType.ProjectID);
+            Models.Project? currentProject = await _userProjectService.GetProjectByID(projectID);
             if (currentProject == null ||
                 currentUser == null ||
                 !await _userProjectService.UserIsInProject(currentProject.ID, currentUser.ID))

@@ -267,6 +267,7 @@
             <div id="EDIT_CATEGORY@(category.ID)" class="hidden categoryform">
                 <form asp-action="EditCategory" asp-controller="Projects">
                     <input type="hidden" value="@category.ID" name="categoryID" />
+                    <input type="hidden" name="projectID" value="@ViewBag.ProjectID" />
                     <div class="modal-container">
                         <h1 class="modal-title">Редактировать категорию</h1>
                         <label class="input-form__label add-project">

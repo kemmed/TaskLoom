@@ -460,7 +460,7 @@ public class ProjectsControllerTests
             ProjectID = projectID
         };
 
-        var result = await _controller.EditCategory(updatedCategoryType, categoryType.ID) as RedirectResult;
+        var result = await _controller.EditCategory(updatedCategoryType, categoryType.ID, projectID) as RedirectResult;
         Assert.NotNull(result);
         Assert.Equal($"/Projects/ProjectSettings/{projectID}#categories-section", result.Url);
 
